@@ -1,0 +1,36 @@
+1：安装virtualenv,在隔离环境下开发测试
+    pip  install virtualenv
+
+2: 创建隔离环境venv，这个名字和路径可自定义,
+virtualenv venv                #创建隔离环境
+source venv/bin/activate       #启用隔离环境
+
+3；开发包安装
+git clone http://192.168.1.251:8000/git/devops.aiyuanxin.com
+cd  devops.aiyuanxin.com
+pip  -r install requirement.txt    
+
+4: 开发代码结构——包结构
+├── devops              
+│   ├── api             #独立的api项目
+│   │   ├── __init__.py#api项目入口文件。所有的新建模块都需要import才能生效，本例中 import test 就是导入test模块
+│   │   └── test.py    #测试模块，后面直接建立类似的文件编写即可
+│   ├── config.py       #数据库连接文件
+│   ├── runapi.py       #执行api项目，端口可以自定义
+│   ├── runweb.py       #执行web项目，端口可以自定义
+│   └── web             #独立的web项目
+│       ├── __init__.
+        |___static             #静态文件
+│       ├templates          #模板文件 
+│       │   └── index.html
+│       └── test.py
+├── README       
+└─requirement.txt   #安装包列表
+
+
+5: 测试文件访问
+
+web:  http://自定义ip:自定义端口/
+api  http://自定义ip:自定义端口/api
+
+

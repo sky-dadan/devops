@@ -8,7 +8,7 @@ source venv/bin/activate       #启用隔离环境
 3；开发包安装
 git clone http://192.168.1.251:8000/git/devops.aiyuanxin.com
 cd  devops.aiyuanxin.com
-pip  -r install requirement.txt    
+pip  install -r requirement.txt    
 
 4: 开发代码结构——包结构
 ├── devops              

@@ -11,21 +11,28 @@ cd  devops.aiyuanxin.com
 pip  install -r requirement.txt    
 
 4: 开发代码结构——包结构
-├── devops              
-│   ├── api             #独立的api项目
-│   │   ├── __init__.py#api项目入口文件。所有的新建模块都需要import才能生效，本例中 import test 就是导入test模块
-│   │   └── test.py    #测试模块，后面直接建立类似的文件编写即可
-│   ├── config.py       #数据库连接文件
-│   ├── runapi.py       #执行api项目，端口可以自定义
-│   ├── runweb.py       #执行web项目，端口可以自定义
-│   └── web             #独立的web项目
-│       ├── __init__.
-        |___static             #静态文件
-│       ├templates          #模板文件 
+
+├── devops
+│   ├── api            #独立的api项目
+│   │   __init__.py    #api项目入口文件。所有的新建模块都需要import才能生效，本例中 import test 就是导入test模块
+│   │   └── test.py   #测试模块，后面直接建立类似的文件编写即可
+│   ├── config.py      #数据库连接文件
+│   ├── runapi.py      #执行api项目，端口可以自定义
+│   ├── runweb.py          #执行web项目，端口可以自定义
+│   └── web                #独立的web项目
+│       ├── __init__.py
+│       ├── static         #静态文件
+│       │   ├── css
+│       │   │   ├── bootstrap.min.css
+│       │   │   └── dashboard.css
+│       │   └── js
+│       │       ├── bootstrap.min.js
+│       │       └── jquery.min.js
+│       ├── templates
 │       │   └── index.html
 │       └── test.py
-├── README       
-└─requirement.txt   #安装包列表
+├── README
+└── requirememt.txt   #安装包列表
 
 
 5: 测试文件访问

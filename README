@@ -14,8 +14,8 @@ pip  install -r requirement.txt
 
 ├── devops
 │   ├── api            #独立的api项目
-│   │   __init__.py    #api项目入口文件。所有的新建模块都需要import才能生效，本例中 import test 就是导入test模块
-│   │   └── test.py   #测试模块，后面直接建立类似的文件编写即可
+│   │   ├── __init__.py    #api项目入口文件。所有的新建模块都需要import才能生效，本例中 import test 就是导入test模块
+│   │   └── test.py    #测试模块，后面直接建立类似的文件编写即可
 │   ├── config.py      #数据库连接文件
 │   ├── runapi.py      #执行api项目，端口可以自定义
 │   ├── runweb.py          #执行web项目，端口可以自定义

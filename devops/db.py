@@ -1,11 +1,14 @@
 import MySQLdb as mysql
 
 class Cursor():
-    def __init__(self):
+    def __init__(self, config):
+        self.config = dict([(k[6:], config[k]) for k in config if k.startswith('mysql_')])
+        if 'port' in self.config:
+            self.config['port'] = int(self.config['port'])
         self.connect_db()
 
     def connect_db(self):
-        self.db = mysql.connect(user='liuziping',passwd='liuziping_123456',db='devops',host='192.168.1.251',charset='utf8')
+        self.db = mysql.connect(**self.config)
         self.db.autocommit(True)
         self.cur = self.db.cursor()
 

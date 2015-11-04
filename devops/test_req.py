@@ -10,7 +10,7 @@ if __name__ == '__main__':
     s = util.get_validate('test3', '123456')
     headers = {'Authorization': s}
 
-    conn = httplib.HTTPConnection('localhost', 1000)
+    conn = httplib.HTTPConnection('localhost', 2000)
     conn.request('GET', '/api', headers=headers)
     response = conn.getresponse()
     print response.read()

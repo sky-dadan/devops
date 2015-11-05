@@ -19,3 +19,8 @@ if __name__ == '__main__':
     conn.request('PUT', '/api', json.dumps(data), headers)
     response = conn.getresponse()
     print response.read()
+
+    users= {'user1': 'zhangxunan','user2':'lisi'}
+    conn.request('PUT','/api/lock_user',json.dumps(users),headers)
+    response = conn.getresponse()
+    print response.read()

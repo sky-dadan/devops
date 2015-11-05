@@ -23,6 +23,14 @@ class Cursor():
             self.close_db()
             self.connect_db()
             return self.cur.execute(sql)
+    
+    def execute_arg(self,sql,args):
+        try:
+            return self.cur.execute(sql,args)
+        except:
+            self.close_db()
+            self.connect_db()
+            return self.cur.execute(sql,args)
 
     def fetchone(self):
         return self.cur.fetchone()

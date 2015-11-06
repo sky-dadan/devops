@@ -24,3 +24,8 @@ if __name__ == '__main__':
     conn.request('PUT','/api/lock_user',json.dumps(users),headers)
     response = conn.getresponse()
     print response.read()
+
+    group = {'groupname': 'sa','name_cn':'管理员','comment':'test','users':['zhangxunan','lisi']}
+    conn.request('PUT','/api/groupadd',json.dumps(group),headers)
+    response = conn.getresponse()
+    print response.read()

@@ -28,7 +28,8 @@ def groupadd():
         name_cn = data['name_cn']
         comment = data['comment']
         users = data['users']
-
+        if len(users) == 0:
+            return json.dumps({'code':1,'result':'Users can not be empty'})
         sql = "insert into groups(name,name_cn,comment) values('%s','%s','%s')" % (groupname,name_cn,comment)
         app.config['cursor'].execute(sql)
         sql = 'select id from groups where name = "%s"' % groupname

@@ -29,3 +29,7 @@ if __name__ == '__main__':
     conn.request('PUT','/api/groupadd',json.dumps(group),headers)
     response = conn.getresponse()
     print response.read()
+
+    conn.request('GET','/api/querygroup',headers=headers)
+    response = conn.getresponse()
+    print response.read()

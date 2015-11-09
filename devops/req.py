@@ -7,12 +7,12 @@ import requests
 import util
 
 if __name__ == '__main__':
-    s = util.get_validate('test3', '123456')
+    s = util.get_validate('devops', '123456')
     headers = {'Authorization': s,'content-type': 'application/json'}
-    data = {'username': 'lzp', 'name': 'lzp', 'email': 'liuziping@123.com', 'mobile': '1234678'}
+    data = {'username': 'devops','password':'123456','name': 'devops', 'email': 'devops@123.com', 'mobile': '1234678','role':1}
     # for get one user, update and delete user
-    url = "http://192.168.1.243:1000/api/user/4" 
-    #r = requests.get(url, headers=headers)     #for get one user
+    url = "http://192.168.1.243:1000/api/user/3" 
+#    r = requests.get(url, headers=headers)     #for get one user
     r = requests.delete(url, headers=headers) #for delete one user
 #    r = requests.put(url, headers=headers,json=json.dumps(data))
  

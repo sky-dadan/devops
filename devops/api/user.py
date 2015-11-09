@@ -19,7 +19,7 @@ def User(user_id):
     if request.method == 'GET':  #get one user info from user_id
         try:
 
-            if util.if_userid_exist(user_id) is False:
+            if not util.if_userid_exist(user_id):
               return json.dumps({'code':1,'errmsg':'User is not exist'})
             user = {}
             fields = ['id','username','name','email','mobile']
@@ -35,7 +35,7 @@ def User(user_id):
             return json.dumps({'code':1,'errmsg':'Get users error'})
     elif request.method == 'PUT':   #update user info  from user_id
         try:
-            if util.if_userid_exist(user_id) is False:
+            if not util.if_userid_exist(user_id): 
               return json.dumps({'code':1,'errmsg':'User is not exist'})
             data = request.get_json()
             data = json.loads(data)
@@ -52,11 +52,11 @@ def User(user_id):
             return json.dumps({'code':1,'errmsg':'update user error'})
     elif request.method == 'DELETE':
         try:
-            if util.role(name) is False:
+            if not util.role(name):
                 logging.getLogger().warning("You are not admin,Request forbiden")
                 return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
 
-            if util.if_userid_exist(user_id) is False:
+            if not util.if_userid_exist(user_id):
                 return json.dumps({'code':1,'errmsg':'User is not exist'})
             sql = "DELETE FROM user where id = %d" % (user_id) 
             app.config['cursor'].execute(sql)
@@ -82,7 +82,7 @@ def UserList():
     
     if request.method == 'GET':
         try:
-            if util.role(name) is False:
+            if not util.role(name):
                 logging.getLogger().warning("You are not admin,Request forbiden")
                 return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
             users = []
@@ -102,7 +102,7 @@ def UserList():
 
     elif request.method == 'POST':
         try:
-            if util.role(name) is False:
+            if not util.role(name):
                 logging.getLogger().warning("You are not admin,Request forbiden")
                 return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
             data = request.get_data()

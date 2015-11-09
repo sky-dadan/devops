@@ -15,13 +15,9 @@ def lock_user(user_id):
         if not name:
             logging.getLogger().warning("Request forbiden")
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        sql = 'SELECT role FROM user WHERE username = "%s"' % (name)
-        app.config['cursor'].execute(sql)
-        row = app.config['cursor'].fetchone()
-        if row[0] == 1:
-            util.write_log(name,'%s is not admin,call failed' % (name))
-            return json.dumps({'code':1,'errmsg':'%s is not admin,call failed' % (name)})
-            sys.exit(1) 
+        if util.role(name) is False:
+            logging.getLogger().warning("You are not admin,Request forbiden")
+            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
     except:
         logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'User validate error'})
@@ -55,13 +51,9 @@ def lock_userlist():
         if not name:
             logging.getLogger().warning("Request forbiden")
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        sql = 'SELECT role FROM user WHERE username = "%s"' % (name)
-        app.config['cursor'].execute(sql)
-        row = app.config['cursor'].fetchone()
-        if row[0] == 1:
-            util.write_log(name,'%s is not admin,call failed' % (name))
-            return json.dumps({'code':1,'errmsg':'%s is not admin,call failed' % (name)})
-            sys.exit(1) 
+        if util.role(name) is False:
+            logging.getLogger().warning("You are not admin,Request forbiden")
+            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
     except:
         logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'User validate error'})

@@ -82,7 +82,7 @@ def if_userid_exist(user_id):
         return True
 
 def role(name):
-    sql = 'select role from user where name = "%s" ' % (name)
+    sql = 'select role from user where username = "%s" ' % (name)
     app.config['cursor'].execute(sql)
     res = app.config['cursor'].fetchone()
     if res[0] == 1:

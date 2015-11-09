@@ -8,6 +8,7 @@ import hashlib
 import logging
 import logging.handlers
 import ConfigParser
+from api import app
 
 def get_config(config_filename, section=''):
     config = ConfigParser.ConfigParser()
@@ -69,3 +70,22 @@ def validate(key, fix_pwd):
         return x[0]
     else:
         return
+
+def if_userid_exist(user_id):
+    sql = 'select * from user where id = %d ' % (user_id)
+    app.config['cursor'].execute(sql)
+    res = app.config['cursor'].fetchone()
+    if res is None:
+        logging.getLogger().error("user is not exist")
+        return False
+    else:
+        return True
+
+def role(name):
+    sql = 'select role from user where name = "%s" ' % (name)
+    app.config['cursor'].execute(sql)
+    res = app.config['cursor'].fetchone()
+    if res[0] == 1:
+        return False
+    else:
+        return True

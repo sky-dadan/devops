@@ -4,15 +4,6 @@ from . import app
 import  json,traceback
 import logging,util
 
-def if_userid_exist(user_id):
-    sql = 'select * from user where id = %d ' % (user_id)
-    app.config['cursor'].execute(sql)
-    res = app.config['cursor'].fetchone()
-    if res is None:
-        logging.getLogger().error("user is not exist")
-        return json.dumps({'code':1,'errmsg':'User is not exist'})
-
-
 @app.route('/api/user/<int:user_id>',methods=['GET','PUT','DELETE'])
 def User(user_id):
     try:
@@ -27,7 +18,9 @@ def User(user_id):
     
     if request.method == 'GET':  #get one user info from user_id
         try:
-            if_userid_exist(user_id)
+
+            if util.if_userid_exist(user_id) is False:
+              return json.dumps({'code':1,'errmsg':'User is not exist'})
             user = {}
             fields = ['id','username','name','email','mobile']
             sql = "SELECT %s FROM user where id=%d" % (','.join(fields),user_id)
@@ -42,7 +35,8 @@ def User(user_id):
             return json.dumps({'code':1,'errmsg':'Get users error'})
     elif request.method == 'PUT':   #update user info  from user_id
         try:
-            if_userid_exist(user_id)
+            if util.if_userid_exist(user_id) is False:
+              return json.dumps({'code':1,'errmsg':'User is not exist'})
             data = request.get_json()
             data = json.loads(data)
             username = data['username']
@@ -58,7 +52,12 @@ def User(user_id):
             return json.dumps({'code':1,'errmsg':'update user error'})
     elif request.method == 'DELETE':
         try:
-            if_userid_exist(user_id)
+            if util.role(name) is False:
+                logging.getLogger().warning("You are not admin,Request forbiden")
+                return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
+
+            if util.if_userid_exist(user_id) is False:
+                return json.dumps({'code':1,'errmsg':'User is not exist'})
             sql = "DELETE FROM user where id = %d" % (user_id) 
             app.config['cursor'].execute(sql)
             util.write_log(name,'delete user %d' % user_id)
@@ -83,6 +82,9 @@ def UserList():
     
     if request.method == 'GET':
         try:
+            if util.role(name) is False:
+                logging.getLogger().warning("You are not admin,Request forbiden")
+                return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
             users = []
             fields = ['id', 'username', 'name', 'email', 'mobile']
             sql = "SELECT %s FROM user" % ','.join(fields)
@@ -100,6 +102,9 @@ def UserList():
 
     elif request.method == 'POST':
         try:
+            if util.role(name) is False:
+                logging.getLogger().warning("You are not admin,Request forbiden")
+                return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
             data = request.get_data()
             data = request.get_data()
             data = json.loads(data)

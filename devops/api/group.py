@@ -16,13 +16,9 @@ def group():
         if not name:
             logging.getLogger().warning("Request forbiden")
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        sql = 'SELECT role FROM user WHERE username = "%s"' % (name)
-        app.config['cursor'].execute(sql)
-        row = app.config['cursor'].fetchone()
-        if row[0] == 1:
-            util.write_log(name,'%s is not admin,call failed' % (name))
-            return json.dumps({'code':1,'errmsg':'%s is not admin,call failed' % (name)})
-            sys.exit(1)
+        if util.role(name) is False:
+            logging.getLogger().warning("You are not admin,Request forbiden")
+            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
     except:
         logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'User validate error'})
@@ -59,14 +55,11 @@ def group():
             row = app.config['cursor'].fetchone()
             gid = row[0]
             sql = "SELECT id FROM user WHERE username IN (%s)" % (','.join(["'%s'" % x for x in data['users']]))
-            print sql
             app.config['cursor'].execute(sql)
             rows = app.config['cursor'].fetchall()
             for row in rows:
                 uids.append(row[0])
-            print uids
             values = ', '.join(["(%s, %s)" % (gid, uid) for uid in uids])
-            print values
             sql = "INSERT INTO user_group VALUES %s" % values
             app.config['cursor'].execute(sql)
             util.write_log(name,'add group %s' % data['name'])

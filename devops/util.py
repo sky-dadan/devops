@@ -81,6 +81,16 @@ def if_userid_exist(user_id):
     else:
         return True
 
+def if_groupid_exist(group_id):
+    sql = 'SELECT * FROM groups WHERE id = %d' % (group_id)
+    app.config['cursor'].execute(sql)
+    res = app.config['cursor'].fetchone()
+    if res is None:
+        logging.getLogger().error("group is not exist")
+        return False
+    else:
+        return True
+
 def role(name):
     sql = 'select role from user where username = "%s" ' % (name)
     app.config['cursor'].execute(sql)

@@ -59,7 +59,7 @@ def group():
             rows = app.config['cursor'].fetchall()
             for row in rows:
                 uids.append(row[0])
-            values = ', '.join(["(%s, %s)" % (gid, uid) for uid in uids])
+            values = ', '.join(["(%s, %s)" % (uid, gid) for uid in uids])
             sql = "INSERT INTO user_group VALUES %s" % values
             app.config['cursor'].execute(sql)
             util.write_log(name,'add group %s' % data['name'])

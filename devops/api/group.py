@@ -87,6 +87,8 @@ def group_detail(gid):
     
     if request.method == 'GET':
         try:
+            if not util.if_groupid_exist(gid):
+                return json.dumps({'code':1,'errmsg':'group is not exist'})
             members = []
             sql = 'SELECT name FROM groups WHERE id = %d' %(gid)
             app.config['cursor'].execute(sql)

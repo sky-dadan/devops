@@ -70,7 +70,7 @@ def group():
             logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Add group error'})
 
-    if request.method == 'DELETE':
+    if request.method == 'DELETE' and util.role(name):
         try:
             del_groups = request.get_data()
             del_groups = json.loads(del_groups)

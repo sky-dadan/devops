@@ -79,13 +79,13 @@ def group():
             values = del_groups[field]
             for d_group in values:
                 sql_del_group = 'delete from groups where name="%s"' % d_group
-		sql_sel_gid = 'select id from groups where name="%s"'  % d_group
-		app.config['cursor'].execute(sql_sel_gid)
-		sel_gid = app.config['cursor'].fetchone()
-		sql_del_userin_group = 'delete from user_group where group_id="%s"' % sel_gid 
-		app.config['cursor'].execute(sql_del_group)
-		app.config['cursor'].execute(sql_del_userin_group)
-		util.write_log(name,"delete group %s" %  d_group )
+				sql_sel_gid = 'select id from groups where name="%s"'  % d_group
+				app.config['cursor'].execute(sql_sel_gid)
+				sel_gid = app.config['cursor'].fetchone()
+				sql_del_userin_group = 'delete from user_group where group_id="%s"' % sel_gid 
+				app.config['cursor'].execute(sql_del_group)
+				app.config['cursor'].execute(sql_del_userin_group)
+				util.write_log(name,"delete group %s" %  d_group )
             return json.dumps({'code':0,'result':'successful','values':values})
         except:
             logging.getLogger().error("Create user error: %s" % traceback.format_exc())

@@ -131,8 +131,8 @@ def group_detail(gid):
 @app.route('/api/group/manager',methods=['GET','PUT','DELETE'])
 def group_manager():
     try:
-        authorization=request.headers['authorization']
-        name=util.validate(authorization,app.config['passport_key'])
+        authorization = request.headers['authorization']
+        name = util.validate(authorization,app.config['passport_key'])
         if not name :
             logging.getLogger().warining("Request forbiden")
             return json.dumps({'code':1,'errmsg':"User validate error"})
@@ -140,12 +140,12 @@ def group_manager():
         logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'User Validate error'})
 
-    if request.method=='PUT':
+    if request.method == 'PUT':
         try:
-            s_data=request.get_data()
-            s_data=json.loads(s_data)
-            s_username=s_data.values()[0]       
-            s_result=[]
+            s_data = request.get_data()
+            s_data = json.loads(s_data)
+            s_username = s_data.values()[0]       
+            s_result = []
             sql="select name,name_cn  from groups  where id=(select group_id from user_group where user_id =(select id from user where username='%s'))"   %  s_username
             app.config['cursor'].execute(sql)
             for g_name in app.config['cursor'].fetchone():
@@ -155,4 +155,3 @@ def group_manager():
         except:
             logging.getLogger().error("select group error:%s" %  traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'select user_group  error'})
-

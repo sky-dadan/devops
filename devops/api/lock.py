@@ -78,17 +78,11 @@ def lock_userlist():
         try:
             data = request.get_data()
             data = json.loads(data)
-            users = []
-            for k, v in data.items():
-                users.append(v)
+            sql = 'UPDATE user SET is_lock = 1 WHERE username in (%s)' % (','.join(["'%s'" % x for x in data['users']]))
+            app.config['cursor'].execute(sql)
 
-            sql = 'UPDATE user SET is_lock = 1 WHERE username in (%s)'
-            inargs = ', '.join(map(lambda x: '%s',users))
-            sql = sql % inargs
-            app.config['cursor'].execute_arg(sql,users)
-
-            util.write_log(name,'lock user %s' % ','.join(users))
-            return json.dumps({'code':0,'result': 'Lock %s Success' % ','.join(users)})
+            util.write_log(name,'lock user %s' % ','.join(data['users']))
+            return json.dumps({'code':0,'result': 'Lock %s Success' % ','.join(data['users'])})
         except:
             logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Lock user error'})

@@ -6,3 +6,5 @@ import  test
 import lock
 import group
 import user
+import password
+import role

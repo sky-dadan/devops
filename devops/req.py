@@ -13,8 +13,8 @@ if __name__ == '__main__':
 
  
    # select user info  or user list 
-#    url = "http://192.168.1.243:1000/api/user?offset=0&size=3" 
-    url = "http://192.168.1.243:1000/api/user" 
+    url = "http://192.168.1.243:1000/api/user?offset=0&size=3&list=true" 
+#    url = "http://192.168.1.243:1000/api/user" 
     r = requests.get(url, headers=headers)      #for get all user
     # update  create  delete user 
 #    r = requests.put(url, headers=headers,json=json.dumps(data))

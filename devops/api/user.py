@@ -22,7 +22,7 @@ def User(offset=0,size=10):
             user = {}
             users = []
             fields = ['username','name','email','mobile','role']
-            if util.role(name):  #admin select user list
+            if util.role(name) and request.args.get('list') =="true": #是管理员且传值list＝true才输出用户列表
                 if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
                     offset = request.args.get('offset')
                     size = request.args.get('size')
@@ -38,7 +38,7 @@ def User(offset=0,size=10):
                 count=int(app.config['cursor'].fetchone()[0])
                 util.write_log(name, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})
-            else:    #user select info 
+            else:    #普通用户和管理员都是通过自己的登陆用户名查询自己的信息
                 sql = 'SELECT %s FROM user where username="%s"' % (','.join(fields),name)
                 app.config['cursor'].execute(sql)
                 res = app.config['cursor'].fetchone()    #返回结果为元组(id,username,……)

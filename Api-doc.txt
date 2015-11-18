@@ -18,14 +18,16 @@ Api调用说明文档
 
 2.1：管理员查看所有用户列表
 
-    默认查看id前10的用户列表
-    url = "http://192.168.1.243:1000/api/user" 
+    默认查看id前10的用户列表。
+    url = "http://192.168.1.243:1000/api/user?list=true" 
     
     自定义查找区间（分页），offset查询开始的位置，size查询第三条，size不允许超过1000
-    url = "http://192.168.1.243:1000/api/user?offset=0&size=2" 
+    url = "http://192.168.1.243:1000/api/user?offset=0&size=2&list=true" 
     r = requests.get(url, headers=headers)    
 
-2.2：用户查看自己信息(通过user登录时候的信息实现where查询条件)
+    备注：由于查看用户信息和查看用户列表都合并写到了同一个get请求。管理员登陆后，就有两个权限，查询自己的信息还是查询用户列表的信息。为了明确需求。如果管理员登陆且要查看用户列表，必须额外传入一个参数list=true.两个条件同时满足才会返回用户列表，否则返回管理员的个人信息
+
+2.2：用户和管理员查看自己信息(通过user登录时候的信息实现where查询条件)
 
         url = "http://192.168.1.243:1000/api/user"  
         r = requests.get(url, headers=headers)    

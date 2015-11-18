@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import Flask,request
 from . import app
-import  json,traceback,hashlib,random
+import  json,traceback,hashlib
 import logging,util
 
 @app.route('/api/user',methods=['GET','PUT','POST','DELETE'])

@@ -32,13 +32,15 @@ Api调用说明文档
 
 3.1：管理员更新,删除某个用户信息(依据用户id实现where查询条件)
     
+   
     data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","user_id":7}
     url = "http://192.168.1.243:1000/api/user" 
     r = requests.delete(url, headers=headers) 
     r = requests.put(url, headers=headers,json=json.dumps(data))
    
 3.2：用户自己更新信息
-   
+
+    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa"}
     url = "http://192.168.1.243:1000/api/user" 
     r = requests.put(url, headers=headers,json=json.dumps(data))
    

@@ -4,8 +4,8 @@ from . import app
 import  json,traceback,hashlib
 import logging,util
 
-@app.route('/api/password/<int:user_id>',methods=['PUT'])
-def passwd(user_id):
+@app.route('/api/password',methods=['PUT'])
+def passwd():
     try:
         authorization = request.headers['authorization']
         name = util.validate(authorization,app.config['passport_key'])
@@ -17,15 +17,19 @@ def passwd(user_id):
         return json.dumps({'code':1,'errmsg':'User validate error'})
     
     try:
-        if not util.if_userid_exist(user_id): 
-          return json.dumps({'code':1,'errmsg':'User is not exist'})
         data = request.get_json()
         data = json.loads(data)
-        if  util.role(name):   # admin no need oldpassword
-            password = hashlib.md5(data['password']).hexdigest()
-            sql = 'update user set password="%s" where id=%d' % (password,user_id)
+        if  util.role(name):   # admin no need oldpassword  but need user_id
+            if  not data.has_key('user_id') :
+                return json.dumps({'code':1,'errmsg':'admin must input user_id'})
+            else:
+                user_id = data['user_id']
+                if not util.if_userid_exist(user_id): 
+                    return json.dumps({'code':1,'errmsg':'User is not exist'})
+                password = hashlib.md5(data['password']).hexdigest()
+                sql = 'update user set password="%s" where id=%d' % (password,user_id)
         else:                  #user  need input oldpassword
-            if data['oldpassword'] is None:
+            if not data.has_key("oldpassword") :
                 return json.dumps({'code':1,'errmsg':'need input your old password'})
             else:
                 oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
@@ -38,8 +42,8 @@ def passwd(user_id):
                     password = hashlib.md5(data['password']).hexdigest()
                     sql = 'update user set password="%s" where username="%s"' % (password,name)
         app.config['cursor'].execute(sql)
-        util.write_log(name,'update user  %s password' % user_id)
-        return json.dumps({'code':0,'result':'update %s success' % user_id})
+        util.write_log(name,'update user password')
+        return json.dumps({'code':0,'result':'update password success'})
     except:
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'update user password error'})

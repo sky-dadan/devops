@@ -26,9 +26,17 @@ def group():
 
     if request.method == 'GET':
         try:
+            if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
+                offset = request.args.get('offset')
+                size = request.args.get('size')
+                if int(size) >= 1000:
+                    return json.dumps({'code': 1, 'errmsg': 'you input size too big '})
+            else:
+                return json.dumps({'code':1,'errmsg':'Invalid args'})
+
             fields = ['name','name_cn','comment']
             groups = []
-            sql = 'SELECT %s from groups' % (','.join(fields))
+            sql = 'SELECT %s from groups limit %d,%d' % (','.join(fields),int(offset),int(size))
             app.config['cursor'].execute(sql)
             for row in app.config['cursor'].fetchall():
                 group_list = {}

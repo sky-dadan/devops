@@ -33,11 +33,19 @@ def lock_user(user_id):
         try:
             data = request.get_data()
             data = json.loads(data)
-            user_id  = data['user_id']
-            sql = 'UPDATE user SET is_lock = 1 WHERE id = %d' % (user_id)
+#            user_id = data['user_id']
+            is_lock = data['is_lock']
+            sql = 'UPDATE user SET is_lock = %d WHERE id = %d' % (is_lock,user_id)
             app.config['cursor'].execute(sql)
-            util.write_log(name,'Lock user %d'% user_id)
-            return json.dumps({'code':0,'msg':'Lock user user_id = %d' % user_id}) 
+            if is_lock == 1:
+                util.write_log(name,'Lock user %d'% user_id)
+                return json.dumps({'code':0,'msg':'Lock user user_id = %d' % user_id})
+            elif is_lock == 0:
+                util.write_log(name,'Unlock user %d'% user_id)
+                return json.dumps({'code':0,'msg':'Unlock user user_id = %d' % user_id})
+            else:
+                util.write_log(name,'Invalid value is_lock = %d' % is_lock)
+                return json.dumps({'code':0,'msg':'Invalid value is_lock = %d' % is_lock})
         except:
             logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Lock user error'})
@@ -86,32 +94,5 @@ def lock_userlist():
         except:
             logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Lock user error'})
-@app.route("/api/unlockuser/<int:user_id>",methods=['PUT'])
-def unlockuser(user_id):
-    try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization, app.config['passport_key'])
-        if not name:
-            logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        if util.role(name) is False:
-            logging.getLogger().warning("You are not admin,Request forbiden")
-            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
-    except:
-        logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-
-    if request.method == 'PUT':
-        try:
-            data = request.get_data()
-            data = json.loads(data)
-            user_id  = data['user_id']
-            sql = 'UPDATE user SET is_lock = 0 WHERE id = %d' % (user_id)
-            app.config['cursor'].execute(sql)
-            util.write_log(name,'Lock user %d'% user_id)
-            return json.dumps({'code':0,'msg':'Unlock user user_id = %d' % user_id}) 
-        except:
-            logging.getLogger().error("Unlock user error: %s" % traceback.format_exc())
-            return json.dumps({'code': 1, 'errmsg': 'Unlock user error'})
 
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method})

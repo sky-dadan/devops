@@ -21,7 +21,7 @@ def User(user_id):
             if not util.if_userid_exist(user_id):
               return json.dumps({'code':1,'errmsg':'User is not exist'})
             user = {}
-            fields = ['id','username','name','email','mobile']
+            fields = ['id','username','name','email','mobile','role']
             sql = "SELECT %s FROM user where id=%d" % (','.join(fields),user_id)
             app.config['cursor'].execute(sql)
             res = app.config['cursor'].fetchone()    #返回结果为元组(id,username,……)
@@ -32,20 +32,22 @@ def User(user_id):
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'Get users error'})
-    elif request.method == 'PUT':   #user update from user_id
+    elif request.method == 'PUT':   #user update 
         try:
-            if not util.if_userid_exist(user_id): 
-              return json.dumps({'code':1,'errmsg':'User is not exist'})
             data = request.get_json()
             data = json.loads(data)
-            fields = ['username','name','email','mobile']
-            values = [ data[x] for x in fields]
-            sql = 'update user set username="%s",name="%s",email="%s",mobile="%s" where id=%d' % (values[0],values[1],values[2],values[3],user_id)
+            print data
+            if  util.role(name):    #admin  update from user_id
+                if not util.if_userid_exist(user_id): 
+                    return json.dumps({'code':1,'errmsg':'User is not exist'})
+                sql = 'update user set username="%(username)s",name="%(name)s",email="%(email)s",mobile="%(mobile)s" where id=%%d' % data %user_id
+            else:                      #login user update from his name
+                sql = 'update user set username="%(username)s",name="%(name)s",email="%(email)s",mobile="%(mobile)s" where username="%%s"' % data %name
             app.config['cursor'].execute(sql)
             util.write_log(name,'update user %s' % data['username'])
             return json.dumps({'code':0,'result':'update %s success' % data['username']})
         except:
-            logging.getLogger().error('Create user error : %s' % traceback.format_exc())
+            logging.getLogger().error('update user error : %s' % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'update user error'})
     elif request.method == 'DELETE':
         try:
@@ -74,7 +76,7 @@ def UserList():
             logging.getLogger().warning("Request forbiden")
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
         else:
-            if not util.role(name):
+            if not  util.role(name):
                 logging.getLogger().warning("You are not admin,Request forbiden")
                 return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
     except:
@@ -84,7 +86,7 @@ def UserList():
     if request.method == 'GET':
         try:
             users = []
-            fields = ['id', 'username', 'name', 'email', 'mobile']
+            fields = ['id', 'username', 'name', 'email', 'mobile','role']
             sql = "SELECT %s FROM user" % ','.join(fields)
             app.config['cursor'].execute(sql)
             for row in app.config['cursor'].fetchall():

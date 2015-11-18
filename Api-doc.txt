@@ -1,0 +1,63 @@
+Api调用说明文档
+
+一：共用部分
+    用户登录验证
+    s = util.get_validate('liuziping', '123456')  
+    
+    请求头
+    headers = {'Authorization': s,'content-type': 'application/json'}
+    
+    创建和更新提交的参数数据。username，name,email，mobile
+    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa"}
+
+一：用户操作api
+1: 管理员创建用户
+
+    url = "http://192.168.1.243:1000/api/user" 
+    r = requests.post(url, headers=headers,data=json.dumps(data)) 
+
+2.1：管理员查看所有用户列表
+
+    默认查看id前10的用户列表
+    url = "http://192.168.1.243:1000/api/user" 
+    
+    自定义查找区间（分页），offset查询开始的位置，size查询第三条，size不允许超过1000
+    url = "http://192.168.1.243:1000/api/user?offset=0&size=2" 
+    r = requests.get(url, headers=headers)    
+
+2.2：用户查看自己信息(通过user登录时候的信息实现where查询条件)
+
+        url = "http://192.168.1.243:1000/api/user"  
+        r = requests.get(url, headers=headers)    
+
+3.1：管理员更新,删除某个用户信息(依据用户id实现where查询条件)
+    
+    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","user_id":7}
+    url = "http://192.168.1.243:1000/api/user" 
+    r = requests.delete(url, headers=headers) 
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+   
+3.2：用户自己更新信息
+   
+    url = "http://192.168.1.243:1000/api/user" 
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+   
+    
+4.1：管理员修改用户密码
+
+    data = {"password":"13456","user_id":1}
+    url = "http://192.168.1.243:1000/api/password" 
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+
+4.2：用户自己修改密码
+
+    data = {"oldpassword":"123456", "password":"13456"}
+    url = "http://192.168.1.243:1000/api/password"   
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+
+5：修改用户角色
+
+    data = {"role":1}
+    url = "http://192.168.1.243:1000/api/role/user_id" 
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+

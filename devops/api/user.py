@@ -36,7 +36,6 @@ def User(user_id):
         try:
             data = request.get_json()
             data = json.loads(data)
-            print data
             if  util.role(name):    #admin  update from user_id
                 if not util.if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
@@ -68,7 +67,7 @@ def User(user_id):
 
 
 @app.route('/api/user',methods=['GET','POST'])
-def UserList():
+def UserList(offset=0,size=10):
     try:
         authorization = request.headers['authorization']
         name = util.validate(authorization, app.config['passport_key'])
@@ -86,16 +85,25 @@ def UserList():
     if request.method == 'GET':
         try:
             users = []
+            if request.args.get('offset')  is not  None or request.args.get('size') is  not None:
+                offset = request.args.get('offset')
+                size = request.args.get('size')
+                if int(size) >= 1000:
+                    return json.dumps({'code': 1, 'errmsg': 'you input size too big '})
+
             fields = ['id', 'username', 'name', 'email', 'mobile','role']
-            sql = "SELECT %s FROM user" % ','.join(fields)
+            sql = "SELECT %s FROM user limit %d,%d" % (','.join(fields),int(offset),int(size))
             app.config['cursor'].execute(sql)
             for row in app.config['cursor'].fetchall():
                 user = {}
                 for i, k in enumerate(fields):
                     user[k] = row[i]
                 users.append(user)
+
+            app.config['cursor'].execute("select  count(0) from user")
+            count=int(app.config['cursor'].fetchone()[0])
             util.write_log(name, 'get_all_users')
-            return json.dumps({'code': 0, 'users': users})
+            return json.dumps({'code': 0, 'users': users,'count':count})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Get users error'})

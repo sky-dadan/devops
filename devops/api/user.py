@@ -119,3 +119,14 @@ def User(offset=0,size=10):
             return json.dumps({'code':1,'errmsg':'delete user error'})
    
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method })
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return json.dumps({'code':1,'errmsg':'your request is not found'})
+ #   return render_template('404.html'), 404 
+    
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return json.dumps({'code':1,'errmsg':'server is too busy'})
+#    return render_template('500.html'), 500 

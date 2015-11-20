@@ -17,7 +17,7 @@ def group():
         if not name:
             logging.getLogger().warning("Request forbiden")
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        if util.role(name) is False:
+        if not util.role(name):
             logging.getLogger().warning("You are not admin,Request forbiden")
             return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
     except:

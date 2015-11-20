@@ -19,6 +19,7 @@ if __name__ == '__main__':
 #    conn.request('PUT', '/api', json.dumps(data), headers)
 #    response = conn.getresponse()
 #    print response.read()
+
 	data={'name':['test2','test1']}
 	conn.request('DELETE','/api/group', json.dumps(data), headers)
 	response=conn.getresponse()

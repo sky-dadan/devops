@@ -7,19 +7,11 @@ import util
 
 from flask import Flask, request
 from . import app             #等价 from api import app
+from auth import auth_login
 
 @app.route("/api",methods=['GET', 'PUT'])
-def index():
-    try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization, app.config['passport_key'])
-        if not name:
-            logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-    except:
-        logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-
+@auth_login
+def index(auth_info):
     if request.method == 'GET':
         try:
             users = []
@@ -31,7 +23,7 @@ def index():
                 for i, k in enumerate(fields):
                     user[k] = row[i]
                 users.append(user)
-            util.write_log(name, 'get_all_users')
+            util.write_log(auth_info[0], 'get_all_users')
             return json.dumps({'code': 0, 'users': users})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
@@ -47,7 +39,7 @@ def index():
                 values.append("'%s'" % v)
             sql = "INSERT INTO user (%s) VALUES (%s)" % (','.join(fields), ','.join(values))
     
-            util.write_log(name, "create_user %s" % data['username'])
+            util.write_log(auth_info[0], "create_user %s" % data['username'])
             return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
         except:
             logging.getLogger().error("Create user error: %s" % traceback.format_exc())

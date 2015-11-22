@@ -7,7 +7,7 @@ import httplib
 import util
 
 if __name__ == '__main__':
-    s = util.get_validate('test3', '123456')
+    s = util.get_validate('test3', 1, 1, '123456')
     headers = {'Authorization': s}
 
     conn = httplib.HTTPConnection('localhost', 1000)

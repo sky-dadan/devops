@@ -51,23 +51,23 @@ def set_logging(log_path, log_level='error'):
 def write_log(user, msg):
     logging.getLogger('record').debug('%s %s %s' % (int(time.time()), user, msg))
 
-def get_validate(name, fix_pwd):
+def get_validate(name, uid, role, fix_pwd):
     t = int(time.time())
     validate_key = hashlib.md5('%s%s%s' % (name, t, fix_pwd)).hexdigest()
-    return base64.encodestring('%s|%s|%s' % (name, t, validate_key)).strip()
+    return base64.encodestring('%s|%s|%s|%s|%s' % (name, t, uid, role, validate_key)).strip()
 
 def validate(key, fix_pwd):
     t = int(time.time())
     key = base64.decodestring(key)
     x = key.split('|')
-    if len(x) != 3:
+    if len(x) != 5:
         return
 
     if t > int(x[1]) + 2*60*60:
         return
     validate_key = hashlib.md5('%s%s%s' % (x[0], x[1], fix_pwd)).hexdigest()
-    if validate_key == x[2]:
-        return x[0]
+    if validate_key == x[4]:
+        return x[0], x[2], x[3]
     else:
         return
 

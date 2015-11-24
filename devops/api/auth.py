@@ -20,5 +20,6 @@ def auth_login(func):
             logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})
         return func(res, *arg, **args)
+    wrapper.__name__ = '%s_wrapper' % func.__name__
     return wrapper
 

@@ -54,11 +54,11 @@ def write_log(user, msg):
 def get_validate(name, uid, role, fix_pwd):
     t = int(time.time())
     validate_key = hashlib.md5('%s%s%s' % (name, t, fix_pwd)).hexdigest()
-    return base64.encodestring('%s|%s|%s|%s|%s' % (name, t, uid, role, validate_key)).strip()
+    return base64.b64encode('%s|%s|%s|%s|%s' % (name, t, uid, role, validate_key)).strip()
 
 def validate(key, fix_pwd):
     t = int(time.time())
-    key = base64.decodestring(key)
+    key = base64.b64decode(key)
     x = key.split('|')
     if len(x) != 5:
         return

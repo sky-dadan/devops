@@ -91,11 +91,3 @@ def if_groupid_exist(group_id):
     else:
         return True
 
-def role(name):
-    sql = 'select role from user where username = "%s" ' % (name)
-    app.config['cursor'].execute(sql)
-    res = app.config['cursor'].fetchone()
-    if res[0] == 0:
-        return True
-    else:
-        return False

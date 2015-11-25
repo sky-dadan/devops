@@ -7,23 +7,11 @@ import util
 
 from flask import Flask, request
 from . import app             #等价 from api import app
-
+from auth import auth_login
 
 @app.route("/api/group",methods=['GET','POST','DELETE'])
-def group():
-    try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization, app.config['passport_key'])
-        if not name:
-            logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        if not util.role(name):
-            logging.getLogger().warning("You are not admin,Request forbiden")
-            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
-    except:
-        logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-
+@auth_login
+def group(auth_info):
     if request.method == 'GET':
         try:
             if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
@@ -43,13 +31,11 @@ def group():
                 for i,k in enumerate(fields):
                     group_list[k] = row[i]
                 groups.append(group_list)
-            util.write_log(name, 'list all groups')
+            util.write_log(auth_info[0], 'list all groups')
             return json.dumps({'code': 0, 'groups': groups})
         except:
             logging.getLogger().error("Get group list error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Get group list error'})
-
-
     if request.method == 'POST':
         try:
             data = request.get_data()
@@ -72,49 +58,36 @@ def group():
             values = ', '.join(["(%s, %s)" % (uid, gid) for uid in uids])
             sql = "INSERT INTO user_group VALUES %s" % values
             app.config['cursor'].execute(sql)
-            util.write_log(name,'add group %s' % data['name'])
-            return json.dumps({'code':0,'result': 'add group %s Success' % data['name']})
+            util.write_log(auth_info[0],'Add group %s' % data['name'])
+            return json.dumps({'code':0,'result': 'Add group %s Success' % data['name']})
         except:
-            logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
+            logging.getLogger().error("Add group error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Add group error'})
-
-    if request.method == 'DELETE' and util.role(name):
+    if request.method == 'DELETE':
         try:
-            del_groups = request.get_data()
-            del_groups = json.loads(del_groups)
+            data = request.get_data()
+            data = json.loads(data)
             fields, values = [],[]
-            field = del_groups.keys()[0]
-            values = del_groups[field]
-            for d_group in values:
-                sql_del_group = 'delete from groups where name="%s"' % d_group
-                sql_sel_gid = 'select id from groups where name="%s"'  % d_group
-                app.config['cursor'].execute(sql_sel_gid)
-                sel_gid = app.config['cursor'].fetchone()
-                sql_del_userin_group = 'delete from user_group where group_id="%s"' % sel_gid 
-                app.config['cursor'].execute(sql_del_group)
-                app.config['cursor'].execute(sql_del_userin_group)
-                util.write_log(name,"delete group %s" %  d_group )
-            return json.dumps({'code':0,'result':'successful','values':values})
+            field = data.keys()[0]
+            values = data[field]
+            for group in values:
+                sql1 = 'SELECT id FROM groups WHERE name="%s"'  % group
+                sql2 = 'DELETE FROM groups WHERE name="%s"' % group
+                app.config['cursor'].execute(sql1)
+                row = app.config['cursor'].fetchone()
+                sql3 = 'delete from user_group where group_id="%s"' % row[0]
+                app.config['cursor'].execute(sql2)
+                app.config['cursor'].execute(sql3)
+            util.write_log(auth_info[0],"Delete groups %s" % ','.join("'%s'" % group for group in values))
+            return json.dumps({'code':0,'result':'Delete groups %s successful' % ','.join(["'%s'" % group for group in values])})
         except:
-            logging.getLogger().error("Create user error: %s" % traceback.format_exc())
-            return json.dumps({'code': 1, 'errmsg': 'Create user error'})
+            logging.getLogger().error("Delete groups error: %s" % traceback.format_exc())
+            return json.dumps({'code': 1, 'errmsg': 'Delete groups error'})
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method})
 
 @app.route("/api/group_detail/<int:gid>",methods=['GET','POST','PUT','DELETE'])
-def group_detail(gid):
-    try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization, app.config['passport_key'])
-        if not name:
-            logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-        if util.role(name) is False:
-            logging.getLogger().warning("You are not admin,Request forbiden")
-            return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
-    except:
-        logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'User validate error'})
-    
+@auth_login
+def group_detail(auth_info,gid):
     if request.method == 'GET':
         try:
             if not util.if_groupid_exist(gid):
@@ -128,38 +101,10 @@ def group_detail(gid):
             for row in app.config['cursor'].fetchall():
                 members.append(row[0])
                 comment = row[1]
-            util.write_log(name,"List %s's members:%s" % (group_name,','.join(members)))
+            util.write_log(auth_info[0],"List %s's members:%s" % (group_name,','.join(members)))
             return json.dumps({'code':0,'group_name':group_name,'members':members,'comment':comment})
         except:
             logging.getLogger().error(" list members error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'List members error'})
 
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method})
-
-@app.route('/api/group/manager',methods=['GET','PUT','DELETE'])
-def group_manager():
-    try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization,app.config['passport_key'])
-        if not name :
-            logging.getLogger().warining("Request forbiden")
-            return json.dumps({'code':1,'errmsg':"User validate error"})
-    except:
-        logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'User Validate error'})
-
-    if request.method == 'PUT':
-        try:
-            s_data = request.get_data()
-            s_data = json.loads(s_data)
-            s_username = s_data.values()[0]       
-            s_result = []
-            sql="select name,name_cn  from groups  where id=(select group_id from user_group where user_id =(select id from user where username='%s'))"   %  s_username
-            app.config['cursor'].execute(sql)
-            for g_name in app.config['cursor'].fetchone():
-                s_result.append(g_name)
-            util.write_log(name,"select %s belong to group"  % s_username)
-            return json.dumps({'code':0,'result':'select successful','g_name':s_result})
-        except:
-            logging.getLogger().error("select group error:%s" %  traceback.format_exc())
-            return json.dumps({'code': 1, 'errmsg': 'select user_group  error'})

@@ -3,24 +3,17 @@ from flask import Flask,request
 from . import app
 import  json,traceback
 import logging,util
+from auth import auth_login
 
 @app.route('/api/role/<int:user_id>',methods=['PUT'])
-def role(user_id):
+@auth_login
+def role(auth_info,user_id):
     try:
-        authorization = request.headers['authorization']
-        name = util.validate(authorization,app.config['passport_key'])
-        if not name :
+        name = auth_info[0]
+        role = int(auth_info[2])
+        if role != 0:
             logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code':1,'errmsg':'User validate error'})
-        else:
-            if not  util.role(name):   #not admin 
-                logging.getLogger().warning("You are not admin,Request forbiden")
-                return json.dumps({'code':1,'errmsg':'You are not admin,Request forbiden'})
-    except:
-        logging.getLogger().warning('validate error: %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'User validate error'})
-    
-    try:
+            return json.dumps({'code': 1, 'errmsg': 'User validate error, Request forbiden'})
         if not util.if_userid_exist(user_id): 
           return json.dumps({'code':1,'errmsg':'User is not exist'})
         data = request.get_json()

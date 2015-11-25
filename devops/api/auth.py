@@ -13,6 +13,8 @@ def auth_login(func):
         try:
             authorization = request.headers.get('authorization', '')
             res = util.validate(authorization, app.config['passport_key'])
+            print res
+            print type(res)
             if not res:
                 logging.getLogger().warning("Request forbiden")
                 return json.dumps({'code': 1, 'errmsg': 'User validate error'})

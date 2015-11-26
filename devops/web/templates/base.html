@@ -1,0 +1,135 @@
+<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="pragma" content="no-cache">
+    <meta name="robots" content="index,follow">
+    <meta name="Author" content="Yuanxin Inc.">
+    <meta name="Keywords" content="ocr, miaoshou.com">
+    <meta name="Description" content="Yuanxin Devops System">
+
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/bootstrap-responsive.min.css')}}">
+
+    <link rel="stylesheet" href="{{url_for('static',filename='css/fullcalendar.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/matrix-style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/matrix-media.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/font-awesome.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/jquery.gritter.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/uniform.css')}}">
+	<link rel="stylesheet" href="{{url_for('static',filename='css/commod.css')}}"> 
+
+    <title>Devops - {% block title %}{% endblock %}</title>
+</head>
+
+<body>
+<!--Header-part-->
+<div id="header">
+    <h1><a href="#">Devops</a></h1>
+</div>
+<!--close-Header-part-->
+
+<!--top-Header-menu-->
+<div id="user-nav" class="navbar navbar-inverse">
+    <ul class="nav">
+        <li  class="dropdown" id="profile-messages" >
+            <a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle"><i class="icon icon-user"></i> <span class="text">liuziping</span><b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="/user_info"><i class="icon-user"></i>个人中心</a></li>
+                <li class="divider"></li>
+                <li><a href="/user_update"><i class="icon-check"></i>修改资料</a></li>
+                <li class="divider"></li>
+                <li><a href="/user_passwd"><i class="icon-check"></i>更改密码</a></li>
+                <li class="divider"></li>
+                <li><a href="/user_logout"><i class="icon-key"></i>退出登录</a></li>
+            </ul>
+        </li>
+        <li><a href="/user_update"><i class="icon icon-cog"></i><span class="text">资料修改</span></a></li>
+        <li><a href="/user_logout"><i class="icon icon-share-alt"></i><span class="text">退出登录</span></a></li>
+    </ul>
+</div>
+<!--close-top-Header-menu-->
+
+<!--sidebar-menu-->
+<div id="sidebar"><a href="#" class="visible-phone"><i class="icon icon-home"></i>控制面板</a>
+    <ul>
+		<li class="active"><a href="/"><i class="icon icon-home"></i> <span>控制面板</span></a> </li>
+        <li class="submenu open">
+            <a href="javascript:;">
+                <i class="icon icon-user-md"></i><span>管理员管理</span>
+                <span class="arrow icon-chevron-down"></span>
+            </a>
+            <ul>
+                <li><a href="/admin_user/addadmin.html">添加用户</a></li>
+                <li><a href="/admin_user/admin_list.html">用户列表</a></li>
+            </ul>
+        </li>  <!--end user-->
+        <li class="submenu open">
+        <a href="javascript:;">
+            <i class="icon icon-bell"></i><span>权限管理</span>
+            <span class="arrow icon-chevron-down"></span>
+        </a>
+        <ul>
+            <li><a href="/ocr_file/upload_file.html">添加用户权限</a></li>
+            <li><a href="/ocr_file/ocr_result.html">扫描结果列表</a></li>
+        </ul>
+        </li> <!--end priviage-->
+        <li class="submenu open">
+        <a href="javascript:;">
+            <i class="icon icon-bell"></i><span>CMDB系统</span>
+            <span class="arrow icon-chevron-down"></span>
+        </a>
+        <ul>
+            <li><a href="/ocr_file/upload_file.html">主机管理</a></li>
+            <li><a href="/ocr_file/ocr_result.html">网络设备管理</a></li>
+        </ul>
+        </li> <!--end cmdb-->
+    </ul>
+</div>
+<!--sidebar-menu-->
+
+<!--main-container-part-->
+<div id="content">
+    <div id="content-header">
+        <div id="breadcrumb">
+            <a href="/" title="回到首页" class="tip-bottom"><i class="icon-home"></i>管理首页</a>
+            <a href="/accounts/">账号中心</a>
+        </div>
+
+            <div class="row-fluid">
+                {% block row %}
+                <div class="span12">
+                    <h1> hello</h1>
+                </div>
+                <h2>world</h2>
+                {% endblock %}
+            </div> <!--end row-fluid-->
+    </div><!--end content-header-->
+</div> <!--end coontet-->
+<!--end-main-container-part-->
+
+<!--Footer-part-->
+<div class="row-fluid">
+    <div id="footer" class="span12">CopyRights 2015 (c) Yuanxin-inc.COM All Rights Reserved.</div>
+</div>
+
+<!--end-Footer-part-->
+
+<script type="text/javascript" src="{{url_for('static',filename='js/excanvas.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/jquery.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/jquery.ui.custom.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/matrix.js')}}"></script>
+
+<script type="text/javascript" src="{{url_for('static',filename='js/jquery.simplemodal-1.4.4.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/jquery.ba-outside-events.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/miao.util.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static',filename='js/miao.func.js')}}""></script>
+
+
+
+
+
+</body></html>

@@ -1,0 +1,112 @@
+.selected_tr { background-color:#e9ffdc; }
+.selected_tr:hover { background-color:#e9ffdc; }
+
+/*------------start global modal window ---------------*/
+#modal_overlay {background-color:#000; cursor:normal;}
+.modal_close_img, .modalCloseImg {
+    background:url(../img/modal_close_btn.png) no-repeat;
+    width:25px; height:29px; display:inline;
+    position:absolute; top:-10px; right:-10px; cursor:pointer;
+}
+* html #invite_overlay {
+    background-color:#999; opacity: 0.6; filter:alpha(opacity=6);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../img/overlay.png", sizingMethod='scale');
+}
+* html .modal_close_img, * html .modalCloseImg {
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../img/modal_close_btn.png", sizingMethod='scale');
+}
+
+#global_alert_modal{
+    display:none; width:390px; background:#FFF; overflow:hidden; padding:20px;
+    -moz-border-radius:6px; -webkit-border-radius:6px; border-radius:6px;
+    -moz-box-shadow:0 0 64px #000; -webkit-box-shadow:0 0 64px #000; box-shadow:0 0 64px #000;
+}
+#global_alert_modal .con { padding:5px; }
+#global_alert_modal .con i{ font-size:italic; color:#00979E; }
+
+
+#show_content_modal{
+    display:none; width:800px; height:600px; background:#FFF; overflow:hidden; padding:20px;
+    -moz-border-radius:6px; -webkit-border-radius:6px; border-radius:6px;
+    -moz-box-shadow:0 0 64px #000; -webkit-box-shadow:0 0 64px #000; box-shadow:0 0 64px #000;
+}
+#show_content_modal .con { padding:5px; }
+#show_content_modal .con i{ font-size:italic; color:#00979E; }
+
+/*-------------- end global modal window -------------- */
+
+/***** exCalendar style controller *****************/
+.exCalendarContainer {
+    clear:both; margin:0; padding:0; width:220px; overflow:hidden; font-size:9pt;
+}
+.exCalendarContainer .exCalDays { display:block; position:relative; float:left; width:218px; }
+.exCalendarContainer .exCalDays table { background:#E5E5E5; border-collapse:collapse; border:1px solid #D3D4D4; color:#000000; }
+.exCalendarContainer .exCalDays table tr.header{ height:28px; font-weight:bold; }
+.exCalendarContainer .exCalDays table tr.header td.previous{ font-size:16px; }
+.exCalendarContainer .exCalDays table tr.header td.previous a{ height:21px; padding-top:7px; }
+.exCalendarContainer .exCalDays table tr.header td.next{ font-size:16px; }
+.exCalendarContainer .exCalDays table tr.header td.next a{ height:21px; padding-top:7px;}
+.exCalendarContainer .exCalDays table a { text-decoration:none; color:#004154; font-weight:bold; }
+.exCalendarContainer .exCalDays table th { font-weight:normal; height:25px; text-align:center; }
+.exCalendarContainer .exCalDays table th a { font-weight:normal; text-decoration:none; color:#FFF; padding:1px; text-align:center; }
+.exCalendarContainer .exCalDays table td { padding:1px 2px; text-align:center; background-color:#FCFCFC; overflow:hidden;
+}
+.exCalendarContainer .exCalDays table td a { display:block; width:27px; height:18px; padding-top:6px; line-height:9pt; }
+.exCalendarContainer .exCalDays table td a:hover { background-color:#89B9F7; color:#fff; }
+.exCalendarContainer .exCalDays table td a.invalid { color:#888; font-weight:normal; }
+.exCalendarContainer .exCalDays table td a.invalid:hover { background-color:#eee;}
+.exCalendarContainer .exCalDays table td a.current { background-color:#519EFB; color:#fff; }
+/*.exCalendarContainer .exCalDays table td a.today { background-color:#004154; color:#FFFFFF; }*/
+
+.exCalendarContainer .exCalTimes{
+    display:block; position:relative; float:left;
+    width:90px; height:173px;
+    border-right:1px solid #D6D6D5;
+    border-bottom:1px solid #D6D6D5;
+}
+.exCalendarContainer .exCalTimes ul { clear:both; list-style:none; padding:0px; margin:0px; background:#F2F2F2; }
+.exCalendarContainer .exCalTimes ul.list { height:150px; overflow:hidden; overflow-x: hidden; overflow-y: scroll;}
+.exCalendarContainer .exCalTimes ul.list li { cursor:pointer; }
+.exCalendarContainer .exCalTimes ul.list li:hover { background-color:#01A5B4; color:#FFFFFF; }
+.exCalendarContainer .exCalTimes ul.list li.current { background-color:#057FA3; color:#FFFFFF; }
+.exCalendarContainer .exCalTimes ul li { clear:both; list-style:none; padding:6px 0; margin:0px; text-align:center; }
+.exCalendarContainer .exCalTimes ul li.header { height:18px; padding:5px 0 0 0; background:#D6D6D5; }
+
+
+#time_calendar_container {
+    clear:both; display:none; position:absolute;
+    background:#FFF; width:450px; height:295px; margin:0; padding:15px;
+    overflow:hidden; z-index:10; font-size:9pt;
+    _margin-top:43px;
+    border:1px #E6E6E6 solid;
+    -moz-box-shadow:1px 1px 4px #ccc; -webkit-box-shadow:1px 1px 4px #ccc; box-shadow:1px 1px 4px #ddd;
+}
+.operate #time_calendar_container,.create #time_calendar_container { right:10px;}
+#time_calendar_container #time_summary { height:30px; }
+#time_calendar_container #time_summary a{ display:block; float:left; font-size:13px; padding-top:1px; line-height:14px; font-weight:bold; }
+#time_calendar_container #time_summary span{ display:block; float:left; font-size:14px; padding:0px 5px; line-height:14px; color:#ddd; }
+#time_calendar_container #time_calendar_detail { overflow:hidden; }
+#time_calendar_container #time_calendar_detail .date_time_titles{ height:20px; font-size:12px; }
+#start_calendar_container{ position:relative; float:left; width:220px; }
+#end_calendar_container{ position:relative; float:right; width:220px; }
+#time_calendar_button_container{ height:36px; padding-top:10px; font-size:14px; }
+
+.single_date_calendar_container{
+    clear:both; display:none; position:absolute;
+    background:#FFF; width:220px; height:205px; margin:0; padding:5px 5px 0 5px;
+    overflow:hidden; z-index:10; font-size:9pt;
+    -moz-box-shadow:2px 2px 6px #666; -webkit-box-shadow:2px 2px 6px #666; box-shadow:2px 2px 6px #666;
+}
+
+/***** exCalendar style controller *****************/
+
+/*** global radius **/
+.global_radius_4 {
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+/*** end global radius **/
+
+

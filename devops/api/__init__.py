@@ -3,8 +3,8 @@ from flask import Flask
 app = Flask(__name__)
 
 import  test
-import lock
+#import lock
 import group
 import user
-import password
-import role
+#import password
+#import role

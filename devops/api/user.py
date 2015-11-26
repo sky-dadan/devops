@@ -13,20 +13,20 @@ def User(auth_info,offset=0,size=10):
     uid = int(auth_info[1])
     role = int(auth_info[2])
 ###########  select for admin and user #################################
-    if request.method == 'GET':  #get one user info from user_id
+    if request.method == 'GET':  #get all user info from user_id
         try:
-            user = {}
             users = []
-            fields = ['id','username','name','email','mobile','role']
+            fields = ['id','username','name','email','mobile','role','is_lock']
             if role == 0  and request.args.get('list') =="true": #是管理员且传值list＝true才输出用户列表
                 if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
                     offset = request.args.get('offset')
                     size = request.args.get('size')
                     if int(size) >= 1000:
                         return json.dumps({'code': 1, 'errmsg': 'you input size too big '})
-                sql = "SELECT %s FROM user limit %d,%d" % (','.join(fields),int(offset),int(size))
+                sql = "SELECT %s FROM user LIMIT %d,%d" % (','.join(fields),int(offset),int(size))
                 app.config['cursor'].execute(sql)
                 for row in app.config['cursor'].fetchall():
+                    user = {}
                     for i, k in enumerate(fields):
                         user[k] = row[i]
                     users.append(user)
@@ -35,13 +35,14 @@ def User(auth_info,offset=0,size=10):
                 util.write_log(name, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})
             else:    #普通用户和管理员都是通过自己的登陆用户名查询自己的信息
-                sql = 'SELECT %s FROM user where username="%s"' % (','.join(fields),name)
+                user = {}
+                sql = 'SELECT %s FROM user WHERE username="%s"' % (','.join(fields),name)
                 app.config['cursor'].execute(sql)
                 res = app.config['cursor'].fetchone()    #返回结果为元组(id,username,……)
                 for i,k in enumerate(fields):     #取出元组的值及对应的索引号 0.1,2……
-                    user[k]=res[i]    #fields中的列名作为user字典的k,索引作为数据库返回列表的k,实现字典赋值
+                    user[k]=res[i]                #fields中的列名作为user字典的k,索引作为数据库返回列表的k,实现字典赋值
                 util.write_log(name, 'get_one_users') 
-                return json.dumps({'code':0,'users':user})
+                return json.dumps({'code':0,'user':user})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'Get users error'})
@@ -56,11 +57,11 @@ def User(auth_info,offset=0,size=10):
                     if not util.if_userid_exist(user_id): 
                         return json.dumps({'code':1,'errmsg':'User is not exist'})
                     else:
-                        sql = 'update user set username="%(username)s",name="%(name)s", \
-                               email="%(email)s",mobile="%(mobile)s" where id=%%d' % data %user_id
+                        sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
+                               email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
-                sql = 'update user set username="%(username)s",name="%(name)s",email="%(email)s", \
-                        mobile="%(mobile)s" where username="%%s"' % data %name
+                sql = 'UPDATE user SET username="%(username)s",name="%(name)s",email="%(email)s", \
+                        mobile="%(mobile)s" WHERE username="%%s"' % data %name
             app.config['cursor'].execute(sql)
             util.write_log(name,'update user %s' % data['username'])
             return json.dumps({'code':0,'result':'update %s success' % data['username']})
@@ -104,7 +105,7 @@ def User(auth_info,offset=0,size=10):
                     user_id = data['user_id']
             if not util.if_userid_exist(user_id):
                 return json.dumps({'code':1,'errmsg':'User is not exist'})
-            sql = "DELETE FROM user where id = %d" % (user_id) 
+            sql = "DELETE FROM user WHERE id = %d" % (user_id) 
             app.config['cursor'].execute(sql)
             util.write_log(name,'delete user %d' % user_id)
             return json.dumps({'code':0,'result':'delte %d success' % user_id})
@@ -132,20 +133,20 @@ def passwd(auth_info):
                 if not util.if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
                 password = hashlib.md5(data['password']).hexdigest()
-                sql = 'update user set password="%s" where id=%d' % (password,user_id)
+                sql = 'UPDATE user SET password="%s" WHERE id=%d' % (password,user_id)
         else:                  #user  need input oldpassword
             if not data.has_key("oldpassword") :
                 return json.dumps({'code':1,'errmsg':'need input your old password' })
             else:
                 oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
-                sql = 'select password from user where username="%s"' % name
+                sql = 'SELECT password FROM user WHERE username="%s"' % name
                 app.config['cursor'].execute(sql)
                 res = app.config['cursor'].fetchone()
                 if res[0] != oldpassword:
                     return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
                 else:
                     password = hashlib.md5(data['password']).hexdigest()
-                    sql = 'update user set password="%s" where username="%s"' % (password,name)
+                    sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,name)
         app.config['cursor'].execute(sql)
         util.write_log(name,'update user password')
         return json.dumps({'code':0,'result':'update password success'  })

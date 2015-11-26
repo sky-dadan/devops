@@ -40,20 +40,29 @@ def lock_user(auth_info,user_id):
 
 @app.route("/api/lockuser",methods=['GET','PUT'])
 @auth_login
-def lock_userlist(auth_info):    
+def lock_userlist(auth_info):
+
+    name = auth_info[0]
+    uid = int(auth_info[1])
+    role = int(auth_info[2])
+    
     if request.method == 'GET':
         try:
             users = []
             fields = ['username','is_lock']
-            sql = 'SELECT %s FROM user' % ','.join(fields)
-            app.config['cursor'].execute(sql)
-            for row in app.config['cursor'].fetchall():
-                user = {}
-                for i,k in enumerate(fields):
-                    user[k] = row[i]
-                users.append(user)
-            util.write_log(auth_info[0],'Check all users are locked')
-            return json.dumps({'code':0,'is_lock':users})
+            if role == 0 and request.args.get('list') =="true":
+                sql = 'SELECT %s FROM user WHERE is_lock = 1' % ','.join(fields)
+                app.config['cursor'].execute(sql)
+                for row in app.config['cursor'].fetchall():
+                    user = {}
+                    for i,k in enumerate(fields):
+                        user[k] = row[i]
+                    users.append(user)
+                util.write_log(name,'Check all users are locked')
+                return json.dumps({'code':0,'is_lock':users})
+            else:
+                util.write_log(name,'You are not admin,no permission!')
+                return json.dumps({'code':1,'result':'You are not admin,no permission!'})
         except:
             logging.getLogger().error("Get users is_lock error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Get users is_lock error'})
@@ -69,5 +78,5 @@ def lock_userlist(auth_info):
         except:
             logging.getLogger().error("Lock user error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'Lock user error'})
-
+    
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method})

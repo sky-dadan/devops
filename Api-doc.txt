@@ -2,13 +2,13 @@ Api调用说明文档
 
 一：共用部分
     用户登录验证
-    s = util.get_validate('liuziping', '123456')  
+    s = util.get_validate('liuziping',3,0,'123456')  
     
     请求头
     headers = {'Authorization': s,'content-type': 'application/json'}
     
     创建和更新提交的参数数据。username，name,email，mobile
-    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa"}
+    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","role":1,"is_lock":0}
 
 一：用户操作api
 1: 管理员创建用户
@@ -32,15 +32,15 @@ Api调用说明文档
         url = "http://192.168.1.243:1000/api/user"  
         r = requests.get(url, headers=headers)    
 
-3.1：管理员更新,删除某个用户信息(依据用户id实现where查询条件)
+3.1：管理员更新,删除某个用户信息(依据用户id实现where查询条件),支持锁定用户，data里增加is_lock,1为锁定，0为解锁
     
    
-    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","user_id":7}
+    data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","is_lock":1,"user_id":7}
     url = "http://192.168.1.243:1000/api/user" 
     r = requests.delete(url, headers=headers) 
     r = requests.put(url, headers=headers,json=json.dumps(data))
    
-3.2：用户自己更新信息
+3.2：用户自己更新信息,不能修改is_lock
 
     data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa"}
     url = "http://192.168.1.243:1000/api/user" 
@@ -65,42 +65,24 @@ Api调用说明文档
     url = "http://192.168.1.243:1000/api/role/user_id" 
     r = requests.put(url, headers=headers,json=json.dumps(data))
 
-6.1: 管理员查看用户锁定状态
-
-    url = "http://192.168.1.243:1000/api/lockuser/<user_id>"
-    r = requests.get(url,headers=headers)
-
-6.2: 管理员解除，锁定用户
-
-    data = {"is_lock":0} 解除锁定
-    data = {"is_lock":1} 锁定
-    url = "http://192.168.1.243:1000/api/lockuser/<user_id>"
-    r = requests.put(url,headers=headers,json=json.dumps(data))
-
-6.3:管理员批量锁定用户
-
-    data = {"users":['jack','rose']}
-    url = "http://192.168.1.243:1000/api/lockuser"    
-    r = requests.put(url,headers=headers,json=json.dumps(data))
-
-7.1:  管理员查看组列表
+6.1:  管理员查看组列表,支持分页，如果参数为空，默认为前10条
 
     url = "http://192.168.1.243:1000/api/group?offset=0&size=2"
     r = requests.get(url,headers=headers)
 
-7.2: 管理员创建组
+6.2: 管理员创建组
 
     data = {'name':'sa','name_cn':'guanliyuan','comment':'Test','users':['zhangxunan','lisi']}
     url = "http://192.168.1.243:1000/api/group"
     r = requests.post(url,headers=headers,json=json.dumps(data))
 
-7.3: 管理员删除组
+6.3: 管理员删除组
 	data = {'name':['test2','test1']}
     url = "http://192.168.1.243:1000/api/group"
     r = requests.delete(url,headers=headers,json=json.dumps(data))    
 
 
-7.4：管理员查看组详情
+6.4：管理员查看组详情
 
     url = "http://192.168.1.243:1000/api/group_detail/<gid>"
     r = requests.get(url,headers=headers)

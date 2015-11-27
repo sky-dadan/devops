@@ -3,6 +3,47 @@
 {% block breadcrumb %}账号中心{% endblock %}
 
 {% block h1 %}个人信息{% endblock %}
+
+<!--主体内容-->
 {% block row %}
-<h2>hello world</h2>
+<div class="widget-box">
+       <div class="widget-title"> 
+          <span class="icon"> <i class="icon-briefcase"></i> </span>
+	      <h5>您的个人资料</h5>
+          <h5 style="float:right;">
+         （<a href="/accounts/edit"><i class="icon-edit"></i>编辑个人资料</a>）</h5>
+	   </div> <!--end widget-title-->
+
+	   <div class="widget-content">
+           <div class="row-fluid">
+               <div class="span6">
+					<table class="" id = "info">
+							<tr>
+								<td><h4>刘子平</h4></td>
+							</tr>
+							<tr>
+								<td>Tel:18310519941</td>
+							</tr>
+					</table>
+			    </div> <!--info end-->
+				<div class="span6">
+					<table class="table table-bordered table-invoice" id = "detail">
+							<tr>
+								<td class="width30">E-mail地址：</td>
+								<td class="width70"><strong>liuziping@yuanxin-inc.com</strong></td>
+							</tr>
+							<tr>
+								<td>加入时间:</td>
+								<td><strong>2015-10-13 15:19:52</strong></td>
+							</tr>
+							<tr>
+								<td>所属管理组:</td>
+								<td><strong>超级管理员</strong></td>
+							</tr>
+					</table> 
+                </div><!--detail end-->
+           </div> <!--row-fluid end-->
+
+    </div> <!--widget-content  end -->
+</div><!--widget-box end-->
 {% endblock %}

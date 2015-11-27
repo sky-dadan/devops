@@ -14,3 +14,6 @@ def index():
 def user_edit():
     return render_template('edit.html')
 
+@app.route("/accounts/add",methods=['GET','POST'])
+def user_add():
+    return render_template('add.html')

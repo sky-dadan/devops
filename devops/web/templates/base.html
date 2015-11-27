@@ -90,7 +90,7 @@
     <div id="content-header">
         <div id="breadcrumb">
             <a href="/" title="回到首页" class="tip-bottom"><i class="icon-home"></i>管理首页</a>
-            <a href="/accounts/">{% block breadcrumb %}{% endblock %}</a>
+            {% block breadcrumb %}{% endblock %}
         </div>
         <h1>{% block h1 %}{% endblock %}</h1>
     </div><!--end content-header-->

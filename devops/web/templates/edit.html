@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}个人资料修改{% endblock %}
+{% block breadcrumb %}<a href="/accounts/edit">个人资料修改</a>{% endblock %}
+
+{% block h1 %}个人资料修改{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+       <div class="widget-title"> 
+          <span class="icon"> <i class="icon-info-sign"></i> </span>
+	      <h5>您的个人资料</h5>
+	   </div> <!--end widget-title-->
+
+	   <div class="widget-content">
+
+		 <form class="form-horizontal" id="edit_profile_form" accept-charset="UTF-8" method="POST" autocomplete="off" novalidate="novalidate">
+             <input type="hidden" id="edit_profile_token" value="60e2259b432adee160845b466cd2b1f1" />
+             <div class="control-group">
+                  <label class="control-label">登录账号：</label>
+                  <div class="controls">
+                  		<span style="display:block; padding-top:4px;color:#888;">liuziping</span>
+                  </div>
+			 </div> <!--end zhanghao-->
+             <div class="control-group">
+                   <label class="control-label">姓名：</label>
+                   <div class="controls">
+                   		<input type="text" name="user_name" id="user_name" value="刘子平" />
+                    	<span for="required" generated="true" class="help-inline"></span>
+                    </div>
+			 </div> <!--end name-->
+			 <div class="control-group">
+				<label class="control-label">联系电话：</label>
+				<div class="controls">
+					<input type="text" name="user_phone" id="user_phone" value="18310519941" />
+					<span for="required" generated="true" class="help-inline"></span>
+				</div>
+			 </div>   <!--end phone-->
+			 <div class="form-actions">
+				<input type="button" href="javascript:void(0);" id="submit_edit_profile" value="确定修改" class="btn btn-success global_radius_4">
+			 </div>  <!--end button-->
+	 </form>
+
+     </div> <!--widget-content  end -->
+</div><!--widget-box end-->
+{% endblock %}

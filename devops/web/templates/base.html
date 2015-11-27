@@ -94,11 +94,15 @@
         </div>
         <h1>{% block h1 %}{% endblock %}</h1>
     </div><!--end content-header-->
-    <div class="row-fluid">
-        {% block row %}
-        <h2>你的内容都在这里</h2>
-        {% endblock %}
-    </div> <!--end row-fluid-->
+
+    <div class="container-fluid"><hr>
+        <div class="row-fluid">
+            {% block row %}
+            <h2>你的内容都在这里</h2>
+            {% endblock %}
+        </div> <!--end row-fluid-->
+
+    </div> <!--end content-fluid-->
 </div> <!--end content-->
 <!--end-main-container-part-->
 

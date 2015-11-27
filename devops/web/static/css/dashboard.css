@@ -1,0 +1,22 @@
+/* Header */
+#header {
+	height: 77px;
+	position: relative;
+	width: 100%;
+	z-index: -9;
+}
+#header h1 {
+	background: url("../images/logo.png") no-repeat scroll 0 0 transparent;
+	height: 60px;
+	left: 2px;
+	line-height: 600px;
+	overflow: hidden;
+	position: relative;
+	top: 10px;
+	width: 212px;
+}
+#header h1 a {
+	display: block;
+}
+
+

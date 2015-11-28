@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}个人密码修改{% endblock %}
+{% block breadcrumb %}<a href="/user/passwd">个人密码修改</a>{% endblock %}
+
+{% block h1 %}个人密码修改{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+   <div class="widget-title"> 
+      <span class="icon"> <i class="icon-info-sign"></i> </span>
+      <h5>个人密码修改</h5>
+   </div> <!--end widget-title-->
+
+   <div class="widget-content">
+
+     <form class="form-horizontal" id="edit_profile_form" accept-charset="UTF-8" method="POST" autocomplete="off" novalidate="novalidate">
+         <div class="control-group">
+             <label class="control-label">请输入旧密码：</label>
+              <div class="controls">
+                    <input type="password" name="old_passwd" id="old_passwd" value="请输入旧密码" />
+              </div>
+         </div> <!--end oldpasswd-->
+         <div class="control-group">
+               <label class="control-label">请输入新密码：</label>
+               <div class="controls">
+                    <input type="password" name="new_passwd" id="new_passwd" value="请输入新密码" />
+                </div>
+         </div> <!--end new_passwd-->
+         <div class="form-actions">
+            <input type="button" href="javascript:void(0);" id="submit_update_passwd" value="确定修改" class="btn btn-success global_radius_4">
+         </div>  <!--end button-->
+     </form>
+
+ </div> <!--widget-content  end -->
+</div><!--widget-box end-->
+{% endblock %}

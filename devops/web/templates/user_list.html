@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}用户列表{% endblock %}
+{% block breadcrumb %}<a href="/user/list">用户列表</a>{% endblock %}
+
+{% block h1 %}用户列表{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>用户列表</h5>
+  </div> <!--end widget-title-->
+
+  <div class="widget-content">
+
+   <table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th scope="col">E-mail</th>
+			<th scope="col">姓名</th>
+			<th scope="col">手机号码</th>
+			<th scope="col">状态</th>
+			<th scope="col">账户类型</th>
+            <th  scope="col">操作</th>
+		</tr>
+	</thead>
+	<body>
+		<tr id="_con_tr" class="odd gradeX">
+			<td>liuziping@yuanxin-inc.com</td>
+			<td>刘子平</td>
+			<td>18310519941</td>
+			<td><span style="color:#5EDF47;">正常</span></td>
+			<td>超级管理员</td>
+			<td>
+                <button  class='btn btn-primary btn-sm'>更新</button>
+                <button  class='btn btn-danger btn-sm'>删除</button>
+			</td>
+		</tr>
+		<tr id="_con_tr" class="odd gradeX">
+			<td>songpeng@yuanxin-inc.com</td>
+			<td>宋鹏</td>
+			<td>13401044191</td>
+			<td><span style="color:#5EDF47;">正常</span></td>
+			<td>超级管理员</td>
+			<td>
+                <button  class='btn btn-primary btn-sm'>更新</button>
+                <button  class='btn btn-danger btn-sm'>删除</button>
+			</td>
+		</tr>
+		<tr id="_con_tr" class="odd gradeX">
+			<td>zhangxunan@miaoshou.com</td>
+			<td>张旭楠</td>
+			<td>18612259636</td>
+			<td><span style="color:#5EDF47;">正常</span></td>
+			<td>超级管理员</td>
+			<td>
+                <button  class='btn btn-primary btn-sm'>更新</button>
+                <button  class='btn btn-danger btn-sm'>删除</button>
+			</td>
+		</tr>
+												
+	</tbody>
+   </table>
+
+ </div> <!--widget-content  end -->
+</div><!--widget-box end-->
+{% endblock %}

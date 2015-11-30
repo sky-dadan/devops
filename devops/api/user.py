@@ -201,7 +201,9 @@ def login():
                 return json.dumps({'code': 1, 'errmsg': "Password is wrong."})
         except:
             logging.getLogger().error("user login error: %s" % traceback.format_exc())
-            return json.dumps({'code': 1, 'errmsg': 'login exception'})
+            return json.dumps({'code': 1, 'errmsg': "login exception"})
+    else:
+        return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
 
 @app.errorhandler(404)
 def page_not_found(e):

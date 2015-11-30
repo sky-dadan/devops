@@ -1,11 +1,16 @@
 Api调用说明文档
 
+一：用户登录接口
+    用户输入用户名和密码，获取服务端返回的验证串
+    url = "http://192.168.1.243:1000/api/auth?name=XXX&passwd=XXXXXX"
+    r = requests.get(url)
+
+    登录成功返回：json({'code': 0, 'authorization': '验证串'})
+    验证串的生成方式为：base64(name|login_timestamp|uid|role|md5(name|login_timestamp|default_key))
+
 一：共用部分
-    用户登录验证
-    s = util.get_validate('liuziping',3,0,'123456')  
-    
     请求头
-    headers = {'Authorization': s,'content-type': 'application/json'}
+    headers = {'Authorization': 登录后获得的authorization,'content-type': 'application/json'}
     
     创建和更新提交的参数数据。username，name,email，mobile
     data = {"username": "sa", "email": "sap@123.com", "mobile": "222543210000", "name": "sa","role":1,"is_lock":0}

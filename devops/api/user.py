@@ -176,6 +176,32 @@ def role(auth_info,user_id):
         logging.getLogger().error('update user role error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'update user role error'})
 
+## 用户登录
+@app.route('/api/auth', methods=['GET'])
+def login():
+    if request.method == 'GET':
+        try:
+            name = request.args.get('name', None)
+            passwd = request.args.get('passwd', None)
+            if not (name and passwd):
+                return json.dumps({'code': 1, 'errmsg': "Please input name or password."})
+
+            sql = "select id, username, password, role, is_lock from user where username='%s'" % name
+            app.config['cursor'].execute(sql)
+            row = app.config['cursor'].fetchone()
+            if not row:
+                return json.dumps({'code': 1, 'errmsg': "No such user."})
+            if row[4] == 1:
+                return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % name})
+            #passwd = hashlib.md5(passwd).hexdigest()
+            if passwd == row[2]:
+                s = util.get_validate(row[1], row[0], row[3], app.config['passport_key'])
+                return json.dumps({'code': 0, 'authorization': s})
+            else:
+                return json.dumps({'code': 1, 'errmsg': "Password is wrong."})
+        except:
+            logging.getLogger().error("user login error: %s" % traceback.format_exc())
+            return json.dumps({'code': 1, 'errmsg': 'login exception'})
 
 @app.errorhandler(404)
 def page_not_found(e):

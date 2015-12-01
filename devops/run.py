@@ -23,7 +23,7 @@ if __name__ == '__main__':
         exec import_str
         app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     except:
-        print "Load '%s' module error" % module_name
+        print "Load '%s' module error,\n %s" % (module_name,traceback.format_exc())
         sys.exit()
 
     conf_name = os.path.join(work_dir, 'service.conf')

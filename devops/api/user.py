@@ -183,6 +183,7 @@ def login():
         try:
             name = request.args.get('name', None)
             passwd = request.args.get('passwd', None)
+            passwd = hashlib.md5(passwd).hexdigest()
             if not (name and passwd):
                 return json.dumps({'code': 1, 'errmsg': "Please input name or password."})
 
@@ -193,7 +194,7 @@ def login():
                 return json.dumps({'code': 1, 'errmsg': "No such user."})
             if row[4] == 1:
                 return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % name})
-            #passwd = hashlib.md5(passwd).hexdigest()
+
             if passwd == row[2]:
                 s = util.get_validate(row[1], row[0], row[3], app.config['passport_key'])
                 return json.dumps({'code': 0, 'authorization': s})

@@ -9,7 +9,6 @@ import traceback
 import db
 import util
 
-#from api import app
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
@@ -22,6 +21,7 @@ if __name__ == '__main__':
     try:
         import_str = "from %s import app" % module_name
         exec import_str
+        app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
     except:
         print "Load '%s' module error" % module_name
         sys.exit()

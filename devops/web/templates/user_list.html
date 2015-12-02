@@ -12,6 +12,69 @@
       <h5>用户列表</h5>
   </div> <!--end widget-title-->
 
+<!--update modal-->                                                                                 
+<div id="updateModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+		<h4 class="modal-title">更新用户信息</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+      <p id="errorMsg" class="text-danger">this is  a test</p> <!-- foe error msg-->
+
+    <form class="form-horizontal" id="updateForm">
+     	<div class="form-group">
+			 <label class="col-md-2 control-label">name</label>
+     		 <div class="col-md-9">
+       		 	<input id="upname"  type="text" class="form-control" name="name" >
+      		</div> 
+       	</div> <!--update name end-->
+        <div class="form-group">
+			<label class="col-md-2 control-label">email</label>
+      		<div class="col-md-9">
+       			<input id="upemail" type="text" class="form-control" name="email" >
+      		</div> 
+		</div><!--update email  end -->
+        <div class="form-group">
+			<label class="col-md-2 control-label">mobile</label>
+      		<div class="col-md-9">
+       			<input id="upemobile" type="text" class="form-control" name="mobile" >
+      		</div> 
+		</div><!--update mobile  end -->
+ 		<div class="form-group">
+			<label class="col-md-2 control-label">role</label>
+      		<div class="col-md-9">
+       			<select name="role"  class="form-control" id="uprole">
+					<option value="0">超级管理员</option> 
+					<option value="1">普通用户</option> 
+				</select> 
+      		</div> 
+    	</div><!--update role end-->
+        <div class="form-group">
+			<label class="col-md-2 control-label">lock</label>
+      		<div class="col-md-9">
+       			<select name="lock"  class="form-control" id="uplock">
+					<option value="0">正常</option> 
+					<option value="1">锁定</option> 
+				</select> 
+      		</div> 
+		</div><!--update lock  end -->
+    	<div class="form-group">
+     		<div class="col-md-4 col-md-offset-2">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+    	</div><!--button end-->
+
+    </form><!--form end-->
+   </div> <!--modal body end-->
+ </div><!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
   <div class="widget-content">
 
    <table class="table table-bordered table-striped">
@@ -34,8 +97,8 @@
             <td><span style="color:#5EDF47;">{%if user['is_lock']=='0'%}锁定{%else%}正常{%endif%}</span></td>
             <td>{%if user['role']==0 %}超级管理员{%else%}普通用户{% endif %}</td>
 			<td>
-                <button  class='btn btn-primary btn-sm' data-id='{{user['id']}}'>更新</button>
-                <button  class='btn btn-danger btn-sm' data-id='{{user['id']}}'>删除</button>
+                <button  class='btn btn-primary btn-sm update-btn' data-id='{{user['id']}}'>更新</button>
+                <button  class='btn btn-danger btn-sm delete-btn' data-id='{{user['id']}}'>删除</button>
 			</td>
 		</tr>
         {% endfor %}										
@@ -44,4 +107,55 @@
 
  </div> <!--widget-content  end -->
 </div><!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+<script>
+/*get data for update */
+$("body").on('click','.update-btn',function(){
+    var id = $(this).attr('data-id')
+    var getbyid = "/getbyid?id="+id
+    $('#updateModal').modal('show')  //show modal
+    $.getJSON(getbyid,function(result){
+      alert(result)   //for test
+      $('#upname').val(result['name']) 
+      $('#upemail').val(result['email']) 
+      $('#upmobile').val(result['mobile']) 
+      $('#uprole').val(result['role']) 
+      $('#uplock').val(result['lock']) 
+    })
+    
+})
+/*update */
+$('#updateForm').on('submit',function(){
+       var str = $('#updateForm').serialize()
+       var url = '/update?'+str
+       $.getJSON(url,function(result){
+			 console.log(result)
+			 if (result['error']==0){   //recevie json object
+				alert('sucuess')
+				$('#updateModal').modal('hide')
+			 }else{
+				//alert('failed  '+result['msg'])
+				 $('#errorMsg').html('failed '+result['msg']).show()
+			}
+       })
+       return false   //update data and end
+})    
+/*delete data*/
+$("body").on('click','.delete-btn',function(){
+	if(confirm("Are you sure delete")){
+		var id = $(this).attr('data-id')
+		var delete_url = '/delete?id='+id
+		$.get(delete_url,function(result){
+			if (result=='ok'){
+				alert('success')
+			}else{
+				alert(result)
+			}
+    	})
+    }  // end confirm
+})   
+    
+</script>
 {% endblock %}

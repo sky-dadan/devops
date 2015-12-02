@@ -56,3 +56,29 @@ def user_list():
     else:
         return render_template('user_list.html')
 
+@app.route("/getbyid",methods=['GET','POST'])
+def getbyid():
+    if session.get('username') == None:
+    	return redirect('/login')
+    id = request.args.get('id')                                   
+    if not id:
+    	return "need an id"
+    headers['authorization'] = session['author']
+    url = "http://192.168.1.243:1000/api/user"
+    r = requests.get(url, headers=headers)      
+    result = json.loads(r.content)
+    if int(result['code']) == 0:
+	return "ok"
+
+
+@app.route("/user/update",methods=['GET','POST'])
+def user_update():
+    if session.get('username') == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    url = "http://192.168.1.243:1000/api/user"
+    r = requests.put(url, headers=headers,json=json.dumps(data))
+    result = json.loads(r.content)
+    if int(result['code']) == 0:
+	return "ok"
+

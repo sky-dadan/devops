@@ -18,7 +18,7 @@ def login():
         result = json.loads(r.content)
         if result['code'] == 0:
             token = result["authorization"]
-            res = util.validate(token,app.config['passport_key'])  #list(name,uid,role)
+            res = util.validate(token,app.config['passport_key'])  #return : list(name,uid,role)
             if int(res[2]) == 0:                          #针对管理员和普通用户的前端页面展示，暂不处理
                 print "%s is admin" % res[0]
             else:
@@ -30,4 +30,7 @@ def login():
             return redirect('/login')
     return render_template('login.html')
 
-
+@app.route("/logout",methods=['GET','POST'])
+def logout():
+    session.pop('username',None)
+    return redirect('/login')

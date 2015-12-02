@@ -19,10 +19,10 @@
                <div class="span6">
 					<table class="" id = "info">
 							<tr>
-								<td><h4>刘子平</h4></td>
+                                <td><h4>{{result.name}}</h4></td>
 							</tr>
 							<tr>
-								<td>Tel:18310519941</td>
+                                <td>Tel:{{result.mobile}}</td>
 							</tr>
 					</table>
 			    </div> <!--info end-->
@@ -30,7 +30,7 @@
 					<table class="table table-bordered table-invoice" id = "detail">
 							<tr>
 								<td class="width30">E-mail地址：</td>
-								<td class="width70"><strong>liuziping@yuanxin-inc.com</strong></td>
+                                <td class="width70"><strong>{{result.email}}</strong></td>
 							</tr>
 							<tr>
 								<td>加入时间:</td>
@@ -38,7 +38,8 @@
 							</tr>
 							<tr>
 								<td>所属管理组:</td>
-								<td><strong>超级管理员</strong></td>
+                                <td><strong>{% if result.role==0 %}超级管理员{% else %} 
+                                            普通用户 {% endif %}</strong></td>
 							</tr>
 					</table> 
                 </div><!--detail end-->

@@ -17,8 +17,8 @@
    <table class="table table-bordered table-striped">
 	<thead>
 		<tr>
-			<th scope="col">E-mail</th>
 			<th scope="col">姓名</th>
+			<th scope="col">E-mail</th>
 			<th scope="col">手机号码</th>
 			<th scope="col">状态</th>
 			<th scope="col">账户类型</th>
@@ -26,40 +26,19 @@
 		</tr>
 	</thead>
 	<body>
+        {% for user in users %}
 		<tr id="_con_tr" class="odd gradeX">
-			<td>liuziping@yuanxin-inc.com</td>
-			<td>刘子平</td>
-			<td>18310519941</td>
-			<td><span style="color:#5EDF47;">正常</span></td>
-			<td>超级管理员</td>
+            <td>{{user['name']}}</td>
+            <td>{{user['email']}}</td>
+            <td>{{user['mobile']}}</td>
+            <td><span style="color:#5EDF47;">{%if user['is_lock']=='0'%}锁定{%else%}正常{%endif%}</span></td>
+            <td>{%if user['role']==0 %}超级管理员{%else%}普通用户{% endif %}</td>
 			<td>
-                <button  class='btn btn-primary btn-sm'>更新</button>
-                <button  class='btn btn-danger btn-sm'>删除</button>
+                <button  class='btn btn-primary btn-sm' data-id='{{user['id']}}'>更新</button>
+                <button  class='btn btn-danger btn-sm' data-id='{{user['id']}}'>删除</button>
 			</td>
 		</tr>
-		<tr id="_con_tr" class="odd gradeX">
-			<td>songpeng@yuanxin-inc.com</td>
-			<td>宋鹏</td>
-			<td>13401044191</td>
-			<td><span style="color:#5EDF47;">正常</span></td>
-			<td>超级管理员</td>
-			<td>
-                <button  class='btn btn-primary btn-sm'>更新</button>
-                <button  class='btn btn-danger btn-sm'>删除</button>
-			</td>
-		</tr>
-		<tr id="_con_tr" class="odd gradeX">
-			<td>zhangxunan@miaoshou.com</td>
-			<td>张旭楠</td>
-			<td>18612259636</td>
-			<td><span style="color:#5EDF47;">正常</span></td>
-			<td>超级管理员</td>
-			<td>
-                <button  class='btn btn-primary btn-sm'>更新</button>
-                <button  class='btn btn-danger btn-sm'>删除</button>
-			</td>
-		</tr>
-												
+        {% endfor %}										
 	</tbody>
    </table>
 

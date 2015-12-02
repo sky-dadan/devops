@@ -24,19 +24,35 @@ def index():
 
 @app.route("/user/passwd",methods=['GET','POST'])
 def change_passwd():
+    if session.get('username') == None:
+       return redirect('/login')
     return render_template('change_passwd.html')
 
 @app.route("/user/edit",methods=['GET','POST'])
 def user_edit():
+    if session.get('username') == None:
+       return redirect('/login')
     return render_template('user_edit.html')
 
 ##  for admin
 @app.route("/user/add",methods=['GET','POST'])
 def user_add():
+    if session.get('username') == None:
+       return redirect('/login')
     return render_template('user_add.html')
 
 
 @app.route("/user/list",methods=['GET','POST'])
 def user_list():
-    return render_template('user_list.html')
+    if session.get('username') == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    name = session['username']
+    url = "http://192.168.1.243:1000/api/user?list=true"
+    r = requests.get(url, headers=headers)      
+    result = json.loads(r.content)
+    if int(result['code']) == 0:
+        return render_template('user_list.html',name=name,users=result['users'])
+    else:
+        return render_template('user_list.html')
 

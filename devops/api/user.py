@@ -77,12 +77,13 @@ def User(auth_info,offset=0,size=10):
             data = request.get_json()
             data = json.loads(data)
             fields, values = [], []
-            password = '3b53871ffb407966fc330307500ce968'
+#            password = '3b53871ffb407966fc330307500ce968'
+            data['password'] = hashlib.md5(data['password']).hexdigest()
             for k, v in data.items():
                 fields.append(k)
                 values.append("'%s'" % v)
-            sql = "INSERT INTO user (%s,password) VALUES (%s,'%s')" %  \
-                    (','.join(fields), ','.join(values),password)
+            sql = "INSERT INTO user (%s) VALUES (%s)" %  \
+                    (','.join(fields), ','.join(values))
             app.config['cursor'].execute(sql)
             util.write_log(name, "create_user %s" % data['username'])
             return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})

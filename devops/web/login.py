@@ -3,6 +3,7 @@ from flask import Flask,request,session,render_template,redirect
 from  . import app  
 from db  import Cursor    #导入数据库连接模块
 import requests,json 
+import util 
 
 headers = {'content-type': 'application/json'}
 
@@ -16,10 +17,20 @@ def login():
 #        return r.content
         result = json.loads(r.content)
         if result['code'] == 0:
-            session['author'] = result["authorization"]
+            token = result["authorization"]
+            res = util.validate(token,app.config['passport_key'])  #return : list(name,uid,role)
+            if int(res[2]) == 0:                          #针对管理员和普通用户的前端页面展示，暂不处理
+                print "%s is admin" % res[0]
+            else:
+                print "%s is user" % res[0]
+            session['author'] = token
+            session['username'] = res[0]
             return redirect('/')
         else:
             return redirect('/login')
     return render_template('login.html')
 
-
+@app.route("/logout",methods=['GET','POST'])
+def logout():
+    session.pop('username',None)
+    return redirect('/login')

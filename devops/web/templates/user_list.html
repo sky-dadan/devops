@@ -47,7 +47,7 @@
         <div class="form-group">
 			<label class="control-label">mobile</label>
       		<div class="controls">
-       			<input id="upemobile" type="text"  name="mobile" >
+       			<input id="upmobile" type="text"  name="mobile" >
       		</div> 
 		</div><!--update mobile  end -->
  		<div class="form-group">
@@ -124,13 +124,13 @@ $("body").on('click','.update-btn',function(){
     var getbyid = "/getbyid?id="+id
     $('#updateModal').modal('show')  //show modal
     $.getJSON(getbyid,function(result){
-      alert(result)   //for test
+      alert(result['name'])   //for test
       $('#upname').val(result['name']) 
       $('#upusername').val(result['username']) 
       $('#upemail').val(result['email']) 
       $('#upmobile').val(result['mobile']) 
       $('#uprole').val(result['role']) 
-      $('#uplock').val(result['lock']) 
+      $('#uplock').val(result['is_lock']) 
     })
     
 })

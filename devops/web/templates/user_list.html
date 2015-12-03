@@ -124,7 +124,7 @@ $("body").on('click','.update-btn',function(){
     var getbyid = "/getbyid?id="+id
     $('#updateModal').modal('show')  //show modal
     $.getJSON(getbyid,function(result){
-      alert(result['name'])   //for test
+      console.log(result)   //for test
       $('#upname').val(result['name']) 
       $('#upusername').val(result['username']) 
       $('#upemail').val(result['email']) 
@@ -137,7 +137,7 @@ $("body").on('click','.update-btn',function(){
 /*update */
 $('#updateForm').on('submit',function(){
        var str = $('#updateForm').serialize()
-       var url = '/update?'+str
+       var url = '/user/update?'+str
        $.getJSON(url,function(result){
 			 console.log(result)
 			 if (result['error']==0){   //recevie json object

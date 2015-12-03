@@ -12,7 +12,40 @@
 	      <h5>您的个人资料</h5>
           <h5 style="float:right;">
          （<a href="/user/edit"><i class="icon-edit"></i>编辑个人资料</a>）</h5>
+          <h5 style="float:right;" id = "passwd">
+              (<i class="icon-edit"></i><strong>修改密码</strong>)</h5>
 	   </div> <!--end widget-title-->
+<!--模态窗-->
+<div id="updateModal"  class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<h3>修改个人密码</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal" id="updateForm">
+     	<div class="form-group">
+			<label class="control-label">旧密码</label>
+     		 <div class="controls">
+       		 	<input id="oldpasswd"  type="text"  name="oldpasswd" >
+      		</div> 
+       	</div> <!-- oldpasswd end-->
+     	<div class="form-group">
+			<label class="control-label">新密码</label>
+     		 <div class="controls">
+       		 	<input id="newpasswd"  type="password"  name="newpasswd" >
+      		</div> 
+       	</div> <!--newpasswd  end-->
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+
+    </form><!--form end-->
+  </div> <!--modal-body end -->
+</div> <!--modal end-->
+<!--模态窗结束-->
 
 	   <div class="widget-content">
            <div class="row-fluid">
@@ -47,4 +80,19 @@
 
     </div> <!--widget-content  end -->
 </div><!--widget-box end-->
+
+
+{% endblock %}
+{% block js %}
+<script>
+/*get data for update */
+$("body").on('click','#passwd',function(){
+    $('#updateModal').modal('show')  //show modal
+    /*$.getJSON(getbyid,function(result){
+      console.log(result)   //for test
+      $('#upname').val(result['name']) 
+    })*/
+    
+})
+</script>
 {% endblock %}

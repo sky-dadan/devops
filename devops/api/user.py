@@ -58,7 +58,7 @@ def User(auth_info,offset=0,size=10):
                         return json.dumps({'code':1,'errmsg':'User is not exist'})
                     else:
                         sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
-                               email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d" WHERE id=%%d' % data %user_id
+                               email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
                 sql = 'UPDATE user SET username="%(username)s",name="%(name)s",email="%(email)s", \
                         mobile="%(mobile)s" WHERE username="%%s"' % data %name
@@ -115,6 +115,31 @@ def User(auth_info,offset=0,size=10):
             return json.dumps({'code':1,'errmsg':'delete user error'})
    
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method })
+
+@app.route('/api/user/getbyid/<int:user_id>',methods=['GET'])
+@auth_login
+def getbyid(auth_info,user_id):
+    name = auth_info[0]
+    uid = int(auth_info[1])
+    role = int(auth_info[2])
+    if request.method == 'GET':  #get user info from user_id
+        try:
+            fields = ['name','email','mobile','role','is_lock']
+            if role == 0:
+                user = {}
+                sql = "SELECT %s FROM user WHERE id = %d" % (','.join(fields),user_id)
+                app.config['cursor'].execute(sql)
+                row = app.config['cursor'].fetchone()
+                for i,k in enumerate(fields):
+                    user[k]=row[i]
+                util.write_log(name, 'get_one_users') 
+                return json.dumps({'code':0,'user':user})
+            else:
+                util.write_log(name, 'you are not admin!') 
+                return json.dumps({'code':1,'result':'you are not admin!'})
+        except:
+            logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
+            return json.dumps({'code':1,'errmsg':'Get users error'})
 
 ## 管理员和用户都可以修改密码
 @app.route('/api/password',methods=['PUT'])

@@ -28,31 +28,31 @@
      <form class="form-horizontal" id="updateForm">
         <input type="hidden" id='id' name="id">  <!--update need id-->
      	<div class="form-group">
-			 <label class="control-label">name</label>
+            <label class="control-label">姓名</label>
      		 <div class="controls">
        		 	<input id="upname"  type="text"  name="name" >
       		</div> 
        	</div> <!--update name end-->
      	<div class="form-group">
-            <label class="control-label">username</label>
+            <label class="control-label">用户名</label>
      		 <div class="controls">
        		 	<input id="upusername"  type="text"  name="username" >
       		</div> 
        	</div> <!--update username end-->
         <div class="form-group">
-			<label class="control-label">email</label>
+            <label class="control-label">E-mail</label>
       		<div class="controls">
        			<input id="upemail" type="text"  name="email" >
       		</div> 
 		</div><!--update email  end -->
         <div class="form-group">
-			<label class="control-label">mobile</label>
+            <label class="control-label">手机</label>
       		<div class="controls">
        			<input id="upmobile" type="text"  name="mobile" >
       		</div> 
 		</div><!--update mobile  end -->
  		<div class="form-group">
-			<label class="control-label">role</label>
+			<label class="control-label">角色</label>
       		<div class="controls">
        			<select name="role"  id="uprole">
 					<option value="0">超级管理员</option> 
@@ -61,7 +61,7 @@
       		</div> 
     	</div><!--update role end-->
         <div class="form-group">
-			<label class="control-label">lock</label>
+			<label class="control-label">状态</label>
       		<div class="controls">
        			<select name="lock" id="uplock">
 					<option value="0">正常</option> 
@@ -126,14 +126,18 @@ $("body").on('click','.update-btn',function(){
     var getbyid = "/getbyid?id="+id
     $('#updateModal').modal('show')  //show modal
     $.getJSON(getbyid,function(result){
-      console.log(result)   //for test
-      $('#id').val(result['id']) 
-      $('#upname').val(result['name']) 
-      $('#upusername').val(result['username']) 
-      $('#upemail').val(result['email']) 
-      $('#upmobile').val(result['mobile']) 
-      $('#uprole').val(result['role']) 
-      $('#uplock').val(result['is_lock']) 
+      console.log(result)//for test
+      if (result['code']==0){
+          $('#id').val(result['user']['id']) 
+          $('#upname').val(result['user']['name']) 
+          $('#upusername').val(result['user']['username']) 
+          $('#upemail').val(result['user']['email']) 
+          $('#upmobile').val(result['user']['mobile']) 
+          $('#uprole').val(result['user']['role']) 
+          $('#uplock').val(result['user']['is_lock']) 
+      }else{
+         $('#errorMsg').html('failed '+result['errmsg']).show()
+      }
     })
     
 })
@@ -144,6 +148,7 @@ $('#updateForm').on('submit',function(){
        $.getJSON(url,function(result){
 			 console.log(result)
 			 if (result['code']==0){   //recevie json object
+                alert("更新成功")
 				$('#updateModal').modal('hide')
 			 }else{
 				//alert('failed  '+result['msg'])

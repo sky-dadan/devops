@@ -25,7 +25,8 @@
       <div class="modal-body">
       <p id="errorMsg" class="text-danger">this is  a test</p> <!-- foe error msg-->
 
-    <form class="form-horizontal" id="updateForm">
+     <form class="form-horizontal" id="updateForm">
+        <input type="hidden" id='id' name="id">  <!--update need id-->
      	<div class="form-group">
 			 <label class="control-label">name</label>
      		 <div class="controls">
@@ -126,6 +127,7 @@ $("body").on('click','.update-btn',function(){
     $('#updateModal').modal('show')  //show modal
     $.getJSON(getbyid,function(result){
       console.log(result)   //for test
+      $('#id').val(result['id']) 
       $('#upname').val(result['name']) 
       $('#upusername').val(result['username']) 
       $('#upemail').val(result['email']) 

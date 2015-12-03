@@ -23,7 +23,7 @@
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
-      <p id="errorMsg" class="text-danger">this is  a test</p> <!-- foe error msg-->
+      <p hidden id="errorMsg" class="text-danger" style="color:red">this is a test</p> <!-- foe error msg-->
 
      <form class="form-horizontal" id="updateForm">
         <input type="hidden" id='id' name="id">  <!--update need id-->
@@ -143,12 +143,11 @@ $('#updateForm').on('submit',function(){
        var url = '/user/update?'+str
        $.getJSON(url,function(result){
 			 console.log(result)
-			 if (result['error']==0){   //recevie json object
-				alert('sucuess')
+			 if (result['code']==0){   //recevie json object
 				$('#updateModal').modal('hide')
 			 }else{
 				//alert('failed  '+result['msg'])
-				 $('#errorMsg').html('failed '+result['msg']).show()
+				 $('#errorMsg').html('failed '+result['errmsg']).show()
 			}
        })
        return false   //update data and end

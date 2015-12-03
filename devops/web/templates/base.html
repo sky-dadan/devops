@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="{{url_for('static',filename='css/matrix-style.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='css/matrix-media.css')}}">
     <link rel="stylesheet" href="{{url_for('static',filename='css/font-awesome.css')}}">
-
+    {% block css %} {% endblock%}
     <title>Devops - {% block title %}{% endblock %}</title>
 </head>
 
@@ -118,7 +118,7 @@
 <script type="text/javascript" src="{{url_for('static',filename='js/jquery.ui.custom.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static',filename='js/matrix.js')}}"></script>
-
-
+{% block js%}
+{% endblock %}
 
 </body></html>

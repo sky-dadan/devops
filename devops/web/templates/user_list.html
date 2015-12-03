@@ -13,11 +13,12 @@
   </div> <!--end widget-title-->
 
 <!--update modal-->                                                                                 
-<div id="updateModal" class="modal fade">
+<div id="updateModal" class="modal hide fade">
   <div class="modal-dialog">
     <div class="modal-content">
 
       <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 		<h4 class="modal-title">更新用户信息</h4>
 	  </div><!--modal-header end-->
 
@@ -26,47 +27,53 @@
 
     <form class="form-horizontal" id="updateForm">
      	<div class="form-group">
-			 <label class="col-md-2 control-label">name</label>
-     		 <div class="col-md-9">
-       		 	<input id="upname"  type="text" class="form-control" name="name" >
+			 <label class="control-label">name</label>
+     		 <div class="controls">
+       		 	<input id="upname"  type="text"  name="name" >
       		</div> 
        	</div> <!--update name end-->
+     	<div class="form-group">
+            <label class="control-label">username</label>
+     		 <div class="controls">
+       		 	<input id="upusername"  type="text"  name="username" >
+      		</div> 
+       	</div> <!--update username end-->
         <div class="form-group">
-			<label class="col-md-2 control-label">email</label>
-      		<div class="col-md-9">
-       			<input id="upemail" type="text" class="form-control" name="email" >
+			<label class="control-label">email</label>
+      		<div class="controls">
+       			<input id="upemail" type="text"  name="email" >
       		</div> 
 		</div><!--update email  end -->
         <div class="form-group">
-			<label class="col-md-2 control-label">mobile</label>
-      		<div class="col-md-9">
-       			<input id="upemobile" type="text" class="form-control" name="mobile" >
+			<label class="control-label">mobile</label>
+      		<div class="controls">
+       			<input id="upemobile" type="text"  name="mobile" >
       		</div> 
 		</div><!--update mobile  end -->
  		<div class="form-group">
-			<label class="col-md-2 control-label">role</label>
-      		<div class="col-md-9">
-       			<select name="role"  class="form-control" id="uprole">
+			<label class="control-label">role</label>
+      		<div class="controls">
+       			<select name="role"  id="uprole">
 					<option value="0">超级管理员</option> 
 					<option value="1">普通用户</option> 
 				</select> 
       		</div> 
     	</div><!--update role end-->
         <div class="form-group">
-			<label class="col-md-2 control-label">lock</label>
-      		<div class="col-md-9">
-       			<select name="lock"  class="form-control" id="uplock">
+			<label class="control-label">lock</label>
+      		<div class="controls">
+       			<select name="lock" id="uplock">
 					<option value="0">正常</option> 
 					<option value="1">锁定</option> 
 				</select> 
       		</div> 
 		</div><!--update lock  end -->
     	<div class="form-group">
-     		<div class="col-md-4 col-md-offset-2">
+     		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
 				<button class="btn btn-warning" data-dismiss="modal">退出</button>
          	</div>
-    	</div><!--button end-->
+      </div><!--button end-->
 
     </form><!--form end-->
    </div> <!--modal body end-->
@@ -119,6 +126,7 @@ $("body").on('click','.update-btn',function(){
     $.getJSON(getbyid,function(result){
       alert(result)   //for test
       $('#upname').val(result['name']) 
+      $('#upusername').val(result['username']) 
       $('#upemail').val(result['email']) 
       $('#upmobile').val(result['mobile']) 
       $('#uprole').val(result['role']) 

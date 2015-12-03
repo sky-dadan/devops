@@ -1,5 +1,5 @@
 #coding:utf-8
-from flask import Flask, render_template,session,redirect
+from flask import Flask, render_template,session,redirect,request
 from  . import app  #导入__init__包文件中实例化的app，等价 from web import app
 from db  import Cursor    #导入数据库连接模块
 import util
@@ -60,16 +60,15 @@ def user_list():
 def getbyid():
     if session.get('username') == None:
     	return redirect('/login')
-    id = request.args.get('id')                                   
+    id = int(request.args.get('id'))     
     if not id:
     	return "need an id"
     headers['authorization'] = session['author']
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:1000/api/user/getbyid/%d" % id
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
-	return "ok"
-
+	return json.dumps(result['user'])
 
 @app.route("/user/update",methods=['GET','POST'])
 def user_update():
@@ -77,6 +76,7 @@ def user_update():
        return redirect('/login')
     headers['authorization'] = session['author']
     url = "http://192.168.1.243:1000/api/user"
+    data = {}
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
     if int(result['code']) == 0:

@@ -67,8 +67,7 @@ def getbyid():
     url = "http://192.168.1.243:2000/api/user/getbyid/%d" % id
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
-    if int(result['code']) == 0:
-	return json.dumps(result['user'])
+    return json.dumps(result)
 
 @app.route("/user/update",methods=['GET','POST'])
 def user_update():

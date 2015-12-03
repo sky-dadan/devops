@@ -124,7 +124,7 @@ def getbyid(auth_info,user_id):
     role = int(auth_info[2])
     if request.method == 'GET':  #get user info from user_id
         try:
-            fields = ['name','email','mobile','role','is_lock']
+            fields = ['username','name','email','mobile','role','is_lock']
             if role == 0:
                 user = {}
                 sql = "SELECT %s FROM user WHERE id = %d" % (','.join(fields),user_id)

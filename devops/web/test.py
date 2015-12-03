@@ -14,7 +14,7 @@ def index():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -48,7 +48,7 @@ def user_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:1000/api/user?list=true"
+    url = "http://192.168.1.243:2000/api/user?list=true"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -64,7 +64,7 @@ def getbyid():
     if not id:
     	return "need an id"
     headers['authorization'] = session['author']
-    url = "http://192.168.1.243:1000/api/user/getbyid/%d" % id
+    url = "http://192.168.1.243:2000/api/user/getbyid/%d" % id
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -75,10 +75,18 @@ def user_update():
     if session.get('username') == None:
        return redirect('/login')
     headers['authorization'] = session['author']
-    url = "http://192.168.1.243:1000/api/user"
-    data = {}
+
+    user_id = int(request.args.get('id'))
+    name = request.args.get('name')
+    username = request.args.get('username')
+    email = request.args.get('email')
+    mobile = request.args.get('mobile')
+    role = int(request.args.get('role'))
+    is_lock = int(request.args.get('lock'))
+
+    data = {'user_id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'is_lock':is_lock}
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
-    if int(result['code']) == 0:
-	return "ok"
+    return json.dumps(result)
 

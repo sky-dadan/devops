@@ -60,11 +60,11 @@ def User(auth_info,offset=0,size=10):
                         sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
                                email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
-                sql = 'UPDATE user SET username="%(username)s",name="%(name)s",email="%(email)s", \
+                sql = 'UPDATE user SET name="%(name)s",email="%(email)s", \
                         mobile="%(mobile)s" WHERE username="%%s"' % data %name
             app.config['cursor'].execute(sql)
-            util.write_log(name,'update user %s' % data['username'])
-            return json.dumps({'code':0,'result':'update %s success' % data['username']})
+            util.write_log(name,'update user %s' % name)
+            return json.dumps({'code':0,'result':'update %s success' % name})
         except:
             logging.getLogger().error('update user error : %s' % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'update user error'})

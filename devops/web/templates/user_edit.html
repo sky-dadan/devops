@@ -19,20 +19,28 @@
          <div class="control-group">
               <label class="control-label">登录账号：</label>
               <div class="controls">
-                    <span style="display:block; padding-top:4px;color:#888;">liuziping</span>
+                  <span style="display:block; padding-top:4px;color:#888;">{{user['username']}}</span>
               </div>
          </div> <!--end zhanghao-->
          <div class="control-group">
                <label class="control-label">姓名：</label>
                <div class="controls">
-                    <input type="text" name="user_name" id="user_name" value="刘子平" />
+                   <input type="text" name="user_name" id="user_name" value='{{user['name']}}' />
                     <span for="required" generated="true" class="help-inline"></span>
                 </div>
          </div> <!--end name-->
          <div class="control-group">
+             <label class="control-label">E-mail：</label>
+               <div class="controls">
+                   <input type="text" name="user_email" id="user_email" value='{{user['email']}}' />
+                    <span for="required" generated="true" class="help-inline"></span>
+                </div>
+         </div> <!--end email-->
+
+         <div class="control-group">
             <label class="control-label">联系电话：</label>
             <div class="controls">
-                <input type="text" name="user_phone" id="user_phone" value="18310519941" />
+                <input type="text" name="user_mobile" id="user_mobile" value="{{user['mobile']}}" />
                 <span for="required" generated="true" class="help-inline"></span>
             </div>
          </div>   <!--end phone-->
@@ -44,3 +52,19 @@
  </div> <!--widget-content  end -->
 </div><!--widget-box end-->
 {% endblock %}
+{% block js %}
+<script>
+$('#submit_edit_profile').on('click',function(){
+    var str = $('#edit_profile_form').serialize()
+    var url = '/user/updateoneself?'+str
+    $.getJSON(url,function(result){
+        console.log(result)
+        if (result['code']==0){   //recevie json object
+            alert("更新成功")
+        }else{
+            $('#errorMsg').html('failed '+result['errmsg']).show()
+        }
+    })
+})
+</script>
+{% endblock%}

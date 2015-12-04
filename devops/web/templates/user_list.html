@@ -126,7 +126,7 @@
 	</thead>
 	<tbody>
         {% for user in users %}
-		<tr id="_con_tr" class="odd gradeX">
+		<tr  class="odd gradeX">
             <td>{{user['name']}}</td>
             <td>{{user['email']}}</td>
             <td>{{user['mobile']}}</td>
@@ -207,11 +207,13 @@ $('#ChangePasswdForm').on('submit',function(){
 /*delete data*/
 $("tbody").on('click','.delete-btn',function(){
 	if(confirm("Are you sure delete")){
+        var that = this;
 		var id = $(this).attr('data-id')
 		var delete_url = '/user/delete?id='+id
 		$.getJSON(delete_url,function(result){
 			if (result['code']== 0 ){
 				alert('success')
+                $(that).parents('tr').remove();
 			}else{
 				alert(result['errmsg'])
 			}

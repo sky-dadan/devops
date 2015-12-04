@@ -178,6 +178,7 @@ $('#updateForm').on('submit',function(){
 			 if (result['code']==0){   //recevie json object
                 alert("更新成功")
 				$('#updateModal').modal('hide')
+                location.reload()
 			 }else{
 				//alert('failed  '+result['msg'])
 				 $('#errorMsg').html('failed '+result['errmsg']).show()

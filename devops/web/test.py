@@ -10,7 +10,7 @@ headers = {'content-type': 'application/json'}
 @app.route("/",methods=['GET'])
 @app.route("/user/info",methods=['GET'])
 def index():
-    if session.get('username') == None:
+    if session.get('username') == None or not session:
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
@@ -20,7 +20,7 @@ def index():
     if int(result['code']) == 0:
         return render_template('index.html',name=name,result=result['user'])
     else:
-        return render_template('index.html')
+        return redirect('/login')
 
 @app.route("/user/passwd",methods=['GET','POST'])
 def change_passwd():
@@ -141,5 +141,18 @@ def changepasswd():
     url = "http://192.168.1.243:1000/api/password"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
+    return json.dumps(result)
+
+@app.route("/user/delete",methods=['GET','POST'])
+def userdelete():
+    if session.get('username') == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    user_id = int(request.args.get('id'))
+    url = "http://192.168.1.243:1000/api/user"
+    data = {"user_id":user_id}
+    r = requests.delete(url, headers=headers,json=json.dumps(data))
+    result = json.loads(r.content)
+    print result
     return json.dumps(result)
 

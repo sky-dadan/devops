@@ -208,12 +208,12 @@ $('#ChangePasswdForm').on('submit',function(){
 $("tbody").on('click','.delete-btn',function(){
 	if(confirm("Are you sure delete")){
 		var id = $(this).attr('data-id')
-		var delete_url = '/delete?id='+id
-		$.get(delete_url,function(result){
-			if (result=='ok'){
+		var delete_url = '/user/delete?id='+id
+		$.getJSON(delete_url,function(result){
+			if (result['code']== 0 ){
 				alert('success')
 			}else{
-				alert(result)
+				alert(result['errmsg'])
 			}
     	})
     }  // end confirm

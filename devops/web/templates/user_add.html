@@ -14,34 +14,42 @@
 
    <div class="widget-content">
      
-    <form class="form-horizontal" id="user_signup_form" accept-charset="UTF-8" method="POST" autocomplete="off" novalidate="novalidate">
+       <form class="form-horizontal" id="user_signup_form" accept-charset="UTF-8" method="POST" autocomplete="off" novalidate="novalidate">
     <div class="control-group">
-        <label class="control-label">用户类型：</label>
+        <label class="control-label">角色：</label>
         <div class="controls">
             <select name='role' id='role' style='width:120px'> 
-                <option value=1>超级管理员</option>
-                <option value=2>普通管理员</option>
+                <option value=0>超级管理员</option>
+                <option value=1>普通用户</option>
             </select>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">E-mail地址：</label>
+        <label class="control-label">用户名：</label>
         <div class="controls">
-            <input type="text" name="user_mail" id="user_mail" />
-            <input type="hidden" id="user_mail_status" value="0" />
+            <input type="text" name="username" id="username"/>
+            <input type="hidden" id="user_name_status" value="0" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">姓名：</label>
         <div class="controls">
-            <input type="text" name="user_name" id="user_name" />
+            <input  type="text" name="user_name" id="user_name" />
             <input type="hidden" id="user_name_status" value="0" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">联系电话：</label>
+        <label class="control-label">E-mail：</label>
+        <div class="controls">
+            <input  type="email" ng-model="user.email" name="user_mail" id="user_mail" />
+            <input type="hidden" id="user_mail_status" value="0" />
+            <span for="required" generated="true" class="help-inline"></span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">手机：</label>
         <div class="controls">
             <input type="text" name="user_phone" id="user_phone" />
             <input type="hidden" id="user_phone_status" value="0" />
@@ -49,9 +57,18 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">状态：</label>
+        <div class="controls">
+            <select name='lock' id='lock' style='width:120px'> 
+                <option value=0>正常</option>
+                <option value=1>锁定</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">登录密码：</label>
         <div class="controls">
-            <input type="password" name="user_pwd" id="user_pwd" />
+            <input  type="password" name="user_pwd" id="user_pwd" />
             <input type="hidden" id="user_pwd_status" value="0" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
@@ -59,7 +76,7 @@
     <div class="control-group">
         <label class="control-label">重复输入密码：</label>
         <div class="controls">
-            <input type="password" name="user_repwd" id="user_repwd" />
+            <input  type="password" name="user_repwd" id="user_repwd" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
@@ -71,4 +88,26 @@
        
   </div> <!--widget-content  end -->
 </div><!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+<script>
+$("#submit_data_btn").on('click',function(){
+    var str = $('#user_signup_form').serialize()
+    var url = '/user/useradd?'+str
+    $.getJSON(url,function(result){
+        if (result['code']==0){
+            alert("创建用户成功")
+        }else{
+            alert("创建用户失败")
+        }
+    })
+})
+
+$("form :input.required").each(function(){
+    var $required = $("<strong class='high'> *</strong>"); //创建元素
+    $(this).parent().append($required); //然后将它追加到文档中
+});
+
+</script>
 {% endblock %}

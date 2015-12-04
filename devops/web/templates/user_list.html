@@ -83,6 +83,34 @@
 </div><!-- /.modal -->
 
 
+<div id="ChangePasswdModal" class="modal hide fade">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title">更改用户密码</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+      <p hidden id="errorMsg" class="text-danger" style="color:red">更改用户密码</p> <!-- foe error msg-->
+
+     <form class="form-horizontal" id="ChangePasswdForm">
+        <input type="hidden" id='passwdid' name="passwdid">  <!--update need id-->
+     	<div class="form-group">
+            <label class="control-label">新密码</label>
+     		 <div class="controls">
+       		 	<input id="changepasswd"  type="password"  name="changepasswd" >
+      		</div> 
+        </div>
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+     </form>
+      </div>
+</div>
+
   <div class="widget-content">
 
    <table class="table table-bordered table-striped">
@@ -90,19 +118,19 @@
 		<tr>
 			<th scope="col">姓名</th>
 			<th scope="col">E-mail</th>
-			<th scope="col">手机号码</th>
+			<th scope="col">手机</th>
 			<th scope="col">状态</th>
-			<th scope="col">账户类型</th>
+            <th scope="col">角色</th>
             <th  scope="col">操作</th>
 		</tr>
 	</thead>
-	<body>
+	<tbody>
         {% for user in users %}
 		<tr id="_con_tr" class="odd gradeX">
             <td>{{user['name']}}</td>
             <td>{{user['email']}}</td>
             <td>{{user['mobile']}}</td>
-            <td><span style="color:#5EDF47;">{%if user['is_lock']=='0'%}锁定{%else%}正常{%endif%}</span></td>
+            <td><span style="color:#5EDF47;">{%if user['is_lock']==1%}锁定{%else%}正常{%endif%}</span></td>
             <td>{%if user['role']==0 %}超级管理员{%else%}普通用户{% endif %}</td>
 			<td>
                 <button  class='btn btn-info btn-sm update-btn' data-id='{{user['id']}}'>更新</button>
@@ -121,7 +149,7 @@
 {% block js %}
 <script>
 /*get data for update */
-$("body").on('click','.update-btn',function(){
+$("tbody").on('click','.update-btn',function(){
     var id = $(this).attr('data-id')
     var getbyid = "/getbyid?id="+id
     $('#updateModal').modal('show')  //show modal
@@ -157,8 +185,27 @@ $('#updateForm').on('submit',function(){
        })
        return false   //update data and end
 })    
+/*update passwd*/
+$("tbody").on('click','.passwd-btn',function(){
+    var id = $(this).attr('data-id')
+    $('#passwdid').val(id) 
+    $('#ChangePasswdModal').modal('show')
+})
+
+$('#ChangePasswdForm').on('submit',function(){
+    var str = $('#ChangePasswdForm').serialize()
+    var url = '/user/changepasswd?'+str
+    $.getJSON(url,function(result){
+        if (result['code']==0){
+            alert("密码更新成功")
+            $('#ChangePasswdModal').modal('hide')
+        }else{
+            $('#errorMsg').html('failed '+result['errmsg']).show()
+        }
+    })
+})
 /*delete data*/
-$("body").on('click','.delete-btn',function(){
+$("tbody").on('click','.delete-btn',function(){
 	if(confirm("Are you sure delete")){
 		var id = $(this).attr('data-id')
 		var delete_url = '/delete?id='+id

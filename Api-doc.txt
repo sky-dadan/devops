@@ -92,3 +92,6 @@ Api调用说明文档
     url = "http://192.168.1.243:1000/api/group_detail/<gid>"
     r = requests.get(url,headers=headers)
 
+7.1 管理员通过用户id查看用户信息
+    url = "http://192.168.1.243:1000/api/user/getbyid/<int:user_id>"
+    r = requests.get(url,headers=headers)

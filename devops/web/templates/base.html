@@ -29,8 +29,9 @@
 <div id="user-nav" class="navbar navbar-inverse">
     <ul class="nav">
         <li  class="dropdown" id="profile-messages" >
-            <a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle"><i class="icon icon-user"></i> <span class="text">{{name}}</span><b class="caret"></b>
-            </a>
+            <a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle"><i class="icon icon-user"></i> 
+                <span class="text">{% if not name%}<span style="color: red;">{{errmsg}}</span>{%else%}{{name}}{%endif%}</span>
+            <b class="caret"></b></a>
             <ul class="dropdown-menu">
                 <li><a href="/user/info"><i class="icon-user"></i>个人中心</a></li>
                 <li class="divider"></li>

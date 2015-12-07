@@ -145,14 +145,15 @@ def chpwdoneself():
     if session.get('username') == None:
        return redirect('/login')
     headers['authorization'] = session['author']
-    oldpasswd = request.args.get('oldpasswd')
-    newpasswd = request.args.get('newpasswd')
-    data = {'oldpassword':oldpasswd,'password':newpasswd}
-    print data
-    url = "http://192.168.1.243:2000/api/password"
-    r = requests.put(url, headers=headers,json=json.dumps(data))
-    result = json.loads(r.content)
-    return json.dumps(result)
+    if request.method == 'POST':
+        oldpasswd = request.form.get('oldpasswd')
+        newpasswd = request.form.get('newpasswd')
+        data = {'oldpassword':oldpasswd,'password':newpasswd}
+        print data
+        url = "http://192.168.1.243:2000/api/password"
+        r = requests.put(url, headers=headers,json=json.dumps(data))
+        result = json.loads(r.content)
+        return json.dumps(result)
 
 @app.route("/user/delete",methods=['GET','POST'])
 def userdelete():

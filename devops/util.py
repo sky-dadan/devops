@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 
 import os, os.path
-import time
+import time,json
 import base64
 import hashlib
 import logging
@@ -61,15 +61,20 @@ def validate(key, fix_pwd):
     key = base64.b64decode(key)
     x = key.split('|')
     if len(x) != 5:
-        return
+        logging.getLogger().warning("token参数数量不足")
+        return json.dumps({'code':1,'errmsg':'token参数不足'})
 
     if t > int(x[1]) + 2*60*60:
-        return
+        logging.getLogger().warning("登录已经过期")
+        return json.dumps({'code':1,'errmsg':'登录已过期'})
     validate_key = hashlib.md5('%s%s%s' % (x[0], x[1], fix_pwd)).hexdigest()
     if validate_key == x[4]:
-        return x[0], x[2], x[3]
+        logging.getLogger().info("api认证通过")
+        return json.dumps({'code':0,'name':x[0],'uid':x[2],'role':x[3]})
     else:
-        return
+        logging.getLogger().warning("密码不正确")
+        return json.dumps({'code':1,'errmsg':'密码不正确'})
+        
 
 def if_userid_exist(user_id):
     sql = 'select * from user where id = %d ' % (user_id)

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}用户列表{% endblock %}
+{% block css %} <link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css"> {% endblock%}
 {% block breadcrumb %}<a href="/user/list">用户列表</a>{% endblock %}
 
 {% block h1 %}用户列表{% endblock %}
@@ -113,7 +114,7 @@
 
   <div class="widget-content">
 
-   <table class="table table-bordered table-striped">
+   <table id ="datatable"  class="table table-bordered table-striped">
 	<thead>
 		<tr>
 			<th scope="col">姓名</th>
@@ -126,7 +127,7 @@
 	</thead>
 	<tbody>
         {% for user in users %}
-		<tr id="_con_tr" class="odd gradeX">
+		<tr  class="odd gradeX">
             <td>{{user['name']}}</td>
             <td>{{user['email']}}</td>
             <td>{{user['mobile']}}</td>
@@ -147,7 +148,14 @@
 {% endblock %}
 
 {% block js %}
+<script  type="text/javascript"language="javascript"src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
 <script>
+$(document).ready(function(){
+    $('#datatable').DataTable({
+	
+    });
+
+});
 /*get data for update */
 $("tbody").on('click','.update-btn',function(){
     var id = $(this).attr('data-id')
@@ -178,6 +186,7 @@ $('#updateForm').on('submit',function(){
 			 if (result['code']==0){   //recevie json object
                 alert("更新成功")
 				$('#updateModal').modal('hide')
+                location.reload()
 			 }else{
 				//alert('failed  '+result['msg'])
 				 $('#errorMsg').html('failed '+result['errmsg']).show()
@@ -207,13 +216,15 @@ $('#ChangePasswdForm').on('submit',function(){
 /*delete data*/
 $("tbody").on('click','.delete-btn',function(){
 	if(confirm("Are you sure delete")){
+        var that = this;
 		var id = $(this).attr('data-id')
-		var delete_url = '/delete?id='+id
-		$.get(delete_url,function(result){
-			if (result=='ok'){
+		var delete_url = '/user/delete?id='+id
+		$.getJSON(delete_url,function(result){
+			if (result['code']== 0 ){
 				alert('success')
+                $(that).parents('tr').remove();
 			}else{
-				alert(result)
+				alert(result['errmsg'])
 			}
     	})
     }  // end confirm

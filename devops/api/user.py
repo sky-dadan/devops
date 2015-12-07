@@ -9,9 +9,11 @@ from auth import auth_login
 @app.route('/api/user',methods=['GET','PUT','POST','DELETE'])
 @auth_login
 def User(auth_info,offset=0,size=10):
-    name = auth_info[0]
-    uid = int(auth_info[1])
-    role = int(auth_info[2])
+    if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
+        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+    name = auth_info['name']
+    uid = int(auth_info['uid'])
+    role = int(auth_info['role'])
 ###########  select for admin and user #################################
     if request.method == 'GET':  #get all user info from user_id
         try:
@@ -119,9 +121,11 @@ def User(auth_info,offset=0,size=10):
 @app.route('/api/user/getbyid/<int:user_id>',methods=['GET'])
 @auth_login
 def getbyid(auth_info,user_id):
-    name = auth_info[0]
-    uid = int(auth_info[1])
-    role = int(auth_info[2])
+    if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
+        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+    name = auth_info['name']
+    uid = int(auth_info['uid'])
+    role = int(auth_info['role'])
     if request.method == 'GET':  #get user info from user_id
         try:
             fields = ['id','username','name','email','mobile','role','is_lock']
@@ -145,12 +149,14 @@ def getbyid(auth_info,user_id):
 @app.route('/api/password',methods=['PUT'])
 @auth_login
 def passwd(auth_info):
+    if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
+        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+    name = auth_info['name']
+    uid = int(auth_info['uid'])
+    role = int(auth_info['role'])
     try:
         data = request.get_json()
         data = json.loads(data)
-        name = auth_info[0]
-        uid = int(auth_info[1])
-        role = int(auth_info[2])
         if  role==0:   # admin no need oldpassword  but need user_id
             if  not data.has_key('user_id') :
                 if data.has_key('oldpassword') and data.has_key('password'):
@@ -194,27 +200,6 @@ def passwd(auth_info):
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'update user password error'})
 
-##  管理员修改角色
-@app.route('/api/role/<int:user_id>',methods=['PUT'])
-@auth_login
-def role(auth_info,user_id):
-    try:
-        name = auth_info[0]
-        role = int(auth_info[2])
-        if role != 0:
-            logging.getLogger().warning("Request forbiden")
-            return json.dumps({'code': 1, 'errmsg': 'User validate error, Request forbiden'})
-        if not util.if_userid_exist(user_id): 
-          return json.dumps({'code':1,'errmsg':'User is not exist'})
-        data = request.get_json()
-        data = json.loads(data)
-        sql = 'update user set role=%d where id=%d' % (data['role'],user_id)
-        app.config['cursor'].execute(sql)
-        util.write_log(name,'update user  %s role' % user_id)
-        return json.dumps({'code':0,'result':'update %s success' % user_id})
-    except:
-        logging.getLogger().error('update user role error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'update user role error'})
 
 ## 用户登录
 @app.route('/api/auth', methods=['GET'])

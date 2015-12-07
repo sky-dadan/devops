@@ -11,13 +11,14 @@ from . import app
 def auth_login(func):
     def wrapper(*arg, **args):
         try:
-            authorization = request.headers.get('authorization', '')
+            authorization = request.headers.get('authorization', 'None')
             res = util.validate(authorization, app.config['passport_key'])
-            print res
-            print type(res)
-            if not res:
-                logging.getLogger().warning("Request forbiden")
-                return json.dumps({'code': 1, 'errmsg': 'User validate error'})
+            res = json.loads(res)
+#            print res
+#            print type(res)
+            if int(res['code']) == 1:
+                logging.getLogger().warning("Request forbiden:%s" % res['errmsg'])
+                return json.dumps({'code': 1, 'errmsg': '%s' % res['errmsg']})
         except:
             logging.getLogger().warning("Validate error: %s" % traceback.format_exc())
             return json.dumps({'code': 1, 'errmsg': 'User validate error'})

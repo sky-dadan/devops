@@ -37,8 +37,8 @@
        	</div> <!--newpasswd  end-->
     	<div class="form-group">
      		<div class="modal-footer">
-				<button class="btn btn-primary" >更新</button>
-				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+				<button class="btn btn-primary update-btn" >更新</button>
+				<button class="btn btn-warning exit-btn" data-dismiss="modal">退出</button>
          	</div>
       </div><!--button end-->
 
@@ -93,6 +93,20 @@ $("body").on('click','#passwd',function(){
       $('#upname').val(result['name']) 
     })*/
     
+})
+
+$(".update-btn").on('click',function(){
+   var str = $("#updateForm").serialize()
+   var url = '/user/chpwdoneself?'+str
+   $.getJSON(url,function(result){
+        console.log(result)
+        if (result['code']==0){   //recevie json object
+             alert("更新成功")
+             $('#updateModal').modal('hide')
+        }else{
+             alert("更新失败")
+            }
+   })
 })
 </script>
 {% endblock %}

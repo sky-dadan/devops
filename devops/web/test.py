@@ -10,7 +10,7 @@ headers = {'content-type': 'application/json'}
 @app.route("/",methods=['GET'])
 @app.route("/user/info",methods=['GET'])
 def index():
-    if session.get('username') == None or not session:
+    if session.get('username') == None:
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
@@ -40,34 +40,31 @@ def user_edit():
     if int(result['code']) == 0:
         return render_template('user_edit.html',name=name,user=result['user'])
     else:
-        return render_template('user_edit.html')
+        return render_template('user_edit.html',errmsg=result['errmsg'])
 
 ##  for admin
 @app.route("/user/add",methods=['GET','POST'])
-def user_add():
-    if session.get('username') == None:
-        return redirect('/login')
-    return render_template('user_add.html')
-
-@app.route("/user/useradd",methods=['GET','POST'])
 def useradd():
     if session.get('username') == None:
         return redirect('/login')
-
     headers['authorization'] = session['author']
-    role = int(request.args.get('role'))
-    username = request.args.get('username')
-    name = request.args.get('user_name')
-    email = request.args.get('user_mail')
-    mobile = request.args.get('user_phone')
-    is_lock = int(request.args.get('lock'))
-    password = request.args.get('user_pwd')
-    user_repwd = request.args.get('user_repwd')
+    name = session['username']
+    if request.method == 'POST':
+        role = int(request.form.get('role'))
+        username = request.form.get('username')
+        name = request.form.get('user_name')
+        email = request.form.get('user_mail')
+        mobile = request.form.get('user_phone')
+        is_lock = int(request.form.get('lock'))
+        password = request.form.get('user_pwd')
+        user_repwd = request.form.get('user_repwd')
 
-    data = {'role':role,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
-    url = "http://192.168.1.243:1000/api/user"
-    r = requests.post(url,headers=headers,json=json.dumps(data))
-    return r.content
+        data = {'role':role,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
+        url = "http://192.168.1.243:1000/api/user"
+        r = requests.post(url,headers=headers,json=json.dumps(data))
+        return r.content
+    else:
+        return render_template('user_add.html',name=name)
     
 @app.route("/user/list",methods=['GET','POST'])
 def user_list():
@@ -81,7 +78,7 @@ def user_list():
     if int(result['code']) == 0:
         return render_template('user_list.html',name=name,users=result['users'])
     else:
-        return render_template('user_list.html')
+        return render_template('user_list.html',errmsg=result['errmsg'])
 
 @app.route("/getbyid",methods=['GET','POST'])
 def getbyid():
@@ -118,7 +115,7 @@ def user_update():
 
 @app.route("/user/updateoneself",methods=['GET','POST'])
 def updateoneself():
-    if session.get('username') == None:
+    if session.get('username') == None :
        return redirect('/login')
     headers['authorization'] = session['author']
     name = request.args.get('user_name') 
@@ -132,7 +129,7 @@ def updateoneself():
 
 @app.route("/user/changepasswd",methods=['GET','POST'])
 def changepasswd():
-    if session.get('username') == None:
+    if session.get('username') == None :
        return redirect('/login')
     headers['authorization'] = session['author']
     user_id = int(request.args.get('passwdid'))
@@ -145,7 +142,7 @@ def changepasswd():
 
 @app.route("/user/delete",methods=['GET','POST'])
 def userdelete():
-    if session.get('username') == None:
+    if session.get('username') == None :
        return redirect('/login')
     headers['authorization'] = session['author']
     user_id = int(request.args.get('id'))

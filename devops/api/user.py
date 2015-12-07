@@ -153,7 +153,21 @@ def passwd(auth_info):
         role = int(auth_info[2])
         if  role==0:   # admin no need oldpassword  but need user_id
             if  not data.has_key('user_id') :
-                return json.dumps({'code':1,'errmsg':'admin must input user_id'})
+                if data.has_key('oldpassword') and data.has_key('password'):
+                    oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
+                    sql = 'SELECT password FROM user WHERE username="%s"' % name
+                    app.config['cursor'].execute(sql)
+                    res = app.config['cursor'].fetchone()
+                    if res[0] != oldpassword:
+                        return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
+                    else:
+                        password = hashlib.md5(data['password']).hexdigest()
+                        sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,name)
+                        app.config['cursor'].execute(sql)
+                        util.write_log(name,'update user password')
+                        return json.dumps({'code':0,'result':'update password success'  })
+                else:
+                    return json.dumps({'code':1,'errmsg':'admin must input user_id'})
             else:
                 user_id = data['user_id']
                 if not util.if_userid_exist(user_id): 

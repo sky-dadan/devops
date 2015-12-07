@@ -18,13 +18,14 @@ def login():
         result = json.loads(r.content)
         if result['code'] == 0:
             token = result["authorization"]
-            res = util.validate(token,app.config['passport_key'])  #return : list(name,uid,role)
-            if int(res[2]) == 0:                          #针对管理员和普通用户的前端页面展示，暂不处理
-                print "%s is admin" % res[0]
+            res = util.validate(token,app.config['passport_key'])  #返回json对象
+            res = json.loads(res)  #return : dict(name:*,uid:*,role:*)
+            if int(res['role']) == 0:                    #针对管理员和普通用户的前端页面展示，暂不处理
+                print "%s is admin" % res['name']
             else:
-                print "%s is user" % res[0]
+                print "%s is user" % res['name']
             session['author'] = token
-            session['username'] = res[0]
+            session['username'] = res['name']
             return redirect('/')
         else:
             return redirect('/login')

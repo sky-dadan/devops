@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}用户列表{% endblock %}
-{% block css %} <link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css"> {% endblock%}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<style>
+.widget-content .dataTables_filter{position:static;}
+</style>
+{% endblock%}
 {% block breadcrumb %}<a href="/user/list">用户列表</a>{% endblock %}
 
 {% block h1 %}用户列表{% endblock %}
@@ -152,9 +157,21 @@
 <script>
 $(document).ready(function(){
     $('#datatable').DataTable({
-	
+        "language": {
+            "lengthMenu": "每页 _MENU_ 条记录",
+            "zeroRecords": "没有找到记录",
+            "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+            "infoEmpty": "无记录",
+            "infoFiltered": "(从 _MAX_ 条记录过滤)",
+            "sSearch": "搜索:",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上一页",
+                "sNext": "下一页",
+                "sLast": "末页"
+            }
+        }
     });
-
 });
 /*get data for update */
 $("tbody").on('click','.update-btn',function(){

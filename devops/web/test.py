@@ -14,7 +14,7 @@ def index():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -34,7 +34,7 @@ def user_edit():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -60,7 +60,7 @@ def useradd():
         user_repwd = request.form.get('user_repwd')
 
         data = {'role':role,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
-        url = "http://192.168.1.243:1000/api/user"
+        url = "http://192.168.1.243:2000/api/user"
         r = requests.post(url,headers=headers,json=json.dumps(data))
         return r.content
     else:
@@ -72,7 +72,7 @@ def user_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:1000/api/user?list=true"
+    url = "http://192.168.1.243:2000/api/user?list=true"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -88,7 +88,7 @@ def getbyid():
     if not id:
     	return "need an id"
     headers['authorization'] = session['author']
-    url = "http://192.168.1.243:1000/api/user/getbyid/%d" % id
+    url = "http://192.168.1.243:2000/api/user/getbyid/%d" % id
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     return json.dumps(result)
@@ -108,7 +108,7 @@ def user_update():
     is_lock = int(request.args.get('lock'))
 
     data = {'user_id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'is_lock':is_lock}
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
     return json.dumps(result)
@@ -122,8 +122,7 @@ def updateoneself():
     email = request.args.get('user_email')
     mobile = request.args.get('user_mobile')
     data = {'name':name,'email':email,'mobile':mobile}
-    print data
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     r = requests.put(url,headers=headers,json=json.dumps(data))
     return r.content
 
@@ -132,13 +131,14 @@ def changepasswd():
     if session.get('username') == None :
        return redirect('/login')
     headers['authorization'] = session['author']
-    user_id = int(request.args.get('passwdid'))
-    password = request.args.get('changepasswd')
-    data = {'user_id':user_id,'password':password}
-    url = "http://192.168.1.243:1000/api/password"
-    r = requests.put(url, headers=headers,json=json.dumps(data))
-    result = json.loads(r.content)
-    return json.dumps(result)
+    if request.method == 'POST':
+        user_id = int(request.form.get('passwdid'))
+        password = request.form.get('changepasswd')
+        data = {'user_id':user_id,'password':password}
+        url = "http://192.168.1.243:2000/api/password"
+        r = requests.put(url, headers=headers,json=json.dumps(data))
+        result = json.loads(r.content)
+        return json.dumps(result)
 
 @app.route("/user/chpwdoneself",methods=['GET','POST'])
 def chpwdoneself():
@@ -149,8 +149,7 @@ def chpwdoneself():
         oldpasswd = request.form.get('oldpasswd')
         newpasswd = request.form.get('newpasswd')
         data = {'oldpassword':oldpasswd,'password':newpasswd}
-        print data
-        url = "http://192.168.1.243:1000/api/password"
+        url = "http://192.168.1.243:2000/api/password"
         r = requests.put(url, headers=headers,json=json.dumps(data))
         result = json.loads(r.content)
         return json.dumps(result)
@@ -161,10 +160,9 @@ def userdelete():
        return redirect('/login')
     headers['authorization'] = session['author']
     user_id = int(request.args.get('id'))
-    url = "http://192.168.1.243:1000/api/user"
+    url = "http://192.168.1.243:2000/api/user"
     data = {"user_id":user_id}
     r = requests.delete(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
-    print result
     return json.dumps(result)
 

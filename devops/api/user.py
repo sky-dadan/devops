@@ -11,7 +11,7 @@ from auth import auth_login
 def User(auth_info,offset=0,size=100):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
-    name = auth_info['name']
+    username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])
 ###########  select for admin and user #################################
@@ -34,16 +34,16 @@ def User(auth_info,offset=0,size=100):
                     users.append(user)
                 app.config['cursor'].execute("select  count(0) from user")
                 count=int(app.config['cursor'].fetchone()[0])
-                util.write_log(name, 'get_all_users')
+                util.write_log(username, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})
             else:    #普通用户和管理员都是通过自己的登陆用户名查询自己的信息
                 user = {}
-                sql = 'SELECT %s FROM user WHERE username="%s"' % (','.join(fields),name)
+                sql = 'SELECT %s FROM user WHERE username="%s"' % (','.join(fields),username)
                 app.config['cursor'].execute(sql)
                 res = app.config['cursor'].fetchone()    #返回结果为元组(id,username,……)
                 for i,k in enumerate(fields):     #取出元组的值及对应的索引号 0.1,2……
                     user[k]=res[i]                #fields中的列名作为user字典的k,索引作为数据库返回列表的k,实现字典赋值
-                util.write_log(name, 'get_one_users') 
+                util.write_log(username, 'get_one_users') 
                 return json.dumps({'code':0,'user':user})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
@@ -63,10 +63,10 @@ def User(auth_info,offset=0,size=100):
                                email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
                 sql = 'UPDATE user SET name="%(name)s",email="%(email)s", \
-                        mobile="%(mobile)s" WHERE username="%%s"' % data %name
+                        mobile="%(mobile)s" WHERE username="%%s"' % data %username
             app.config['cursor'].execute(sql)
-            util.write_log(name,'update user %s' % name)
-            return json.dumps({'code':0,'result':'update %s success' % name})
+            util.write_log(username,'update user %s' % username)
+            return json.dumps({'code':0,'result':'update %s success' % username})
         except:
             logging.getLogger().error('update user error : %s' % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'update user error'})
@@ -87,7 +87,7 @@ def User(auth_info,offset=0,size=100):
             sql = "INSERT INTO user (%s) VALUES (%s)" %  \
                     (','.join(fields), ','.join(values))
             app.config['cursor'].execute(sql)
-            util.write_log(name, "create_user %s" % data['username'])
+            util.write_log(username, "create_user %s" % data['username'])
             return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
         except:
             logging.getLogger().error("Create user error: %s" % traceback.format_exc())
@@ -110,7 +110,7 @@ def User(auth_info,offset=0,size=100):
                 return json.dumps({'code':1,'errmsg':'User is not exist'})
             sql = "DELETE FROM user WHERE id = %d" % (user_id) 
             app.config['cursor'].execute(sql)
-            util.write_log(name,'delete user %d' % user_id)
+            util.write_log(username,'delete user %d' % user_id)
             return json.dumps({'code':0,'result':'delte %d success' % user_id})
         except:
             logging.getLogger().error('delete user error : %s' % traceback.format_exc())
@@ -123,7 +123,7 @@ def User(auth_info,offset=0,size=100):
 def getbyid(auth_info,user_id):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
-    name = auth_info['name']
+    username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])
     if request.method == 'GET':  #get user info from user_id
@@ -136,10 +136,10 @@ def getbyid(auth_info,user_id):
                 row = app.config['cursor'].fetchone()
                 for i,k in enumerate(fields):
                     user[k]=row[i]
-                util.write_log(name, 'get_one_users') 
+                util.write_log(username, 'get_one_users') 
                 return json.dumps({'code':0,'user':user})
             else:
-                util.write_log(name, 'you are not admin!') 
+                util.write_log(username, 'you are not admin!') 
                 return json.dumps({'code':1,'result':'you are not admin!'})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
@@ -151,7 +151,7 @@ def getbyid(auth_info,user_id):
 def passwd(auth_info):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
-    name = auth_info['name']
+    username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])
     try:
@@ -161,16 +161,16 @@ def passwd(auth_info):
             if  not data.has_key('user_id') :
                 if data.has_key('oldpassword') and data.has_key('password'):
                     oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
-                    sql = 'SELECT password FROM user WHERE username="%s"' % name
+                    sql = 'SELECT password FROM user WHERE username="%s"' % username
                     app.config['cursor'].execute(sql)
                     res = app.config['cursor'].fetchone()
                     if res[0] != oldpassword:
                         return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
                     else:
                         password = hashlib.md5(data['password']).hexdigest()
-                        sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,name)
+                        sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,username)
                         app.config['cursor'].execute(sql)
-                        util.write_log(name,'update user password')
+                        util.write_log(username,'update user password')
                         return json.dumps({'code':0,'result':'update password success'  })
                 else:
                     return json.dumps({'code':1,'errmsg':'admin must input user_id'})
@@ -185,16 +185,16 @@ def passwd(auth_info):
                 return json.dumps({'code':1,'errmsg':'need input your old password' })
             else:
                 oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
-                sql = 'SELECT password FROM user WHERE username="%s"' % name
+                sql = 'SELECT password FROM user WHERE username="%s"' % username
                 app.config['cursor'].execute(sql)
                 res = app.config['cursor'].fetchone()
                 if res[0] != oldpassword:
                     return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
                 else:
                     password = hashlib.md5(data['password']).hexdigest()
-                    sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,name)
+                    sql = 'UPDATE user SET password="%s" WHERE username="%s"' % (password,username)
         app.config['cursor'].execute(sql)
-        util.write_log(name,'update user password')
+        util.write_log(username,'update user password')
         return json.dumps({'code':0,'result':'update password success'  })
     except:
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())
@@ -206,19 +206,19 @@ def passwd(auth_info):
 def login():
     if request.method == 'GET':
         try:
-            name = request.args.get('name', None)
+            username = request.args.get('username', None)
             passwd = request.args.get('passwd', None)
             passwd = hashlib.md5(passwd).hexdigest()
-            if not (name and passwd):
-                return json.dumps({'code': 1, 'errmsg': "Please input name or password."})
+            if not (username and passwd):
+                return json.dumps({'code': 1, 'errmsg': "Please input username or password."})
 
-            sql = "select id, username, password, role, is_lock from user where username='%s'" % name
+            sql = "select id, username, password, role, is_lock from user where username='%s'" % username
             app.config['cursor'].execute(sql)
             row = app.config['cursor'].fetchone()
             if not row:
                 return json.dumps({'code': 1, 'errmsg': "No such user."})
             if row[4] == 1:
-                return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % name})
+                return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % username})
 
             if passwd == row[2]:
                 s = util.get_validate(row[1], row[0], row[3], app.config['passport_key'])

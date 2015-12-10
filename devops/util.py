@@ -51,10 +51,10 @@ def set_logging(log_path, log_level='error'):
 def write_log(user, msg):
     logging.getLogger('record').debug('%s %s %s' % (int(time.time()), user, msg))
 
-def get_validate(name, uid, role, fix_pwd):
+def get_validate(username, uid, role, fix_pwd):
     t = int(time.time())
-    validate_key = hashlib.md5('%s%s%s' % (name, t, fix_pwd)).hexdigest()
-    return base64.b64encode('%s|%s|%s|%s|%s' % (name, t, uid, role, validate_key)).strip()
+    validate_key = hashlib.md5('%s%s%s' % (username, t, fix_pwd)).hexdigest()
+    return base64.b64encode('%s|%s|%s|%s|%s' % (username, t, uid, role, validate_key)).strip()
 
 def validate(key, fix_pwd):
     t = int(time.time())
@@ -70,7 +70,7 @@ def validate(key, fix_pwd):
     validate_key = hashlib.md5('%s%s%s' % (x[0], x[1], fix_pwd)).hexdigest()
     if validate_key == x[4]:
         logging.getLogger().info("api认证通过")
-        return json.dumps({'code':0,'name':x[0],'uid':x[2],'role':x[3]})
+        return json.dumps({'code':0,'username':x[0],'uid':x[2],'role':x[3]})
     else:
         logging.getLogger().warning("密码不正确")
         return json.dumps({'code':1,'errmsg':'密码不正确'})

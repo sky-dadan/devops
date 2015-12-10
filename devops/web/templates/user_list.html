@@ -222,8 +222,9 @@ $("tbody").on('click','.passwd-btn',function(){
 
 $('#ChangePasswdForm').on('submit',function(){
     var str = $('#ChangePasswdForm').serialize()
-    var url = '/user/changepasswd?'+str
-    $.getJSON(url,function(result){
+    var url = '/user/changepasswd'
+    $.post(url,str,function(result){
+        result = JSON.parse(result)
         if (result['code']==0){
             alert("密码更新成功")
             $('#ChangePasswdModal').modal('hide')
@@ -231,6 +232,7 @@ $('#ChangePasswdForm').on('submit',function(){
             $('#errorMsg').html('failed '+result['errmsg']).show()
         }
     })
+    return false
 })
 /*delete data*/
 $("tbody").on('click','.delete-btn',function(){

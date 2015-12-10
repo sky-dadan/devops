@@ -8,7 +8,7 @@ from auth import auth_login
 
 @app.route('/api/user',methods=['GET','PUT','POST','DELETE'])
 @auth_login
-def User(auth_info,offset=0,size=10):
+def User(auth_info,offset=0,size=100):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     name = auth_info['name']

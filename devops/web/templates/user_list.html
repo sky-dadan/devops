@@ -122,6 +122,7 @@
    <table id ="datatable"  class="table table-bordered table-striped">
 	<thead>
 		<tr>
+            <th scope="col">用户名</th>
 			<th scope="col">姓名</th>
 			<th scope="col">E-mail</th>
 			<th scope="col">手机</th>
@@ -133,6 +134,7 @@
 	<tbody>
         {% for user in users %}
 		<tr  class="odd gradeX">
+            <td>{{user['username']}}</td>
             <td>{{user['name']}}</td>
             <td>{{user['email']}}</td>
             <td>{{user['mobile']}}</td>

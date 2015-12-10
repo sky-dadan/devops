@@ -97,7 +97,7 @@ $("body").on('click','#passwd',function(){
 
 $(".update-btn").on('click',function(){
    var str = $("#updateForm").serialize()
-   var url = 'http://192.168.1.243:1001/user/chpwdoneself'
+   var url = '/user/chpwdoneself'
    $.post(url,str,function(data){
        data=JSON.parse(data)
         console.log(data)

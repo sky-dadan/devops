@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 #coding:utf-8
 from flask import Flask,request
-from flask_jsonrpc import JSONRPC
+from . import jsonrpc
 from . import app
 import logging,util
 from auth import auth_login
 import json,traceback
 
-jsonrpc = JSONRPC(app, '/api')
 
 @jsonrpc.method('cabinet.create')     
 @auth_login
@@ -40,12 +39,16 @@ def get(auth_info,**kwargs):
     if auth_info['code'] == 1:   
         return json.dumps(auth_info)
     username = auth_info['username']
-    fields = ['id','name','idc_id','u_num','power']
     try:
-	data = request.get_json()	
-	data = data['params']
-        if data.has_key("id"):
-	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),data["id"])
+        output = kwargs.get('output',[])
+        print output
+        if len(output) == 0:
+            fields = ['id','name','idc_id','u_num','power']
+        else:
+            fields = output
+        where = kwargs.get('where',None)
+        if where.has_key("id"):
+	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),where["id"])
 	    app.config['cursor'].execute(sql)
 	    row = app.config['cursor'].fetchone()
             result = {}

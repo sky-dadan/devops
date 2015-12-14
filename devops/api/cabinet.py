@@ -41,11 +41,11 @@ def get(auth_info,**kwargs):
     username = auth_info['username']
     try:
         output = kwargs.get('output',[])
+        where = kwargs.get('where',None)
         if len(output) == 0:
             fields = ['id','name','idc_id','u_num','power']
         else:
             fields = output
-        where = kwargs.get('where',None)
         if where.has_key("id"):
 	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),where["id"])
 	    app.config['cursor'].execute(sql)
@@ -101,11 +101,13 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+        data = kwargs.get('data',None)
+        where = kwargs.get('where',None)
+        if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'update Cabinet set name="%(name)s",idc_id="%(idc_id)d",u_num="%(u_num)d", \
-		power="%(power)s" where id=%(id)d'  % data
+		power="%(power)s" where id=%%d'  % data % where['id']
+        print sql
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update cabinet %s sucess' % data['name'])
 	return json.dumps({'code':0,'result':'update %s success' % data['name']})

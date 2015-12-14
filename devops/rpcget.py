@@ -21,13 +21,13 @@ headers = {'content-type': 'application/json','authorization':token}
 url = "http://127.0.0.1:1000/api"
 data = {
         'jsonrpc':'2.0',
-        'method': 'cabinet.get',      
+        'method': 'cabinet.getlist',      
         'id':'1',
         'params':{
-            'output' : ['id','name','power'],   #output，返回指定列为空时，返回所有列
-            'limit' : 5,
-            'where' : {'id':1},
-            'order_by': 'id desc'
+            'output' : ['id','name','power'],   #可选参数，返回指定列，不写或者为空时则返回所有列
+            'limit' : 5,                        #可选参数，后台暂不处理
+            'where' : {'id':1},                 #选择单条记录时必选，
+            'order_by': 'id desc'               #可选参数，后台暂不处理
         }
 
 }

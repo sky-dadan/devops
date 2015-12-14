@@ -41,7 +41,6 @@ def get(auth_info,**kwargs):
     username = auth_info['username']
     try:
         output = kwargs.get('output',[])
-        print output
         if len(output) == 0:
             fields = ['id','name','idc_id','u_num','power']
         else:
@@ -69,10 +68,12 @@ def getlist(auth_info,**kwargs):
 	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
-        fields = ['id','name','idc_id','u_num','power']
-	data = request.get_json()	
-	data = data['params']
-	sql = "select * from Cabinet" 
+        output = kwargs.get('output',[])
+        if len(output) == 0:
+            fields = ['id','name','idc_id','u_num','power']
+        else:
+            fields = output
+	sql = "select %s  from Cabinet" % ','.join(fields)
 	app.config['cursor'].execute(sql)
 	result = []
         count = 0

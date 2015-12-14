@@ -4,5 +4,6 @@ requests
 Flask-Bootstrap 
 Flask-Script 
 Flask-SQLAlchemy 
+Flask-JSONRPC
 Flask-WTF 
 ipython 

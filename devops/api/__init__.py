@@ -2,9 +2,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-import  test
-#import lock
+#import  test
 import group
 import user
-#import password
-#import role
+import cabinet

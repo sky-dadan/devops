@@ -38,7 +38,7 @@ def create(auth_info,**kwargs):
 @auth_login
 def get(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     fields = ['id','name','idc_id','u_num','power']
     try:
@@ -46,7 +46,6 @@ def get(auth_info,**kwargs):
 	data = data['params']
         if data.has_key("id"):
 	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),data["id"])
- #           print sql
 	    app.config['cursor'].execute(sql)
 	    row = app.config['cursor'].fetchone()
             result = {}
@@ -73,13 +72,13 @@ def getlist(auth_info,**kwargs):
 	sql = "select * from Cabinet" 
 	app.config['cursor'].execute(sql)
 	result = []
+        count = 0
         for row in app.config['cursor'].fetchall():
+            count += 1
 	    res = {}
 	    for i,k in enumerate(fields):
                res[k] = row[i]
 	    result.append(res)
-        app.config['cursor'].execute("select  count(0) from Cabinet")
-        count=int(app.config['cursor'].fetchone()[0])
 	util.write_log(username, 'select Cabinet list sucess') 
         return json.dumps({'code':0,'result':result,'count':count})
     except:
@@ -92,7 +91,7 @@ def getlist(auth_info,**kwargs):
 @auth_login
 def update(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
@@ -103,7 +102,6 @@ def update(auth_info,**kwargs):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'update Cabinet set name="%(name)s",idc_id="%(idc_id)d",u_num="%(u_num)d", \
 		power="%(power)s" where id=%(id)d'  % data
-#        print sql        
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update cabinet %s sucess' % data['name'])
 	return json.dumps({'code':0,'result':'update %s success' % data['name']})
@@ -115,7 +113,7 @@ def update(auth_info,**kwargs):
 @auth_login
 def delete(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
@@ -133,14 +131,3 @@ def delete(auth_info,**kwargs):
 	logging.getLogger().error('delete cabinet error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'delete cabinet error'})
 
-@jsonrpc.method('cabinet.test')     
-@auth_login
-def test(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
-    username = auth_info['username']
-    role = int(auth_info['role'])
-    data = {}
-    data['sex'] = kwargs.get('sex',None)
-    data['age'] = kwargs.get('age',None)
-    return 'I am  %s,age is %s,sex is %s' % (username,data['age'],data['sex'])

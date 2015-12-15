@@ -10,7 +10,7 @@ from auth import auth_login
 @auth_login
 def User(auth_info,offset=0,size=100):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
-        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])
@@ -18,6 +18,7 @@ def User(auth_info,offset=0,size=100):
     if request.method == 'GET':  #get all user info from user_id
         try:
             users = []
+            count = 0
             fields = ['id','username','name','email','mobile','role','is_lock']
             if role == 0  and request.args.get('list') =="true": #是管理员且传值list＝true才输出用户列表
                 if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
@@ -28,12 +29,11 @@ def User(auth_info,offset=0,size=100):
                 sql = "SELECT %s FROM user LIMIT %d,%d" % (','.join(fields),int(offset),int(size))
                 app.config['cursor'].execute(sql)
                 for row in app.config['cursor'].fetchall():
+                    count +=1
                     user = {}
                     for i, k in enumerate(fields):
                         user[k] = row[i]
                     users.append(user)
-                app.config['cursor'].execute("select  count(0) from user")
-                count=int(app.config['cursor'].fetchone()[0])
                 util.write_log(username, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})
             else:    #普通用户和管理员都是通过自己的登陆用户名查询自己的信息
@@ -122,7 +122,7 @@ def User(auth_info,offset=0,size=100):
 @auth_login
 def getbyid(auth_info,user_id):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
-        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])
@@ -150,7 +150,7 @@ def getbyid(auth_info,user_id):
 @auth_login
 def passwd(auth_info):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
-        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     uid = int(auth_info['uid'])
     role = int(auth_info['role'])

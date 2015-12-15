@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 #coding:utf-8
 from flask import Flask,request
-from flask_jsonrpc import JSONRPC
+from . import jsonrpc
 from . import app
 import logging,util
 from auth import auth_login
 import json,traceback
 
-jsonrpc = JSONRPC(app, '/api')
 
 @jsonrpc.method('cabinet.create')     
 @auth_login
@@ -40,12 +39,15 @@ def get(auth_info,**kwargs):
     if auth_info['code'] == 1:   
         return json.dumps(auth_info)
     username = auth_info['username']
-    fields = ['id','name','idc_id','u_num','power']
     try:
-	data = request.get_json()	
-	data = data['params']
-        if data.has_key("id"):
-	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),data["id"])
+        output = kwargs.get('output',[])
+        where = kwargs.get('where',None)
+        if len(output) == 0:
+            fields = ['id','name','idc_id','u_num','power']
+        else:
+            fields = output
+        if where.has_key("id"):
+	    sql = "select %s from Cabinet where id = %d" % (','.join(fields),where["id"])
 	    app.config['cursor'].execute(sql)
 	    row = app.config['cursor'].fetchone()
             result = {}
@@ -66,10 +68,12 @@ def getlist(auth_info,**kwargs):
 	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
-        fields = ['id','name','idc_id','u_num','power']
-	data = request.get_json()	
-	data = data['params']
-	sql = "select * from Cabinet" 
+        output = kwargs.get('output',[])
+        if len(output) == 0:
+            fields = ['id','name','idc_id','u_num','power']
+        else:
+            fields = output
+	sql = "select %s  from Cabinet" % ','.join(fields)
 	app.config['cursor'].execute(sql)
 	result = []
         count = 0
@@ -97,11 +101,13 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+        data = kwargs.get('data',None)
+        where = kwargs.get('where',None)
+        if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'update Cabinet set name="%(name)s",idc_id="%(idc_id)d",u_num="%(u_num)d", \
-		power="%(power)s" where id=%(id)d'  % data
+		power="%(power)s" where id=%%d'  % data % where['id']
+        print sql
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update cabinet %s sucess' % data['name'])
 	return json.dumps({'code':0,'result':'update %s success' % data['name']})

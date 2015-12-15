@@ -8,3 +8,18 @@ jsonrpc = JSONRPC(app, '/api')
 import group
 import user
 import cabinet
+import host
+import softassets
+import switch
+
+
+
+
+
+
+
+
+
+
+
+

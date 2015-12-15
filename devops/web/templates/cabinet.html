@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}机柜管理{% endblock %}
+{% block breadcrumb %}<a href="/cmdb/cabinet">机柜管理</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>机柜管理</h5>
+  </div> <!--end widget-title-->
+
+<!--update modal-->                                                                                 
+<div id="updateModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">机柜管理</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="updateForm">
+        <input type="hidden" id='id' name="id">  <!--update need id-->
+     	<div class="form-group">
+            <label class="control-label">机柜名</label>
+     		 <div class="controls">
+       		 	<input id="upname"  type="text"  name="name" >
+      		</div> 
+       	</div> <!--update name end-->
+     	<div class="form-group">
+            <label class="control-label">机房</label>
+     		 <div class="controls">
+       			<select name="idc_id"  id="upidc">
+                    <option value="0">兆维机房</option> 
+                    <option value="1">三元桥</option> 
+				</select> 
+      		</div> 
+       	</div> <!--update idc_id -->
+        <div class="form-group">
+            <label class="control-label">U位</label>
+      		<div class="controls">
+       			<input id="u_num" type="text"  name="u_num" >
+      		</div> 
+		</div><!--update u_num  end -->
+        <div class="form-group">
+            <label class="control-label">电量</label>
+      		<div class="controls">
+       			<input id="uppower" type="text"  name="power" >
+      		</div> 
+		</div><!--update power  end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+
+<div class="widget-content">
+   <table id ="datatable"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">机柜名</th>
+			<th scope="col">机房</th>
+            <th scope="col">U位</th>
+            <th scope="col">电量</th>
+            <th  scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript"language="javascript"src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+function list(){
+    var name=window.location.pathname.split('/').pop()
+    var url = "/listapi?method="+name
+    //console.log(url)
+    $.getJSON(url,function(data){
+       console.log(data)          //object
+      // data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+       var count =  data['count']     
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           str +='<tr class="odd gradeX">'+ 
+           '<td>'+v['name']+'</td>'+  
+           '<td>'+v['idc_id']+'</td>'+  
+           '<td>'+v['u_num']+'</td>'+  
+           '<td>'+v['power']+'</td>'+ 
+           '<td>'+
+           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
+           '</td>'+ 
+           '</tr>'          
+       })       
+         $("tbody").html(str)
+    })
+}
+list()
+$('#datatable').DataTable();
+</script>
+{% endblock %}

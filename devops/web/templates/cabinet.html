@@ -20,7 +20,58 @@ position:static;
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
       <h5>机柜管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加机柜</button>
   </div> <!--end widget-title-->
+
+<!--add modal-->                                                                                 
+<div id="addModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">添加机柜</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="addForm">
+     	<div class="form-group">
+            <label class="control-label">机柜名</label>
+     		 <div class="controls">
+       		 	<input id="name"  type="text"  name="name" >
+      		</div> 
+       	</div> <!--add name end-->
+     	<div class="form-group">
+            <label class="control-label">机房</label>
+     		 <div class="controls">
+       			<select name="idc_id"  id="idc">
+                    <option value="0">兆维机房</option> 
+                    <option value="1">三元桥</option> 
+				</select> 
+      		</div> 
+       	</div> <!--add idc_id -->
+        <div class="form-group">
+            <label class="control-label">U位</label>
+      		<div class="controls">
+       			<input id="unum" type="text"  name="unum" >
+      		</div> 
+		</div><!--add unum  end -->
+        <div class="form-group">
+            <label class="control-label">电量</label>
+      		<div class="controls">
+       			<input id="power" type="text"  name="power" >
+      		</div> 
+		</div><!--add power  end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+                <button class="btn btn-primary" >添加</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+  
+
 
 <!--update modal-->                                                                                 
 <div id="updateModal" class="modal hide fade">
@@ -30,9 +81,9 @@ position:static;
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
-     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
      <form class="form-horizontal" id="updateForm">
-        <input type="hidden" id='id' name="id">  <!--update need id-->
+        <input type="hidden" id='upid' name="id">  <!--update need id-->
      	<div class="form-group">
             <label class="control-label">机柜名</label>
      		 <div class="controls">
@@ -51,7 +102,7 @@ position:static;
         <div class="form-group">
             <label class="control-label">U位</label>
       		<div class="controls">
-       			<input id="u_num" type="text"  name="u_num" >
+       			<input id="upunum" type="text"  name="upunum" >
       		</div> 
 		</div><!--update u_num  end -->
         <div class="form-group">
@@ -92,8 +143,10 @@ position:static;
 
 {% block js %}
 
-<script type="text/javascript"language="javascript"src="/static/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
+var name=window.location.pathname.split('/').pop()
+/* list all data */
 function list(){
     var name=window.location.pathname.split('/').pop()
     var url = "/listapi?method="+name
@@ -106,7 +159,7 @@ function list(){
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
            '<td>'+v['idc_id']+'</td>'+  
@@ -122,6 +175,85 @@ function list(){
     })
 }
 list()
-$('#datatable').DataTable();
+/* DataTable */
+$('#datatable').DataTable({
+    "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+        }
+    }
+});
+/*  add data */
+/*click show modal*/
+$('#addBtn').on('click',function(){
+		$('#addModal').modal('show')
+})
+/* add data for ajax */ 
+$('#addForm').on('submit',function(){
+	   var str = $('#addForm').serialize()
+	   var url = '/addapi?method='+name+'&'+str
+       console.log(url)
+	   $.getJSON(url,function(data){
+	     console.log(data)    //object 
+         data=JSON.parse(data['result']); //object 
+         console.log(data)  //object {'code': 0, 'result':"update success"} or {'code':1,'errmsg':'update cabinet error'}
+         if (data['code']==0){   
+			alert(data['result'])
+		    $('#addModal').modal('hide')
+			list()
+	     }else{
+			$('#errorMsg').html('Failed: '+data['errmsg']).show()
+	    }
+	   })
+	   return false
+	})  //submit form
+
+/*get one data from id for update*/
+$('tbody').on('click','.update-btn',function(){
+	var id = $(this).attr('data-id')
+    var url = "/getapi?method="+name+"&id="+id
+	$.getJSON(url,function(data){
+	  console.log(data)  
+      data = JSON.parse(data['result'])
+      if (data['code']==0){
+          $('#upid').val(data['result']['id'])
+          $('#upname').val(data['result']['name'])
+          $('#upunum').val(data['result']['u_num'])
+          $('#upidc').val(data['result']['idc_id'])
+          $('#uppower').val(data['result']['power'])
+      }else{
+          alert(data['errmsg'])
+      }
+	})
+	$('#updateModal').modal('show')  //show modal
+})
+
+/*update data*/
+$('#updateForm').on('submit',function(){
+var str = $('#updateForm').serialize()
+var url = '/updateapi?method='+name+"&"+str
+$.getJSON(url,function(data){
+    console.log(data)
+    data = JSON.parse(data['result'])
+    if (data['code']==0){   
+        alert(data['result'])
+        $('#updateModal').modal('hide')
+    }else{
+		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+    }
+})
+    return false   //get data and end
+})  //submit form
+
+/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
 </script>
 {% endblock %}

@@ -51,9 +51,9 @@ position:static;
         <div class="form-group">
             <label class="control-label">U位</label>
       		<div class="controls">
-       			<input id="unum" type="text"  name="unum" >
+       			<input id="u_num" type="text"  name="u_num" >
       		</div> 
-		</div><!--add unum  end -->
+		</div><!--add u_num  end -->
         <div class="form-group">
             <label class="control-label">电量</label>
       		<div class="controls">
@@ -102,7 +102,7 @@ position:static;
         <div class="form-group">
             <label class="control-label">U位</label>
       		<div class="controls">
-       			<input id="upunum" type="text"  name="upunum" >
+       			<input id="upu_num" type="text"  name="u_num" >
       		</div> 
 		</div><!--update u_num  end -->
         <div class="form-group">
@@ -150,9 +150,7 @@ var name=window.location.pathname.split('/').pop()
 function list(){
     var name=window.location.pathname.split('/').pop()
     var url = "/listapi?method="+name
-    //console.log(url)
     $.getJSON(url,function(data){
-       console.log(data)          //object
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
        console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
@@ -200,22 +198,21 @@ $('#addBtn').on('click',function(){
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
 	   var str = $('#addForm').serialize()
-	   var url = '/addapi?method='+name+'&'+str
-       console.log(url)
-	   $.getJSON(url,function(data){
-	     console.log(data)    //object 
-         data=JSON.parse(data['result']); //object 
-         console.log(data)  //object {'code': 0, 'result':"update success"} or {'code':1,'errmsg':'update cabinet error'}
-         if (data['code']==0){   
-			alert(data['result'])
+       var data = {"method":name,"formdata":str}
+	   $.post("/addapi",data,function(data){
+	     //console.log(data)    //string
+         data = JSON.parse(data)  //object
+         data = JSON.parse(data['result']) //object
+         if (data['code']==0){
+            alert(data['result'])
 		    $('#addModal').modal('hide')
-			list()
-	     }else{
-			$('#errorMsg').html('Failed: '+data['errmsg']).show()
-	    }
-	   })
+            list()
+         }else{
+		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+         }
+       })
 	   return false
-	})  //submit form
+})  //submit form
 
 /*get one data from id for update*/
 $('tbody').on('click','.update-btn',function(){
@@ -227,7 +224,7 @@ $('tbody').on('click','.update-btn',function(){
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
           $('#upname').val(data['result']['name'])
-          $('#upunum').val(data['result']['u_num'])
+          $('#upu_num').val(data['result']['u_num'])
           $('#upidc').val(data['result']['idc_id'])
           $('#uppower').val(data['result']['power'])
       }else{
@@ -240,13 +237,14 @@ $('tbody').on('click','.update-btn',function(){
 /*update data*/
 $('#updateForm').on('submit',function(){
 var str = $('#updateForm').serialize()
-var url = '/updateapi?method='+name+"&"+str
-$.getJSON(url,function(data){
-    console.log(data)
-    data = JSON.parse(data['result'])
+var data = {'method':name,'formdata':str}
+$.post('/updateapi',data, function(data){  // data is string
+    data = JSON.parse(data)    //object
+    data = JSON.parse(data['result']) //object
     if (data['code']==0){   
         alert(data['result'])
         $('#updateModal').modal('hide')
+        list()
     }else{
 		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
     }

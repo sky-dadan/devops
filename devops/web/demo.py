@@ -32,13 +32,12 @@ def listapi():
 
 @app.route('/addapi', methods=['GET','POST'])
 def addapi():
-    method = request.args.get('method')
-    name = request.args.get('name')
-    idc_id = int(request.args.get('idc_id'))
-    u_num = int(request.args.get('unum'))
-    power = request.args.get('power')
+    method = request.form.get('method')
+    formdata = request.form.get('formdata')  #str
+    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
     data['method'] = method+".create"
-    data['params']={'name':name,'idc_id':idc_id,'u_num':u_num,'power':power}
+    data['params']=formdata
+    #print data
     r = requests.post(url,headers=headers,json=data)
     return r.text
 
@@ -54,18 +53,14 @@ def getapi():
 
 @app.route('/updateapi',methods=['GET','POST'])
 def updateapi():
-    method = request.args.get('method')
-    id = int(request.args.get('id'))
-    name = request.args.get('name')
-    idc_id = int(request.args.get('idc_id'))
-    u_num = int(request.args.get('upunum'))
-    power = request.args.get('power')
-    formdata = {'name':name,'idc_id':idc_id,'u_num':u_num,'power':power}
+    method = request.form.get('method')
+    formdata = request.form.get('formdata')  #str
+    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
     data['method'] = method+".update"
     data['params'] = {
         "data":formdata,
         "where":{
-            "id":id
+            "id":int(formdata['id'])
         }
     }
     print data

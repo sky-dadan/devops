@@ -21,11 +21,10 @@ headers = {'content-type': 'application/json','authorization':token}
 url = "http://127.0.0.1:1000/api"
 data = {
         'jsonrpc':'2.0',
-        'method': 'cabinet.update',      
+        'method': 'cabinet.delete',      
         'id':'1',
         'params':{
-            'data' : {'name':'O04','idc_id':1,'u_num':320,'power':"20A"},
-            'where' : {'id':1}
+            'id':1              #delete必选
         }
 
 }

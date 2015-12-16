@@ -132,8 +132,8 @@ def delete(auth_info,**kwargs):
 	sql = 'delete from Cabinet where id = %d' % data['id']
         print sql        
 	app.config['cursor'].execute(sql)
-	util.write_log(username,'delete cabinet %s sucess' % data['name'])
-        return json.dumps({'code':0,'result':'delete %s success' % data['name']})
+	util.write_log(username,'delete cabinet  sucess'  )
+        return json.dumps({'code':0,'result':'delete  success' })
     except:
 	logging.getLogger().error('delete cabinet error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'delete cabinet error'})

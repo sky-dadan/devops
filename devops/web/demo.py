@@ -67,5 +67,14 @@ def updateapi():
     r = requests.post(url, headers=headers, json=data)
     return r.content
 
+@app.route('/deleteapi')
+def deleteapi():
+    method = request.args.get('method')
+    id  = int(request.args.get('id'))
+    data['method'] = method+".delete"
+    data['params'] = {"id":id}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
+
 
 

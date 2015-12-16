@@ -21,7 +21,7 @@ headers = {'content-type': 'application/json','authorization':token}
 url = "http://127.0.0.1:1000/api"
 data = {
         'jsonrpc':'2.0',
-        'method': 'cabinet.getlist',      
+        'method': 'cabinet.get',      
         'id':'1',
         'params':{
             'output' : ['id','name','power'],   #可选参数，返回指定列，不写或者为空时则返回所有列

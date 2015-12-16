@@ -95,3 +95,133 @@ Api调用说明文档
 7.1 管理员通过用户id查看用户信息
     url = "http://192.168.1.243:1000/api/user/getbyid/<int:user_id>"
     r = requests.get(url,headers=headers)
+
+8.1 创建idc机房信息
+	data = {'jsonrpc':'2.0', 'method':'idc.get','id':'1',
+			'params':{
+					'idc_name':'idc_name',
+					'name':'name',
+					'address':'idc address',
+					'email':'email',
+					'interface_user':'',
+					'user_phone':'phone',
+					'pact_cabinet_num':'',
+					'rel_cabinet_num':'',
+					'remark':''
+					}}
+
+8.2 删除idc机房信息
+	data = {'jsonrpc':'2.0', 'method':'idc.delete','id':'1',
+            'params':{
+					'id':1
+					}}
+
+8.3 获取idc机房信息列表
+	data = {'jsonrpc':'2.0', 'method':'idc.getlist','id':'1',
+            'params':{}
+			}
+
+8.4 获取idc机房信息一条
+	data = {'jsonrpc':'2.0', 'method':'idc.get','id':'1',
+            'params':{
+					'id':1
+				}
+            }
+
+8.5 更新idc机房信息
+	data = {'jsonrpc':'2.0', 'method':'idc.update','id':'1',
+            'params':{
+					'id':1
+                    'idc_name':'idc_name',
+                    'name':'name',
+                    'address':'idc address',
+                    'email':'email',
+                    'interface_user':'',
+                    'user_phone':'phone',
+                    'pact_cabinet_num':'',
+                    'rel_cabinet_num':'',
+                    'remark':''
+					}
+            }
+
+
+9.1 创建services
+	 data = {'jsonrpc':'2.0', 'method':'services.create','id':'1',
+            'params':{
+					'name':'services name',
+					'dev_interface': 'dev',
+					'sa_interface':	'sa',
+					'remark': ''
+					}
+			}
+
+9.2 获取services指定的信息
+		 data = {'jsonrpc':'2.0', 'method':'services.get','id':'1',
+            'params':{
+					'id': 1
+					}
+				}
+
+9.3 获取services信息列表
+		data = {'jsonrpc':'2.0', 'method':'services.getlist','id':'1',
+            'params':{}
+				}
+
+9.4 更新services信息
+		data = {'jsonrpc':'2.0', 'method':'services.update','id':'1',
+            'params':{
+					'id':2,
+					'name':'nginx',
+					'dev_interface':'yuanxin-dev',
+					'sa_interface':'yunxin-sa',
+					'remark':'remark information'
+					}
+				}
+
+9.5 删除services信息
+		data = {'jsonrpc':'2.0', 'method':'services.delete','id':'1',
+            'params':{
+					'id':2
+					}
+				}
+
+10.1 创建manufacturer信息
+		data = {'jsonrpc':'2.0', 'method':'manufact.create','id':'1',
+            'params':{
+					'name':'dell',
+					'supplier_name':'supplier name',
+					'interface_user':'interface user name',
+					'email': '',
+					'user_phone': ''
+					}
+				}
+
+10.2 获取指定的manufacturer信息
+		data = {'jsonrpc':'2.0', 'method':'manufact.get','id':'1',
+            'params':{
+					'id':1
+					}
+				}
+10.3 获取manufacturer信息列表
+		data = {'jsonrpc':'2.0', 'method':'manufact.getlist','id':'1',
+            'params':{}
+				}
+
+10.4 更新manufacturer信息
+		data = {'jsonrpc':'2.0', 'method':'manufact.update','id':'1',
+            'params':{
+					'id':2,
+					'name':'',
+					'supplier_name':'',
+					'interface_user':'',
+					'email':'',
+					'user_phone':''
+					}
+				}
+
+10.5 删除manufacturer信息
+		data = {'jsonrpc':'2.0', 'method':'manufact.delete','id':'1',
+            'params':{
+					'id':1
+					}
+				}

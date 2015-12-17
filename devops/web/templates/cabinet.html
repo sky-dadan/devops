@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block css %}
-<link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<link rel="stylesheet"  href="/static/css/jquery.dataTables.min.css">
 <style>   
 .table th, .table td { 
 text-align: center; 
@@ -142,13 +142,11 @@ position:static;
 {% endblock %}
 
 {% block js %}
-
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
 var name=window.location.pathname.split('/').pop()
 /* list all data */
 function list(){
-    var name=window.location.pathname.split('/').pop()
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
       // data = data['result']  //string
@@ -216,6 +214,7 @@ $('#addForm').on('submit',function(){
 })  //submit form
 
 /*get one data from id for update*/
+
 $('tbody').on('click','.update-btn',function(){
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id

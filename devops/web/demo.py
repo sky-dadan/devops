@@ -1,7 +1,6 @@
 #coding:utf-8
 from flask import Flask, render_template,session,redirect,request
 from  . import app  
-from db  import Cursor    #导入数据库连接模块
 import requests,json 
 import util 
 
@@ -32,6 +31,8 @@ def listapi():
 
 @app.route('/addapi', methods=['GET','POST'])
 def addapi():
+    headers['authorization'] = session['author']
+    method = request.args.get('method')
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
     formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
@@ -43,6 +44,7 @@ def addapi():
 
 @app.route('/getapi')
 def getapi():
+    headers['authorization'] = session['author']
     method = request.args.get('method')
     id  = int(request.args.get('id'))
     data['method'] = method+".get"
@@ -53,6 +55,7 @@ def getapi():
 
 @app.route('/updateapi',methods=['GET','POST'])
 def updateapi():
+    headers['authorization'] = session['author']
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
     formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
@@ -69,6 +72,7 @@ def updateapi():
 
 @app.route('/deleteapi')
 def deleteapi():
+    headers['authorization'] = session['author']
     method = request.args.get('method')
     id  = int(request.args.get('id'))
     data['method'] = method+".delete"

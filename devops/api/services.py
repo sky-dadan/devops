@@ -2,11 +2,10 @@
 #coding: utf-8
 from flask  import Flask, request
 from flask_jsonrpc import JSONRPC
-from .import app
+from .import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json, traceback
-from cabinet import jsonrpc
 
 @jsonrpc.method('services.create')
 @auth_login
@@ -38,11 +37,16 @@ def get(auth_info, **kwargs):
 	if auth_info['code']== 1:
 		return json.dumps(auth_info)
 	username = auth_info['username']
-	fields = ['id','name','dev_interface','sa_interface','remark']
 	try:
-		data = request.get_json()['params']
-		if data.has_key('id'):
-			sql = "select %s from Services where id = %s" % (','.join(fields), data['id'])
+		output = kwargs.get('output',[])
+		where = kwargs.get('where',None)
+		if len(output) == 0:
+			fields = ['id','name','dev_interface','sa_interface','remark']
+		else:
+			fields = output
+		if where.has_key('id'):
+			sql = "select %s from Services where id = %s" % (','.join(fields), where['id'])
+			print sql
 			app.config['cursor'].execute(sql)
 			row = app.config['cursor'].fetchone()
 			result = {}
@@ -66,9 +70,12 @@ def getlist(auth_info, **kwargs):
 		return json.dumps(auth_info)
 	username = auth_info['username']
 	try:
-		fields = ['id','name','dev_interface','sa_interface','remark']
-		data = request.get_json()['params']
-		sql = "select * from Services"
+		output = kwargs.get('output',[])
+		if len(output) == 0:
+			fields = ['id','name','dev_interface','sa_interface','remark']
+		else:
+			fields = output
+		sql = "select %s from Services"  %  ','.join(fields)
 		app.config['cursor'].execute(sql)
 		result = []
 		count = 0
@@ -97,10 +104,14 @@ def update(auth_info, **kwargs):
 	if role != '0':
 		return json.dumps({'code':1,'errmsg':'you are not admin!'})
 	try:
-		data = request.get_json()['params']
-		if not data.has_key('id'):
+		data = kwargs.get('data',None)
+		where = kwargs.get('where', None)
+		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id!'})
-		sql = 'update Services set name="%(name)s",dev_interface="%(dev_interface)s,sa_interface=%(sa_interface)s , remark=%(remark)s" where id=%(id)d'  % data
+		print data
+		print where
+		sql = 'update Services set name="%(name)s",dev_interface="%(dev_interface)s",sa_interface="%(sa_interface)s" , remark="%(remark)s" where id=%%d'  % data  % where['id']
+		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username, 'update services %s success'  % data['name'])
 		return json.dumps({'code':0,'result':'update services %s successed'  %  data['name']})
@@ -125,8 +136,8 @@ def delete(auth_info, **kwargs):
 			return	json.dumps({'code':1,'errmsg':'need give an id!'})
 		sql = 'delete from Services where id= %d' % data['id']
 		app.config['cursor'].execute(sql)
-		util.write_log(username , 'delete services %s success' % data['name'])
-		return json.dumps({'code':0,'result':'delete %s success' % data['name']})
+		util.write_log(username , 'delete services  success' )
+		return json.dumps({'code':0,'result':'delete  success'} )
 	except:
 		logging.getLogger().error('delete services error: %s' % traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'delete services error'})

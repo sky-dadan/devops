@@ -2,11 +2,10 @@
 #coding: utf-8
 from flask import Flask ,request
 from flask_jsonrpc import JSONRPC
-from . import app
+from . import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json,traceback
-from cabinet import jsonrpc
 
 @jsonrpc.method('idc.create')
 @auth_login
@@ -38,20 +37,20 @@ def idc_get(auth_info,**kwargs):
 	if auth_info['code']==1:
 		return json.dumps(auth_info)
 	username = auth_info['username']
-	fields = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
 	try:
-		data = request.get_json()['params']
-		if data.has_key('id'):
-			sql = "select %s from Idc where id = %d" % (','.join(fields), data['id'])
-#			print sql
+		output = kwargs.get('output', [])
+		where = kwargs.get('where', None)
+		if len(output) == 0:
+			fields = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
+		else:
+			fields = output
+		if where.has_key('id'):
+			sql = "select %s from Idc where id = %d" % (','.join(fields), where['id'])
 			app.config['cursor'].execute(sql)
 			row = app.config['cursor'].fetchone()
-#			print row
 			result = {}
 			for i,k in enumerate(fields):
-#				print i,k
 				result[k] = row[i]
-#			print result
 			util.write_log(username, 'select idc information success')
 			return json.dumps({'code':0,'result':result})
 		else:
@@ -68,9 +67,12 @@ def idc_getlist(auth_info, **kwargs):
 		return json.dumps(auth_info)
 	username = auth_info['username']
 	try:
-		fields = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
-		data = request.get_json()['params']
-		sql = "select * from Idc"
+		output = kwargs.get('output', [])
+		if len(output) == 0:
+			fields = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
+		else:
+			fields = output
+		sql = "select %s from Idc"  %  ','.join(fields)
 		app.config['cursor'].execute(sql)
 		result = []
 		count = 0
@@ -98,10 +100,14 @@ def idc_update(auth_info, **kwargs):
 	if role != 0:
 		return json.dumps({'code':1 ,'errmsg':'you are not admin!'})
 	try:
-		data = request.get_json()['params']
-		if not data.has_key('id'):
+		data = kwargs.get('data',None)
+		where = kwargs.get('where', None)
+		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'you must give an id!'})
-		sql = 'update Idc set idc_name="%(idc_name)s", name="%(name)s", address="%(address)s",email="%(email)s",interface_user="%(interface_user)s",user_phone="%(user_phone)s",pact_cabinet_num="%(pact_cabinet_num)s",rel_cabinet_num="%(rel_cabinet_num)s",remark="%(remark)s" where id = "%(id)d"' % data
+		sql = 'update Idc set idc_name="%(idc_name)s", name="%(name)s", address="%(address)s",email="%(email)s",interface_user="%(interface_user)s",user_phone="%(user_phone)s",pact_cabinet_num="%(pact_cabinet_num)s",rel_cabinet_num="%(rel_cabinet_num)s",remark="%(remark)s" where id = "%%d"' % data  % where['id']
+		print data
+		print where
+		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username,'update idc %s success'  % data['name'])
 		return json.dumps({'code':0,'result':'update %s success' % data['name']})
@@ -125,8 +131,8 @@ def idc_delete(auth_info, **kwargs):
 			return json.dumps({'code':1,'errmsg':'you are not admin!'})
 		sql = 'delete from Idc where id = %d' % data['id']
 		app.config['cursor'].execute(sql)
-		util.write_log(username, 'delete idc %s success'  % data['name'])
-		return json.dumps({'code':0,'result':'delete %s success' % data['name']})
+		util.write_log(username, 'delete idc  success')
+		return json.dumps({'code':0,'result':'delete success'})
 	except:
 		logging.getLogger().error('delete idc error : %s'  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'delete idc error'})

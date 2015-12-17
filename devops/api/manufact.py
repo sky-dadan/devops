@@ -3,11 +3,10 @@
 
 from flask import Flask,request
 from flask_jsonrpc import JSONRPC
-from . import app
+from . import app , jsonrpc
 import logging, util
 import json, traceback
 from auth import auth_login
-from cabinet import jsonrpc
 
 
 @jsonrpc.method('manufact.create')
@@ -40,11 +39,16 @@ def manufact_get(auth_info,**kwargs):
 	if auth_info['code'] == 1:
 		return json.dumps(auth_info)
 	username = auth_info['username']
-	fields = ['id','name','supplier_name','interface_user','email','user_phone']
 	try:
-		data = request.get_json()['params']
-		if data.has_key('id'):
-			sql = "select %s from Manufacturers where id = %d"  % (','.join(fields), data['id'])
+		output = kwargs.get('output', [])
+		where = kwargs.get('where',None)
+		if len(output) == 0:
+			fields = ['id','name','supplier_name','interface_user','email','user_phone']
+		else:
+			fields = output
+		if where.has_key('id'):
+			sql = "select %s from Manufacturers where id = %s"  % (','.join(fields), where['id'])
+			print sql
 			app.config['cursor'].execute(sql) 
 			row = app.config['cursor'].fetchone()
 			result = {}
@@ -66,9 +70,12 @@ def manufact_getlist(auth_info, **kwargs):
 		return json.dumps(auth_info)
 	username = auth_info['username']
 	try:
-		fields = ['id','name','supplier_name','interface_user','email','user_phone']
-		data = request.get_json()['params']
-		sql = "select * from Manufacturers"
+		output = kwargs.get('output', [])
+		if len(output) == 0:
+			fields = ['id','name','supplier_name','interface_user','email','user_phone']
+		else:
+			fields = output
+		sql = "select %s from Manufacturers"  %   ','.join(fields)
 		app.config['cursor'].execute(sql)
 		result =  []
 		count = 0
@@ -95,12 +102,11 @@ def manufact_update(auth_info, **kwargs):
 	if role != '0':
 		return json.dumps({'code':1,'errmsg':'you are not admin!'})
 	try:
-		data = request.get_json()['params']
-		print data
-		if not data.has_key('id'):
+		data = kwargs.get('data',None)
+		where = kwargs.get('where',None)
+		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id~!'})
-		print "hello"
-		sql = "update Manufacturers set name='%(name)s', supplier_name='%(supplier_name)s' , interface_user='%(interface_user)s', email='%(email)s', user_phone='%(user_phone)s'  where id=%(id)d"  % data
+		sql = "update Manufacturers set name='%(name)s', supplier_name='%(supplier_name)s' , interface_user='%(interface_user)s', email='%(email)s', user_phone='%(user_phone)s'  where id=%%d"  % data   %  where['id']
 		print sql
 		app.config['cursor'].execute(sql)
 		print "hello"
@@ -122,13 +128,16 @@ def manufact_delete(auth_info,**kwargs):
 	if role != '0':
 		return json.dumps({'code':1,'errmsg':'you are not admin!'})
 	try:
-		data = request.get_json()['params']
+		data = request.get_json('params')
 		if not data.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id!'})
-		sql = "delete from Manufacturers where id = %d"  % data['id']
+		print data
+		print data['id']
+		sql = "delete from Manufacturers where id = %s"  % data['id']
+		print sql
 		app.config['cursor'].execute(sql)
-		util.write_log(username, 'delete manufacturers %s success' % data['name'])
-		return json.dumps({'code':0,'result':'delete manufact %s success'  % data['name']})
+		util.write_log(username, 'delete manufacturers  success')
+		return json.dumps({'code':0,'result':'delete manufact success'})
 	except:
 		logging.getLogger().error('delete manufact error: %s'  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'delete manufact error~!'})

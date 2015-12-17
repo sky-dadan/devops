@@ -25,6 +25,7 @@ def create(auth_info,**kwargs):
 	    values.append("'%s'" % v)
 	sql = "insert into Cabinet (%s) values (%s)" % \
 		(','.join(fields),','.join(values))
+        print sql
 	app.config['cursor'].execute(sql)
 	util.write_log(username, "create Cabinet %s sucess" % data['name'])
 	return json.dumps({'code': 0, 'result': 'Create %s success' % data['name']})
@@ -105,7 +106,7 @@ def update(auth_info,**kwargs):
         where = kwargs.get('where',None)
         if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
-	sql = 'update Cabinet set name="%(name)s",idc_id="%(idc_id)d",u_num="%(u_num)d", \
+	sql = 'update Cabinet set name="%(name)s",idc_id="%(idc_id)s",u_num="%(u_num)s", \
 		power="%(power)s" where id=%%d'  % data % where['id']
         print sql
 	app.config['cursor'].execute(sql)
@@ -131,8 +132,8 @@ def delete(auth_info,**kwargs):
 	sql = 'delete from Cabinet where id = %d' % data['id']
         print sql        
 	app.config['cursor'].execute(sql)
-	util.write_log(username,'delete cabinet %s sucess' % data['name'])
-        return json.dumps({'code':0,'result':'delete %s success' % data['name']})
+	util.write_log(username,'delete cabinet  sucess'  )
+        return json.dumps({'code':0,'result':'delete  success' })
     except:
 	logging.getLogger().error('delete cabinet error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'delete cabinet error'})

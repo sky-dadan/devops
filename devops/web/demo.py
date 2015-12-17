@@ -5,14 +5,12 @@ from db  import Cursor    #导入数据库连接模块
 import requests,json 
 import util 
 
+headers = {"Content-Type": "application/json"}
+url = 'http://127.0.0.1:1000/api'
 data = {
         "jsonrpc": "2.0",
         "id":1,
-        "auth":None,
 }
-
-
-headers = {"Content-Type": "application/json"}
 
 @app.route('/cmdb/<template>')
 def render(template):
@@ -29,40 +27,54 @@ def listapi():
     data['method'] = method+".getlist"
     data['params'] = {}
     print data
-    url = 'http://127.0.0.1:1000/api'
     r = requests.post(url,headers=headers,json=data)
-    print type(r.text)
     return r.text
 
-@app.route('/addapi', methods=['POST'])
+@app.route('/addapi', methods=['GET','POST'])
 def addapi():
-    print request.form
-    data['params'] = request.form
-    action_type = request.form.get('action_type')
-    data['method'] = action_type+".create"
-    print data
-    url = 'http://127.0.0.1:1000/api'
-    r = requests.post(url, headers=headers, json=data)
-    return r.content
+    method = request.form.get('method')
+    formdata = request.form.get('formdata')  #str
+    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    data['method'] = method+".create"
+    data['params']=formdata
+    #print data
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
+
+@app.route('/getapi')
+def getapi():
+    method = request.args.get('method')
+    id  = int(request.args.get('id'))
+    data['method'] = method+".get"
+    data['params'] = {"where":{"id":id}}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
 
 
-@app.route('/updateapi',methods=['POST'])
+@app.route('/updateapi',methods=['GET','POST'])
 def updateapi():
-    formdata = request.form.to_dict()
-    # print formdata
-    action_type = formdata.pop('action_type')
-    # del request.form['action_type']
-    data['method'] = action_type+".update"
+    method = request.form.get('method')
+    formdata = request.form.get('formdata')  #str
+    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    data['method'] = method+".update"
     data['params'] = {
         "data":formdata,
         "where":{
-            "id":request.form.get('id')
+            "id":int(formdata['id'])
         }
     }
     print data
-    url = 'http://127.0.0.1:1000/api'
-    r = requests.post(url, headers=headers, json=json.dumps(data))
+    r = requests.post(url, headers=headers, json=data)
     return r.content
+
+@app.route('/deleteapi')
+def deleteapi():
+    method = request.args.get('method')
+    id  = int(request.args.get('id'))
+    data['method'] = method+".delete"
+    data['params'] = {"id":id}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
 
 
 

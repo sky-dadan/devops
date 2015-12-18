@@ -113,7 +113,7 @@ def manufact_update(auth_info, **kwargs):
 		util.write_log(username ,"update manufact %s success!"  %  data['name'])
 		return json.dumps({'code':0, 'result':'update %s  success'  % data['name']})
 	except:
-		logging.getLogger('update manufact error: %s'  % traceback.format_exc())
+		logging.getLogger().error('update manufact error: %s'  % traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'update manufact error'})
 
 

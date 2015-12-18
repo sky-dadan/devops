@@ -11,7 +11,9 @@ import cabinet
 import host
 import softassets
 import switch
-
+import idc
+import services
+import manufact
 
 
 

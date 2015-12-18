@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="https://cdn.datatables.net/1.10.10/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}服务管理{% endblock %}
+{% block breadcrumb %}<a href="/cmdb/cabinet">服务管理</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>服务管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加服务</button>
+  </div> <!--end widget-title-->
+
+<!--add modal-->                                                                                 
+<div id="addModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">添加服务</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="addForm">
+		<div class='form-group'>
+			<label class='control-label'>服务名称</label>
+			<div class='controls'>
+				<input id='s_name' type='text' name='name'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label'>开发对接人</label>
+			<div class='controls'>
+				<input id=s_devinterface type='text' name='dev_interface'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label'>运维对接人</label>
+			<div class='controls'>
+				<input id=s_sainterface type='text' name='sa_interface'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label'>备注信息</label>
+			<div class='controls'>
+				<input id='s_remark' type='text' name='remark'>
+			</div>
+		</div>
+    	<div class="form-group">
+     		<div class="modal-footer">
+                <button class="btn btn-primary" >添加</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+  
+
+
+<!--update modal-->                                                                                 
+<div id="updateModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">服务管理</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="updateForm">
+        <input type="hidden" id='upid' name="id">  <!--update need id-->
+     	<div class="form-group">
+            <label class="control-label">服务名</label>
+     		 <div class="controls">
+       		 	<input id="up_name"  type="text"  name="name" >
+      		</div> 
+       	</div> <!--update name end-->
+		<div class='form-group'>
+			<label class='control-label'>开发对接人</label>
+			<div class='controls'>
+				<input id='up_dev_interface' type='text' name='dev_interface'>
+			</div>
+		</div>
+
+		<div class='form-group'>
+			<label class='control-label'>运维对接人</label>
+			<div class='controls'>
+				<input id='up_sa_interface' type='text' name='sa_interface'>
+			</div>
+		</div>
+		<div class='form-group'>
+			<label class='control-label'>备注</label>
+			<div class='controls'>
+				<input id='up_remark' type='text' name='remark'>
+			</div>
+		</div>
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+
+<div class="widget-content">
+   <table id ="datatable"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">服务名</th>
+            <th scope="col">开发接口人</th>
+            <th scope="col">运维接口人</th>
+            <th scope="col">备注</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+var name=window.location.pathname.split('/').pop()
+/* list all data */
+function list(){
+    var name=window.location.pathname.split('/').pop()
+    var url = "/listapi?method="+name
+    $.getJSON(url,function(data){
+       //  data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+       var count =  data['count']     
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           str +='<tr class="odd gradeX">'+ 
+           '<td>'+v['name']+'</td>'+  
+           '<td>'+v['dev_interface']+'</td>'+  
+           '<td>'+v['sa_interface']+'</td>'+  
+           '<td>'+v['remark']+'</td>'+ 
+           '<td>'+
+           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
+           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '</td>'+ 
+           '</tr>'          
+       })       
+         $("tbody").html(str)
+    })
+}
+list()
+/* DataTable */
+$('#datatable').DataTable({
+    "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+        }
+    }
+});
+/*  add data */
+/*click show modal*/
+$('#addBtn').on('click',function(){
+		$('#addModal').modal('show')
+})
+/* add data for ajax */ 
+$('#addForm').on('submit',function(){
+	   var str = $('#addForm').serialize()
+       var data = {"method":name,"formdata":str}
+	   $.post("/addapi",data,function(data){
+	     //console.log(data)    //string
+         data = JSON.parse(data)  //object
+         data = JSON.parse(data['result']) //object
+         if (data['code']==0){
+            alert(data['result'])
+		    $('#addModal').modal('hide')
+            list()
+         }else{
+		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+         }
+       })
+	   return false
+})  //submit form
+
+/*get one data from id for update*/
+$('tbody').on('click','.update-btn',function(){
+	var id = $(this).attr('data-id')
+    var url = "/getapi?method="+name+"&id="+id
+	$.getJSON(url,function(data){
+	  console.log(data)  
+      data = JSON.parse(data['result'])
+      if (data['code']==0){
+          $('#upid').val(data['result']['id'])
+		  $('#up_name').val(data['result']['name'])
+		  $('#up_dev_interface').val(data['result']['dev_interface'])
+		  $('#up_sa_interface').val(data['result']['sa_interface'])
+		  $('#up_remark').val(data['result']['remark'])
+      }else{
+          alert(data['errmsg'])
+      }
+	})
+	$('#updateModal').modal('show')  //show modal
+})
+
+/*update data*/
+$('#updateForm').on('submit',function(){
+var str = $('#updateForm').serialize()
+var data = {'method':name,'formdata':str}
+$.post('/updateapi',data, function(data){  // data is string
+    data = JSON.parse(data)    //object
+    data = JSON.parse(data['result']) //object
+    if (data['code']==0){   
+        alert(data['result'])
+        $('#updateModal').modal('hide')
+        list()
+    }else{
+		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+    }
+})
+    return false   //get data and end
+})  //submit form
+
+/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
+$("tbody").on('click','.delete-btn',function(){
+	if(confirm("Are you sure delete")){
+        var that = this;
+		var id = $(this).attr('data-id')
+        var url = "/deleteapi?method="+name+"&id="+id
+		$.getJSON(url,function(data){
+      		data = JSON.parse(data['result'])
+			if (data['code']== 0 ){
+				alert(data['result'])
+                $(that).parents('tr').remove();
+                list()
+			}else{
+				alert(data['errmsg'])
+			}
+    	})
+    }  // end confirm
+    return false   //get data and end
+})   
+</script>
+{% endblock %}

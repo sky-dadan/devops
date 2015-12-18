@@ -11,7 +11,7 @@ import json, traceback
 @auth_login
 def create(auth_info, **kwargs):
 	if auth_info['code'] == 1:
-		return json.dumps({auth_info})
+		return json.dumps(auth_info)
 	username = auth_info['username']
 	role = int(auth_info['role'])
 	if role != 0:

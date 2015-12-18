@@ -254,8 +254,6 @@ var data = {'method':name,'formdata':str}
 $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data)    //object
     data = JSON.parse(data['result']) //object
-	alert(data.code)
-	
     if (data['code']==0){   
         alert(data['result'])
         $('#updateModal').modal('hide')

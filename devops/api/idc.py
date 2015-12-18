@@ -105,9 +105,6 @@ def idc_update(auth_info, **kwargs):
 		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'you must give an id!'})
 		sql = 'update Idc set idc_name="%(idc_name)s", name="%(name)s", address="%(address)s",email="%(email)s",interface_user="%(interface_user)s",user_phone="%(user_phone)s",pact_cabinet_num="%(pact_cabinet_num)s",rel_cabinet_num="%(rel_cabinet_num)s",remark="%(remark)s" where id = "%%d"' % data  % where['id']
-		print data
-		print where
-		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username,'update idc %s success'  % data['name'])
 		return json.dumps({'code':0,'result':'update %s success' % data['name']})

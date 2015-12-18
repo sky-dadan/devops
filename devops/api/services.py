@@ -46,7 +46,6 @@ def get(auth_info, **kwargs):
 			fields = output
 		if where.has_key('id'):
 			sql = "select %s from Services where id = %s" % (','.join(fields), where['id'])
-			print sql
 			app.config['cursor'].execute(sql)
 			row = app.config['cursor'].fetchone()
 			result = {}
@@ -108,10 +107,7 @@ def update(auth_info, **kwargs):
 		where = kwargs.get('where', None)
 		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id!'})
-		print data
-		print where
 		sql = 'update Services set name="%(name)s",dev_interface="%(dev_interface)s",sa_interface="%(sa_interface)s" , remark="%(remark)s" where id=%%d'  % data  % where['id']
-		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username, 'update services %s success'  % data['name'])
 		return json.dumps({'code':0,'result':'update services %s successed'  %  data['name']})

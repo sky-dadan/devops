@@ -48,7 +48,6 @@ def manufact_get(auth_info,**kwargs):
 			fields = output
 		if where.has_key('id'):
 			sql = "select %s from Manufacturers where id = %s"  % (','.join(fields), where['id'])
-			print sql
 			app.config['cursor'].execute(sql) 
 			row = app.config['cursor'].fetchone()
 			result = {}
@@ -107,9 +106,7 @@ def manufact_update(auth_info, **kwargs):
 		if not where.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id~!'})
 		sql = "update Manufacturers set name='%(name)s', supplier_name='%(supplier_name)s' , interface_user='%(interface_user)s', email='%(email)s', user_phone='%(user_phone)s'  where id=%%d"  % data   %  where['id']
-		print sql
 		app.config['cursor'].execute(sql)
-		print "hello"
 		util.write_log(username ,"update manufact %s success!"  %  data['name'])
 		return json.dumps({'code':0, 'result':'update %s  success'  % data['name']})
 	except:
@@ -131,10 +128,7 @@ def manufact_delete(auth_info,**kwargs):
 		data = request.get_json()['params']
 		if not data.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id!'})
-		print data
-		print data['id']
 		sql = "delete from Manufacturers where id = %s"  % data['id']
-		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username, 'delete manufacturers  success')
 		return json.dumps({'code':0,'result':'delete manufact success'})

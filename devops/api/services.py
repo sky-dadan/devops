@@ -86,7 +86,7 @@ def getlist(auth_info, **kwargs):
 				res[k] = row[i]
 			result.append(res)
 		util.write_log(username, 'select services list success')
-		return json.dumps({'code':0,'errmsg':result,'count':count})
+		return json.dumps({'code':0,'result':result,'count':count})
 	except:
 		logging.getLogger().error("select services error: %s " % traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'select services error'})

@@ -128,7 +128,7 @@ def manufact_delete(auth_info,**kwargs):
 	if role != '0':
 		return json.dumps({'code':1,'errmsg':'you are not admin!'})
 	try:
-		data = request.get_json('params')
+		data = request.get_json()['params']
 		if not data.has_key('id'):
 			return json.dumps({'code':1,'errmsg':'must give an id!'})
 		print data

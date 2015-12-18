@@ -39,11 +39,11 @@ def get(auth_info,**kwargs):
     username = auth_info['username']
     try:
         output = kwargs.get('output',[])
+        where = kwargs.get('where',None)
         if len(output) == 0:
             fields =['id','name','type','idc_id','cabinet_id','port_num','status','remark']
         else:
             fields=output
-        where = kwargs.get('where',None)
         if where.has_key('id'):
             sql = "SELECT %s FROM Switch WHERE id = %d" % (','.join(fields),where['id'])
 	    app.config['cursor'].execute(sql)
@@ -97,11 +97,17 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+	data = kwargs.get('data',None)
+        data['idc_id']=int(data['idc_id'])
+        data['cabinet_id']=int(data['cabinet_id'])
+        data['port_num']=int(data['port_num'])
+        data['status']=int(data['status'])
+        where = kwargs.get('where',None)
+        print data,where
+        if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'UPDATE Switch SET name="%(name)s",type="%(type)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",\
-                port_num="%(port_num)d",status="%(status)d",remark="%(remark)s" WHERE id=%(id)d'  % data
+                port_num="%(port_num)d",status="%(status)d",remark="%(remark)s" WHERE id=%%d'  % data % where['id']
         print sql
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update Switch %s sucess' % data['name'])

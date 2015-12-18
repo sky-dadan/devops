@@ -39,11 +39,11 @@ def get(auth_info,**kwargs):
     username = auth_info['username']
     try:
         output = kwargs.get('output',[])
+        where = kwargs.get('where',None)
         if len(output) == 0:
             fields =['id','type','manufacturer','store_date','expire','remark']
         else:
             fields=output
-        where = kwargs.get('where',None)
         if where.has_key('id'):
             sql = "SELECT %s FROM Soft_Assets WHERE id = %d" % (','.join(fields),where['id'])
 	    app.config['cursor'].execute(sql)
@@ -97,11 +97,13 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
-            return json.dumps({'code':1,'errmsg':'must need id '})
+	data = kwargs.get('data',None)
+        where = kwargs.get('where',None)
+        print "where:",where 
+        if not where.has_key("id"):
+            return json.dumps({'code':1,'errmsg':'must need id1'})
 	sql = 'UPDATE Soft_Assets SET type="%(type)s",manufacturer="%(manufacturer)s",store_date="%(store_date)s",\
-                expire="%(expire)s",remark="%(remark)s" WHERE id=%(id)d'  % data
+                expire="%(expire)s",remark="%(remark)s" WHERE id=%%d'  % data % where['id']
         print sql
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update Soft_Assets %s sucess' % data['type'])

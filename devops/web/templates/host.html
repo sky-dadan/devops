@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="/static/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}主机管理{% endblock %}
+{% block breadcrumb %}<a href="/cmdb/host">主机管理</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>主机管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加主机</button>
+  </div> <!--end widget-title-->
+
+<!--add modal-->                                                                                 
+<div id="addModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">添加主机</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="addForm">
+     	<div class="form-group">
+            <label class="control-label">主机名</label>
+     		 <div class="controls">
+       		 	<input id="hostname"  type="text"  name="hostname" >
+      		</div> 
+       	</div> <!--add hostname end-->
+     	<div class="form-group">
+            <label class="control-label">内网IP</label>
+     		 <div class="controls">
+       		 	<input id="inner_ip"  type="text"  name="inner_ip" >
+      		</div> 
+       	</div> <!--add inner_ip end-->
+             <div class="form-group">
+            <label class="control-label">远程控制卡IP</label>
+      		<div class="controls">
+       			<input id="remote_ip" type="text"  name="remote_ip" >
+      		</div> 
+		</div><!--add remote_ip end -->
+        <div class="form-group">
+            <label class="control-label">系统类型</label>
+      		<div class="controls">
+       			<input id="os_info"  type="text"  name="os_info" >
+      		</div> 
+		</div><!--add os_info end -->
+        <div class="form-group">
+            <label class="control-label">机房ID</label>
+      		<div class="controls">
+       			<input id="idc_id" type="text"  name="idc_id" >
+      		</div> 
+		</div><!--add idc_id end -->
+        <div class="form-group">
+            <label class="control-label">机柜ID</label>
+      		<div class="controls">
+       			<input id="cabinet_id" type="text"  name="cabinet_id" >
+      		</div> 
+        </div><!--add cabinet_id end -->
+        <div class="form-group">
+            <label class="control-label">服务ID</label>
+      		<div class="controls">
+       			<input id="service_id" type="text"  name="service_id" >
+      		</div> 
+        </div><!--add cabinet_id end -->
+        <div class="form-group">
+            <label class="control-label">状态</label>
+      		<div class="controls">
+       			<input id="status" type="text"  name="status" >
+      		</div> 
+        </div><!--add cabinet_id end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+                <button class="btn btn-primary" >添加</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+  
+<!--update modal-->                                                                                 
+<div id="updateModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">主机管理</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="updateForm">
+        <input type="hidden" id='upid' name="id">  <!--update need id-->
+     	<div class="form-group">
+            <label class="control-label">主机名</label>
+     		 <div class="controls">
+       		 	<input id="uphostname"  type="text"  name="hostname" >
+      		</div> 
+       	</div> <!--update hostname end-->
+     	<div class="form-group">
+            <label class="control-label">SN</label>
+     		 <div class="controls">
+       		 	<input id="upsn"  type="text"  name="sn" >
+      		</div> 
+       	</div> <!--update hostname end-->
+     	<div class="form-group">
+            <label class="control-label">主机编号</label>
+     		 <div class="controls">
+       		 	<input id="uphost_no"  type="text"  name="host_no" >
+      		</div> 
+       	</div> <!--update hostname end-->
+     	     	<div class="form-group">
+            <label class="control-label">内网IP</label>
+     		 <div class="controls">
+       		 	<input id="upinner_ip"  type="text"  name="inner_ip" >
+      		</div> 
+       	</div> <!--update inner_ip end-->
+        <div class="form-group">
+            <label class="control-label">内网MAC</label>
+     		 <div class="controls">
+       		 	<input id="upmac_address"  type="text"  name="mac_address" >
+      		</div> 
+        </div> <!--update hostname end-->
+     	<div class="form-group">
+            <label class="control-label">远程控制卡IP</label>
+      		<div class="controls">
+       			<input id="upremote_ip" type="text"  name="remote_ip" >
+      		</div> 
+		</div><!--update remote_ip end -->
+        <div class="form-group">
+            <label class="control-label">系统类型</label>
+      		<div class="controls">
+       			<input id="upos_info" type="text"  name="os_info" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">CPU核数</label>
+      		<div class="controls">
+       			<input id="upcpu_num" type="text"  name="cpu_num" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">磁盘大小</label>
+      		<div class="controls">
+       			<input id="updisk_num" type="text"  name="disk_num" >
+      		</div> 
+        </div><!--update idc_id end -->
+        <div class="form-group">
+            <label class="control-label">内存大小</label>
+      		<div class="controls">
+       			<input id="upmem_num" type="text"  name="mem_num" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">服务器类型</label>
+      		<div class="controls">
+       			<input id="uphost_type" type="text"  name="host_type" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">生产商ID</label>
+      		<div class="controls">
+       			<input id="upmanufacturer_id" type="text"  name="manufacturer_id" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">供应商ID</label>
+      		<div class="controls">
+       			<input id="upsupplier_id" type="text"  name="supplier_id" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">入库时间</label>
+      		<div class="controls">
+       			<input id="upstore_date" type="text"  name="store_date" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">质保时间</label>
+      		<div class="controls">
+       			<input id="upexpire" type="text"  name="expire" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">机房ID</label>
+      		<div class="controls">
+       			<input id="upidc_id" type="text"  name="idc_id" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">机柜ID</label>
+      		<div class="controls">
+       			<input id="upcabinet_id" type="text"  name="cabinet_id" >
+      		</div> 
+        </div><!--update cabinet_id end -->
+     	<div class="form-group">
+            <label class="control-label">服务ID</label>
+     		 <div class="controls">
+       		 	<input id="upservice_id"  type="text"  name="service_id" >
+      		</div> 
+       	</div> <!--update inner_ip end-->
+     	<div class="form-group">
+            <label class="control-label">状态</label>
+     		 <div class="controls">
+       		 	<input id="upstatus"  type="text"  name="status" >
+      		</div> 
+       	</div> <!--update inner_ip end-->
+        <div class="form-group">
+            <label class="control-label">是否为虚拟机</label>
+      		<div class="controls">
+       			<input id="upvm_status" type="text"  name="vm_status" >
+      		</div> 
+        </div><!--update os_info end -->
+        <div class="form-group">
+            <label class="control-label">备注</label>
+      		<div class="controls">
+       			<input id="upremark" type="text"  name="remark" >
+      		</div> 
+        </div><!--update os_info end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+
+<div class="widget-content">
+   <table id ="datalist"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">主机名</th>
+			<th scope="col">内网IP</th>
+            <th scope="col">远程控制卡IP</th>
+            <th scope="col">系统类型</th>
+            <th scope="col">机房ID</th>
+            <th scope="col">机柜ID</th>
+            <th scope="col">服务ID</th>
+            <th scope="col">状态</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+var name=window.location.pathname.split('/').pop()
+function datatable(){
+$('#datalist').DataTable({
+   "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+            }
+        }  
+    })
+}
+/* list all data */
+function list(){
+    var name=window.location.pathname.split('/').pop()
+    var url = "/listapi?method="+name
+    $.getJSON(url,function(data){
+      // data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+       var count =  data['count']     
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           str +='<tr class="odd gradeX">'+ 
+           '<td>'+v['hostname']+'</td>'+  
+           '<td>'+v['inner_ip']+'</td>'+  
+           '<td>'+v['remote_ip']+'</td>'+  
+           '<td>'+v['os_info']+'</td>'+ 
+           '<td>'+v['idc_id']+'</td>'+ 
+           '<td>'+v['cabinet_id']+'</td>'+ 
+           '<td>'+v['service_id']+'</td>'+ 
+           '<td>'+v['status']+'</td>'+ 
+           '<td>'+
+           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
+           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '</td>'+ 
+           '</tr>'          
+       })       
+         $("tbody").html(str)
+         datatable()
+    })
+}
+list()
+/*  add data */
+/*click show modal*/
+$('#addBtn').on('click',function(){
+		$('#addModal').modal('show')
+})
+/* add data for ajax */ 
+$('#addForm').on('submit',function(){
+	   var str = $('#addForm').serialize()
+       var data = {"method":name,"formdata":str}
+	   $.post("/addapi",data,function(data){
+	     //console.log(data)    //string
+         data = JSON.parse(data)  //object
+         data = JSON.parse(data['result']) //object
+         if (data['code']==0){
+            alert(data['result'])
+		    $('#addModal').modal('hide')
+            list()
+         }else{
+		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+         }
+       })
+	   return false
+})  //submit form
+
+/*get one data from id for update*/
+$('tbody').on('click','.update-btn',function(){
+	var id = $(this).attr('data-id')
+    var url = "/getapi?method="+name+"&id="+id
+    console.log(url)
+	$.getJSON(url,function(data){
+      data = JSON.parse(data['result'])
+      if (data['code']==0){
+          $('#upid').val(data['result']['id'])
+          $('#uphostname').val(data['result']['hostname'])
+          $('#upsn').val(data['result']['sn'])
+          $('#uphost_no').val(data['result']['host_no'])
+          $('#upinner_ip').val(data['result']['inner_ip'])
+          $('#upmac_address').val(data['result']['mac_address'])
+          $('#upremote_ip').val(data['result']['remote_ip'])
+          $('#upos_info').val(data['result']['os_info'])
+          $('#upcpu_num').val(data['result']['cpu_num'])
+          $('#updisk_num').val(data['result']['disk_num'])
+          $('#upmem_num').val(data['result']['mem_num'])
+          $('#uphost_type').val(data['result']['host_type'])
+          $('#upmanufacturer_id').val(data['result']['manufacturer_id'])
+          $('#upsupplier_id').val(data['result']['supplier_id'])
+          $('#upstore_date').val(data['result']['store_date'])
+          $('#upexpire').val(data['result']['expire'])
+          $('#upidc_id').val(data['result']['idc_id'])
+          $('#upcabinet_id').val(data['result']['cabinet_id'])
+          $('#upservice_id').val(data['result']['service_id'])
+          $('#upstatus').val(data['result']['status'])
+          $('#upvm_status').val(data['result']['vm_status'])
+          $('#upremark').val(data['result']['remark'])
+      }else{
+          alert(data['errmsg'])
+      }
+	})
+	$('#updateModal').modal('show')  //show modal
+})
+
+/*update data*/
+$('#updateForm').on('submit',function(){
+var str = $('#updateForm').serialize()
+    console.log(str)
+var data = {'method':name,'formdata':str}
+console.log(data)
+$.post('/updateapi',data, function(data){  // data is string
+    data = JSON.parse(data)    //object
+    data = JSON.parse(data['result']) //object
+    console.log(data)
+    if (data['code']==0){   
+        alert(data['result'])
+        $('#updateModal').modal('hide')
+        list()
+    }else{
+		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+    }
+})
+    return false   //get data and end
+})  //submit form
+
+/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
+$("tbody").on('click','.delete-btn',function(){
+	if(confirm("Are you sure delete")){
+        var that = this;
+		var id = $(this).attr('data-id')
+        var url = "/deleteapi?method="+name+"&id="+id
+		$.getJSON(url,function(data){
+      		data = JSON.parse(data['result'])
+			if (data['code']== 0 ){
+				alert(data['result'])
+                $(that).parents('tr').remove();
+                list()
+			}else{
+				alert(data['errmsg'])
+			}
+    	})
+    }  // end confirm
+    return false   //get data and end
+})   
+</script>
+{% endblock %}

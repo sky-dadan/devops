@@ -34,56 +34,56 @@ position:static;
      <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
      <form class="form-horizontal" id="addForm">
      	<div class="form-group">
-            <label class="control-label">机房</label>
+            <label class="control-label">机房简称</label>
      		 <div class="controls">
 				<input id='idc_name' type='text' name='idc_name'>
       		</div> 
        	</div> <!--add idc_id -->
 		<div class="form-group">
-			<label class="control-label">机房全程</label>
-			<div class="control">
+			<label class="control-label">机房全称</label>
+			<div class="controls">
 				<input id='idc_bz' type="text" name='name'>
 			</div>
 		</div>
 		<div class='form-group'>
 			<label class="control-label">机房地址</label>
-			<div class="control">
+			<div class="controls">
 				<input id='idc_add' type='text' name='address'>
 			</div>
 		</div> <!-- add idc_address--!>
 		<div class='form-group'>
 			<label class="control-label">机房邮件</label>
-			<div class="control">
+			<div class="controls">
 				<input id='idc_email' type='text' name='email'>
 			</div>
 		</div> <!--add idc_email--!>
 		<div class='form-group'>
 			<label class='control-label'>机房对接人</label>
-				<div class='control'>
+				<div class='controls'>
 					<input id='idc_interface' type='text' name='interface_user'>
 				</div>
 		</div> <!-- add idc_interface --!>
 		<div class='form-group'>
-			<label class='control-lebal'>对接人电话</label>
-				<div class='control'>
+			<label class='control-label'>对接人电话</label>
+				<div class='controls'>
 					<input id='idc_user_phone' type='text' name='user_phone'>
 				</div>
 		</div> <!-- add idc user_phone --!>
 		<div class='form-group'>
-			<label class='control-lebal'>合约机柜数</label>
-			<div class='control'>
+			<label class='control-label'>合约机柜数</label>
+			<div class='controls'>
 				<input id='idc_pact_cab' type='text'  name='pact_cabinet_num'>
 			</div>
 		</div>  <!--add idc pact_cabinet_num --!>
 		<div class='form-group'>
-			<label class='control-lebal'>实际分配机柜数目</label>
-			<div class='control'>
+			<label class='control-label'>实际机柜数</label>
+			<div class='controls'>
 				<input id='idc_rel_cab' type='text' name='rel_cabinet_num'>
 			</div>
 		</div>
 		<div class='form-group'>
-			<label class='control-lebal'>备注信息</label>
-			<div class='control'>
+			<label class='control-label'>备注信息</label>
+			<div class='controls'>
 			<input id='idc_remark' type='text' name='remark'>
 			</div>
 		</div>
@@ -232,10 +232,12 @@ function list(){
            '</tr>'          
        })       
          $("tbody").html(str)
+		datatable()
     })
 }
 list()
 /* DataTable */
+function datatable(){
 $('#datatable').DataTable({
     "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
@@ -252,6 +254,7 @@ $('#datatable').DataTable({
         }
     }
 });
+}
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){

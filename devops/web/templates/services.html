@@ -166,10 +166,12 @@ function list(){
            '</tr>'          
        })       
          $("tbody").html(str)
+		 datatable()
     })
 }
 list()
 /* DataTable */
+function  datatable() {
 $('#datatable').DataTable({
     "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
@@ -186,6 +188,7 @@ $('#datatable').DataTable({
         }
     }
 });
+}
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){

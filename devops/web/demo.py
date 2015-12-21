@@ -2,7 +2,7 @@
 from flask import Flask, render_template,session,redirect,request
 from  . import app  
 import requests,json 
-import util 
+import util,urllib
 
 headers = {"Content-Type": "application/json"}
 url = 'http://127.0.0.1:1000/api'
@@ -58,6 +58,7 @@ def updateapi():
     headers['authorization'] = session['author']
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
+    formdata = urllib.unquote(formdata) 
     formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
     data['method'] = method+".update"
     data['params'] = {

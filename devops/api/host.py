@@ -66,12 +66,16 @@ def getlist(auth_info,**kwargs):
     if auth_info['code'] == 1:   
 	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
+    print "kwargs = ",kwargs
     try:
-        fields = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num','host_type',\
-        'manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
-	data = request.get_json()	
-	data = data['params']
-	sql = "select * from Host" 
+        output=kwargs.get('output',[])
+        if len(output) == 0:
+#            fields = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num','host_type',\
+ #       'manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
+            fields=['id','hostname','inner_ip','remote_ip','os_info','idc_id','cabinet_id','service_id','status']
+        else:
+            fields=output
+	sql = "select %s from Host" % ','.join(fields)
 	app.config['cursor'].execute(sql)
 	result = []
         count = 0
@@ -99,14 +103,27 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+	data = kwargs.get('data',None)
+
+        data['host_no']=int(data['host_no'])
+        data['cpu_num']=int(data['cpu_num'])
+        data['disk_num']=int(data['disk_num'])
+        data['mem_num']=int(data['mem_num'])
+        data['manufacturer_id']=int(data['manufacturer_id'])
+        data['supplier_id']=int(data['supplier_id'])
+        data['idc_id']=int(data['idc_id'])
+        data['cabinet_id']=int(data['cabinet_id'])
+        data['service_id']=int(data['service_id'])
+        data['status']=int(data['status'])
+        data['vm_status']=int(data['vm_status'])
+        where = kwargs.get('where',None)
+        if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'update Host set hostname="%(hostname)s",sn="%(sn)s",host_no="%(host_no)d", inner_ip="%(inner_ip)s",mac_address="%(mac_address)s",\
                 remote_ip="%(remote_ip)s",os_info="%(os_info)s",cpu_num="%(cpu_num)d",disk_num="%(disk_num)d",mem_num="%(mem_num)d",\
                 host_type="%(host_type)s",manufacturer_id="%(manufacturer_id)d",supplier_id="%(supplier_id)d",store_date="%(store_date)s",\
                 expire="%(expire)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",service_id="%(service_id)d",status="%(status)d",\
-                vm_status="%(vm_status)d",remark="%(remark)s" WHERE id="%(id)d"' % data 
+                vm_status="%(vm_status)d",remark="%(remark)s" WHERE id=%%d' % data % where['id']
 	app.config['cursor'].execute(sql)
 	util.write_log(username,'update Host %s sucess' % data['hostname'])
 	return json.dumps({'code':0,'result':'update %s success' % data['hostname']})

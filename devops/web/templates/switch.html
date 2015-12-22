@@ -46,13 +46,15 @@ position:static;
       		</div> 
        	</div> <!--add type end-->
              <div class="form-group">
-            <label class="control-label">机房ID</label>
+            <label class="control-label">机房</label>
       		<div class="controls">
-       			<input id="idc_id" type="text"  name="idc_id" >
+                <!--       			<input id="idc_id" type="text"  name="idc_id" >-->
+                <select name="idc_id" class="idc_info" id="idc"> 
+                </select>
       		</div> 
 		</div><!--add idc_id end -->
         <div class="form-group">
-            <label class="control-label">机柜ID</label>
+            <label class="control-label">机柜</label>
       		<div class="controls">
        			<input id="cabinet_id"  type="text"  name="cabinet_id" >
       		</div> 
@@ -115,13 +117,15 @@ position:static;
       		</div> 
        	</div> <!--update type end-->
      	        <div class="form-group">
-            <label class="control-label">机房ID</label>
+            <label class="control-label">机房</label>
       		<div class="controls">
-                <input id="upidc_id" type="text"  name="idc_id" >
+                <!--                <input id="upidc_id" type="text"  name="idc_id" >-->
+                <select name="idc_id"  class="idc_info" id="idc">
+                </select>
       		</div> 
 		</div><!--update idc_id end -->
         <div class="form-group">
-            <label class="control-label">机柜ID</label>
+            <label class="control-label">机柜</label>
       		<div class="controls">
        			<input id="upcabinet_id" type="text"  name="cabinet_id" >
       		</div> 
@@ -164,8 +168,8 @@ position:static;
 		<tr>
             <th scope="col">网络设备名称</th>
             <th scope="col">设备类型</th>
-            <th scope="col">机房ID</th>
-            <th scope="col">机柜ID</th>
+            <th scope="col">机房</th>
+            <th scope="col">机柜</th>
             <th scope="col">端口数量</th>
             <th scope="col">状态</th>
             <th scope="col">备注</th>
@@ -188,6 +192,7 @@ var name=window.location.pathname.split('/').pop()
 function datatable(){
 $(document).ready(function(){
 $('#datalist').DataTable({
+   "bDestroy":true,
    "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",
@@ -204,6 +209,19 @@ $('#datalist').DataTable({
         }  
     })
 })
+}
+
+function idc(){
+    $.get('/idc',function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        str = ''
+        $.each(data.result,function(k,v){
+            str +=  '<option value="'+v['id']+'">'+v['idc_name']+'</option>'
+        })
+        $('.idc_info').html(str)
+    })
 }
 /* list all data */
 function list(){
@@ -240,6 +258,7 @@ list()
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){
+        idc()
 		$('#addModal').modal('show')
 })
 /* add data for ajax */ 
@@ -281,6 +300,7 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
+    idc()
 	$('#updateModal').modal('show')  //show modal
 })
 

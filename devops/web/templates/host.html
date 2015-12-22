@@ -170,13 +170,13 @@ position:static;
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
-            <label class="control-label">生产商ID</label>
+            <label class="control-label">生产商</label>
       		<div class="controls">
        			<input id="upmanufacturer_id" type="text"  name="manufacturer_id" >
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
-            <label class="control-label">供应商ID</label>
+            <label class="control-label">供应商</label>
       		<div class="controls">
        			<input id="upsupplier_id" type="text"  name="supplier_id" >
       		</div> 
@@ -194,19 +194,19 @@ position:static;
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
-            <label class="control-label">机房ID</label>
+            <label class="control-label">机房</label>
       		<div class="controls">
        			<input id="upidc_id" type="text"  name="idc_id" >
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
-            <label class="control-label">机柜ID</label>
+            <label class="control-label">机柜</label>
       		<div class="controls">
        			<input id="upcabinet_id" type="text"  name="cabinet_id" >
       		</div> 
         </div><!--update cabinet_id end -->
      	<div class="form-group">
-            <label class="control-label">服务ID</label>
+            <label class="control-label">所属服务</label>
      		 <div class="controls">
        		 	<input id="upservice_id"  type="text"  name="service_id" >
       		</div> 
@@ -248,9 +248,9 @@ position:static;
 			<th scope="col">内网IP</th>
             <th scope="col">远程控制卡IP</th>
             <th scope="col">系统类型</th>
-            <th scope="col">机房ID</th>
-            <th scope="col">机柜ID</th>
-            <th scope="col">服务ID</th>
+            <th scope="col">机房</th>
+            <th scope="col">机柜</th>
+            <th scope="col">所属服务</th>
             <th scope="col">状态</th>
             <th scope="col">操作</th>
         </tr>
@@ -270,6 +270,7 @@ position:static;
 var name=window.location.pathname.split('/').pop()
 function datatable(){
 $('#datalist').DataTable({
+   "bDestroy":true,
    "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",

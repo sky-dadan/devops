@@ -18,3 +18,20 @@ def idc():
     data['params'] = {'output':['id','idc_name']}
     r = requests.post(url,headers=headers,json=data)
     return r.text
+
+@app.route('/cabinet',methods=['GET','POST'])
+def cabinet():
+    headers['authorization'] = session['author']
+    data['method'] = 'cabinet.getlist'
+    data['params'] = {'output':['id','name']}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
+
+@app.route('/services',methods=['GET','POST'])
+def services():
+    headers['authorization'] = session['author']
+    data['method'] = 'services.getlist'
+    data['params'] = {'output':['id','name']}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
+

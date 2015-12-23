@@ -58,27 +58,37 @@ position:static;
       		</div> 
 		</div><!--add os_info end -->
         <div class="form-group">
-            <label class="control-label">机房ID</label>
+            <label class="control-label">机房</label>
       		<div class="controls">
-       			<input id="idc_id" type="text"  name="idc_id" >
+                <!--       			<input id="idc_id" type="text"  name="idc_id" >-->
+                <select name="idc_id" class="idc_info" id="idc"> 
+                </select>
       		</div> 
 		</div><!--add idc_id end -->
         <div class="form-group">
-            <label class="control-label">机柜ID</label>
+            <label class="control-label">机柜</label>
       		<div class="controls">
-       			<input id="cabinet_id" type="text"  name="cabinet_id" >
+                <!--       			<input id="cabinet_id" type="text"  name="cabinet_id" >-->
+                <select name="cabinet_id" class="cabinet_info" id="cabinet_id">
+                </select>
       		</div> 
         </div><!--add cabinet_id end -->
         <div class="form-group">
-            <label class="control-label">服务ID</label>
+            <label class="control-label">服务</label>
       		<div class="controls">
-       			<input id="service_id" type="text"  name="service_id" >
+                <!-- 			<input id="service_id" type="text"  name="service_id" >-->
+                <select name="service_id" class="service_info" id="service_id">
+                </select>
       		</div> 
         </div><!--add cabinet_id end -->
         <div class="form-group">
             <label class="control-label">状态</label>
       		<div class="controls">
-       			<input id="status" type="text"  name="status" >
+                <!--       			<input id="status" type="text"  name="status" >-->
+                <select name="status" id="status">
+                     <option value="0">在线</option>
+                     <option value="1">离线</option>
+                </select>
       		</div> 
         </div><!--add cabinet_id end -->
     	<div class="form-group">
@@ -196,37 +206,53 @@ position:static;
         <div class="form-group">
             <label class="control-label">机房</label>
       		<div class="controls">
-       			<input id="upidc_id" type="text"  name="idc_id" >
+                <!--       			<input id="upidc_id" type="text"  name="idc_id" >-->
+                <select name="idc_id" class="idc_info" id="upidc"> 
+                </select>
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
             <label class="control-label">机柜</label>
       		<div class="controls">
-       			<input id="upcabinet_id" type="text"  name="cabinet_id" >
+                <!--       			<input id="upcabinet_id" type="text"  name="cabinet_id" >-->
+                <select name="cabinet_id" class="cabinet_info" id="upcabinet_id">
+                </select>
       		</div> 
         </div><!--update cabinet_id end -->
      	<div class="form-group">
             <label class="control-label">所属服务</label>
      		 <div class="controls">
-       		 	<input id="upservice_id"  type="text"  name="service_id" >
+                 <!--       		 	<input id="upservice_id"  type="text"  name="service_id" >-->
+                 <select name="service_id" class="service_info" id="upservice_id">
+                 </select>
       		</div> 
        	</div> <!--update inner_ip end-->
      	<div class="form-group">
             <label class="control-label">状态</label>
      		 <div class="controls">
-       		 	<input id="upstatus"  type="text"  name="status" >
+                 <!--       		 	<input id="upstatus"  type="text"  name="status" >-->
+                 <select name="status"  id="upstatus">
+                     <option value="0">在线</option>
+                     <option value="1">离线</option>
+                 </select>
       		</div> 
        	</div> <!--update inner_ip end-->
         <div class="form-group">
             <label class="control-label">是否为虚拟机</label>
       		<div class="controls">
-       			<input id="upvm_status" type="text"  name="vm_status" >
+                <!--       			<input id="upvm_status" type="text"  name="vm_status" >-->
+                <select name="vm_status"  id="upvm_status">
+                <option value="0">是</option>
+                <option value="1">否</option>
+                </select>
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
             <label class="control-label">备注</label>
       		<div class="controls">
-       			<input id="upremark" type="text"  name="remark" >
+                <!--       			<input id="upremark" type="textarea"  name="remark" >-->
+                <textarea id="upremark" name="remark">
+                </textarea>
       		</div> 
         </div><!--update os_info end -->
     	<div class="form-group">
@@ -319,10 +345,49 @@ function list(){
          datatable()
     })
 }
+function idc(){
+    $.get('/idc',function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        str = ''
+        $.each(data.result,function(k,v){
+            str +=  '<option value="'+v['id']+'">'+v['idc_name']+'</option>'
+        })
+        $('.idc_info').html(str)
+    })
+}
+function cabinet(){
+    $.get('/cabinet',function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        str = ''
+        $.each(data.result,function(k,v){
+            str += '<option value="'+v['id']+'">'+v['name']+'</option>'
+        })
+        $('.cabinet_info').html(str)
+    })
+}
+function services(){
+    $.get('/services',function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        str = ''
+        $.each(data.result,function(k,v){
+            str += '<option value="'+v['id']+'">'+v['name']+'</option>'
+        })
+        $('.service_info').html(str)
+    })
+}
 list()
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){
+        idc()
+        cabinet()
+        services()
 		$('#addModal').modal('show')
 })
 /* add data for ajax */ 
@@ -378,6 +443,9 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
+    idc()
+    cabinet()
+    services()
 	$('#updateModal').modal('show')  //show modal
 })
 

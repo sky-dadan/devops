@@ -70,9 +70,9 @@ def getlist(auth_info,**kwargs):
     try:
         output=kwargs.get('output',[])
         if len(output) == 0:
-#            fields = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num','host_type',\
- #       'manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
-            fields=['id','hostname','inner_ip','remote_ip','os_info','idc_id','cabinet_id','service_id','status']
+            fields = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num','host_type',\
+        'manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
+#            fields=['id','hostname','inner_ip','remote_ip','os_info','idc_id','cabinet_id','service_id','status']
         else:
             fields=output
 	sql = "select %s from Host" % ','.join(fields)

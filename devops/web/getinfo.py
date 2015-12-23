@@ -35,3 +35,10 @@ def services():
     r = requests.post(url,headers=headers,json=data)
     return r.text
 
+@app.route('/manufact',methods=['GET','POST'])
+def manufact():
+    headers['authorization'] = session['author']
+    data['method'] = 'manufact.getlist'
+    data['params'] = {'output':['id','name','supplier_name']}
+    r = requests.post(url,headers=headers,json=data)
+    return r.text

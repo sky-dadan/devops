@@ -40,11 +40,29 @@ position:static;
       		</div> 
        	</div> <!--add hostname end-->
      	<div class="form-group">
+            <label class="control-label">SN</label>
+     		 <div class="controls">
+       		 	<input id="sn"  type="text"  name="sn" >
+      		</div> 
+       	</div> <!--add sn end-->
+     	<div class="form-group">
+            <label class="control-label">主机编号</label>
+     		 <div class="controls">
+       		 	<input id="host_no"  type="text"  name="host_no" >
+      		</div> 
+       	</div> <!--add host_no end-->
+     	<div class="form-group">
             <label class="control-label">内网IP</label>
      		 <div class="controls">
        		 	<input id="inner_ip"  type="text"  name="inner_ip" >
       		</div> 
        	</div> <!--add inner_ip end-->
+     	<div class="form-group">
+            <label class="control-label">内网MAC</label>
+     		 <div class="controls">
+       		 	<input id="mac_address"  type="text"  name="mac_address" >
+      		</div> 
+       	</div> <!--add mac_address end-->
              <div class="form-group">
             <label class="control-label">远程控制卡IP</label>
       		<div class="controls">
@@ -57,6 +75,56 @@ position:static;
        			<input id="os_info"  type="text"  name="os_info" >
       		</div> 
 		</div><!--add os_info end -->
+     	<div class="form-group">
+            <label class="control-label">CPU核数</label>
+     		 <div class="controls">
+       		 	<input id="cpu_num"  type="text"  name="cpu_num" >
+      		</div> 
+       	</div> <!--add cpu_num end-->
+     	<div class="form-group">
+            <label class="control-label">磁盘大小</label>
+     		 <div class="controls">
+       		 	<input id="disk_num"  type="text"  name="disk_num" >
+      		</div> 
+       	</div> <!--add disk_num end-->
+     	<div class="form-group">
+            <label class="control-label">内存大小</label>
+     		 <div class="controls">
+       		 	<input id="mem_num"  type="text"  name="mem_num" >
+      		</div> 
+       	</div> <!--add mem_num end-->
+     	<div class="form-group">
+            <label class="control-label">服务器类型</label>
+     		 <div class="controls">
+       		 	<input id="host_type"  type="text"  name="host_type" >
+      		</div> 
+       	</div> <!--add host_type end-->
+     	<div class="form-group">
+            <label class="control-label">生产商</label>
+     		 <div class="controls">
+                 <select name="manufacturer_id" class="manufact_info" id="manufacturer_id">
+                 </select>
+      		</div> 
+       	</div> <!--add manufacturer end-->
+        <div class="form-group">
+            <label class="control-label">供应商</label>
+     		 <div class="controls">
+                 <select name="supplier_id" class="supplier_info" id="supplier_id">
+                 </select>
+      		</div> 
+        </div> <!--add supplier end-->
+        <div class="form-group">
+            <label class="control-label">入库时间</label>
+      		<div class="controls">
+       			<input id="store_date" type="date"  name="store_date" >
+      		</div> 
+        </div><!--update store_date end -->
+        <div class="form-group">
+            <label class="control-label">质保时间</label>
+      		<div class="controls">
+       			<input id="expire" type="date"  name="expire" >
+      		</div> 
+        </div><!--update expire end -->
         <div class="form-group">
             <label class="control-label">机房</label>
       		<div class="controls">
@@ -74,13 +142,13 @@ position:static;
       		</div> 
         </div><!--add cabinet_id end -->
         <div class="form-group">
-            <label class="control-label">服务</label>
+            <label class="control-label">所属服务</label>
       		<div class="controls">
                 <!-- 			<input id="service_id" type="text"  name="service_id" >-->
                 <select name="service_id" class="service_info" id="service_id">
                 </select>
       		</div> 
-        </div><!--add cabinet_id end -->
+        </div><!--add service end -->
         <div class="form-group">
             <label class="control-label">状态</label>
       		<div class="controls">
@@ -90,7 +158,26 @@ position:static;
                      <option value="1">离线</option>
                 </select>
       		</div> 
-        </div><!--add cabinet_id end -->
+        </div><!--add status end -->
+        <div class="form-group">
+            <label class="control-label">是否为虚拟机</label>
+      		<div class="controls">
+                <!--       			<input id="upvm_status" type="text"  name="vm_status" >-->
+                <select name="vm_status"  id="vm_status">
+                <option value="0">是</option>
+                <option value="1">否</option>
+                </select>
+      		</div> 
+        </div><!--add vm_status end -->
+        <div class="form-group">
+            <label class="control-label">备注</label>
+      		<div class="controls">
+                <!--       			<input id="upremark" type="textarea"  name="remark" >-->
+                <textarea id="remark" name="remark">
+                </textarea>
+      		</div> 
+        </div><!--add remark end -->
+
     	<div class="form-group">
      		<div class="modal-footer">
                 <button class="btn btn-primary" >添加</button>
@@ -182,25 +269,29 @@ position:static;
         <div class="form-group">
             <label class="control-label">生产商</label>
       		<div class="controls">
-       			<input id="upmanufacturer_id" type="text"  name="manufacturer_id" >
+                <!--       			<input id="upmanufacturer_id" type="text"  name="manufacturer_id" >-->
+                <select name="manufacturer_id" class="manufact_info" id="upmanufacturer_id"> 
+                </select>
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
             <label class="control-label">供应商</label>
       		<div class="controls">
-       			<input id="upsupplier_id" type="text"  name="supplier_id" >
+                <!--       			<input id="upsupplier_id" type="text"  name="supplier_id" >-->
+                <select name="supplier_id" class="supplier_info" id="upsupplier_id"> 
+                </select>
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
             <label class="control-label">入库时间</label>
       		<div class="controls">
-       			<input id="upstore_date" type="text"  name="store_date" >
+       			<input id="upstore_date" type="date"  name="store_date" >
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
             <label class="control-label">质保时间</label>
       		<div class="controls">
-       			<input id="upexpire" type="text"  name="expire" >
+       			<input id="upexpire" type="date"  name="expire" >
       		</div> 
         </div><!--update os_info end -->
         <div class="form-group">
@@ -381,6 +472,21 @@ function services(){
         $('.service_info').html(str)
     })
 }
+function manufact(){
+    $.get('/manufact',function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        str_manufact = ''
+        str_supplier = ''
+        $.each(data.result,function(k,v){
+            str_manufact += '<option value="'+v['id']+'">'+v['name']+'</option>'
+            str_supplier += '<option value="'+v['id']+'">'+v['supplier_name']+'</option>'
+        })
+        $('.manufact_info').html(str_manufact)
+        $('.supplier_info').html(str_supplier)
+    })
+}
 list()
 /*  add data */
 /*click show modal*/
@@ -388,6 +494,7 @@ $('#addBtn').on('click',function(){
         idc()
         cabinet()
         services()
+        manufact()
 		$('#addModal').modal('show')
 })
 /* add data for ajax */ 
@@ -446,6 +553,7 @@ $('tbody').on('click','.update-btn',function(){
     idc()
     cabinet()
     services()
+    manufact()
 	$('#updateModal').modal('show')  //show modal
 })
 

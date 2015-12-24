@@ -416,6 +416,21 @@ function list(){
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
         //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           url_idc = "/getname?method="+"idc"+"&id="+v['idc_id']
+           url_cabinet = "/getname?method="+"cabinet"+"&id="+v['cabinet_id']
+           url_service = "/getname?method="+"services"+"&id="+v['service_id']
+           $.get(url_idc,function(data){
+                console.log(data)
+                data = JSON.parse(data)
+                data = JSON.parse(data['result'])
+                data = JSON.parse(data['result'])
+           })
+           $.get(url_cabinet,function(data){
+               console.log(data)
+           })
+           $.get(url_service,function(data){
+               console.log(data)
+           })
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['hostname']+'</td>'+  
            '<td>'+v['inner_ip']+'</td>'+  

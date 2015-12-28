@@ -42,3 +42,15 @@ def manufact():
     data['params'] = {'output':['id','name','supplier_name']}
     r = requests.post(url,headers=headers,json=data)
     return r.text
+
+@app.route('/getname',methods=['GET','POST'])
+def getname():
+    headers['authorization'] = session['author']
+    method = request.args.get('method')
+    id = int(request.args.get('id'))
+    data['method']=method+".get"
+    data['params']={'output':['name'],'where':{'id':id}}
+    print data
+    r = requests.post(url,headers=headers,json=data)
+    return r.text
+

@@ -43,8 +43,6 @@ position:static;
             <label class="control-label">机房</label>
      		 <div class="controls">
        			<select name="idc_id"  id="idc">
-                    <option value="0">兆维机房</option> 
-                    <option value="1">三元桥</option> 
 				</select> 
       		</div> 
        	</div> <!--add idc_id -->
@@ -75,7 +73,7 @@ position:static;
 
 <!--update modal-->                                                                                 
 <div id="updateModal" class="modal hide fade">
-      <div class="modal-header">
+       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <h4 class="modal-title">机柜管理</h4>
 	  </div><!--modal-header end-->
@@ -83,7 +81,7 @@ position:static;
       <div class="modal-body">
      <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
      <form class="form-horizontal" id="updateForm">
-        <input type="hidden" id='upid' name="id">  <!--update need id-->
+         <input type="hidden" id='upid' name="id">  <!--update need id-->
      	<div class="form-group">
             <label class="control-label">机柜名</label>
      		 <div class="controls">
@@ -91,28 +89,26 @@ position:static;
       		</div> 
        	</div> <!--update name end-->
      	<div class="form-group">
-            <label class="control-label">机房</label>
+             <label class="control-label">机房</label>
      		 <div class="controls">
-       			<select name="idc_id"  id="upidc">
-                    <option value="0">兆维机房</option> 
-                    <option value="1">三元桥</option> 
-				</select> 
+        			<select name="idc_id"  id="upidc">
+				    </select> 
       		</div> 
        	</div> <!--update idc_id -->
         <div class="form-group">
-            <label class="control-label">U位</label>
+             <label class="control-label">U位</label>
       		<div class="controls">
        			<input id="upu_num" type="text"  name="u_num" >
       		</div> 
 		</div><!--update u_num  end -->
         <div class="form-group">
-            <label class="control-label">电量</label>
+             <label class="control-label">电量</label>
       		<div class="controls">
        			<input id="uppower" type="text"  name="power" >
       		</div> 
 		</div><!--update power  end -->
     	<div class="form-group">
-     		<div class="modal-footer">
+      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
 				<button class="btn btn-warning" data-dismiss="modal">退出</button>
          	</div>
@@ -130,11 +126,11 @@ position:static;
 			<th scope="col">机房</th>
             <th scope="col">U位</th>
             <th scope="col">电量</th>
-            <th  scope="col">操作</th>
-        </tr>
+             <th  scope="col">操作</th>
+         </tr>
     </thead> 
     <tbody>
-    </tbody>
+     </tbody>
    </table>
 </div> <!--widget-content-->
 
@@ -164,6 +160,22 @@ $('#datalist').DataTable({
     }  
 });
 } /* datatable  end*/
+
+/*list idc_id,idc_name for cabinet*/
+var idc_arry = {}
+var idc_select=''
+var url = "/listapi?method=idc"
+$.ajaxSettings.async = false;  
+$.getJSON(url,function(data){
+    data = JSON.parse(data['result'])
+    $.each(data.result,function(k,v){
+       idc_arry[v['id']]=v['name']
+       idc_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+    })
+}) 
+
+//console.log(idc_select)
+
 /* list all data */
 function list(){
     var url = "/listapi?method="+name
@@ -174,19 +186,17 @@ function list(){
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
-           '<td>'+v['idc_id']+'</td>'+  
+           '<td>'+idc_arry[v['idc_id']]+'</td>'+  
            '<td>'+v['u_num']+'</td>'+  
            '<td>'+v['power']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
            '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
            '</td>'+ 
            '</tr>'          
-       })       
+       })  //cabinet list end
          $("tbody").html(str)
          datatable()
     })
@@ -196,6 +206,8 @@ list()
 /*click show modal*/
 $('#addBtn').on('click',function(){
 		$('#addModal').modal('show')
+        $('#idc').html(idc_select)
+
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
@@ -219,22 +231,22 @@ $('#addForm').on('submit',function(){
 /*get one data from id for update*/
 
 $('tbody').on('click','.update-btn',function(){
+    $('#upidc').html(idc_select)
+	$('#updateModal').modal('show')  //show modal
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
 	$.getJSON(url,function(data){
-	  console.log(data)  
       data = JSON.parse(data['result'])
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
           $('#upname').val(data['result']['name'])
           $('#upu_num').val(data['result']['u_num'])
           $('#upidc').val(data['result']['idc_id'])
-          $('#uppower').val(data['result']['power'])
+           $('#uppower').val(data['result']['power'])
       }else{
           alert(data['errmsg'])
       }
 	})
-	$('#updateModal').modal('show')  //show modal
 })
 
 /*update data*/

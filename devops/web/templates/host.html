@@ -404,6 +404,49 @@ $('#datalist').DataTable({
         }  
     })
 }
+
+var idc_array= {}
+var idc_select=''
+var cabinet_array = {}
+var cabinet_select = ''
+var services_array = {}
+var services_select = ''
+var manufact_select = ''
+var supplier_select = ''
+var idc_url="/listapi?method=idc"
+var cabinet_url="/listapi?method=cabinet"
+var services_url="/listapi?method=services"
+var manufact_url="/listapi?method=manufact"
+$.ajaxSettings.async = false;
+$.getJSON(idc_url,function(data){
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        idc_array[v['id']]=v['name']
+        idc_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        })
+})
+$.getJSON(cabinet_url,function(data){
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        cabinet_array[v['id']]=v['name']
+        cabinet_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        })
+})
+$.getJSON(services_url,function(data){
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        services_array[v['id']]=v['name']
+        services_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        })
+})
+$.getJSON(manufact_url,function(data){
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        manufact_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        supplier_select += '<option value="'+v['id']+'">'+v['supplier_name']+'</option>'
+        })
+})
+
 /* list all data */
 function list(){
     var name=window.location.pathname.split('/').pop()
@@ -416,14 +459,21 @@ function list(){
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
         //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           if (v['status'] == 0){
+               v['status']="在线"
+           }
+           else 
+           {
+                v['status']="离线"
+           }
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['hostname']+'</td>'+  
            '<td>'+v['inner_ip']+'</td>'+  
            '<td>'+v['remote_ip']+'</td>'+  
            '<td>'+v['os_info']+'</td>'+ 
-           '<td>'+v['idc_id']+'</td>'+ 
-           '<td>'+v['cabinet_id']+'</td>'+ 
-           '<td>'+v['service_id']+'</td>'+ 
+           '<td>'+idc_array[v['idc_id']]+'</td>'+ 
+           '<td>'+cabinet_array[v['cabinet_id']]+'</td>'+ 
+           '<td>'+services_array[v['service_id']]+'</td>'+ 
            '<td>'+v['status']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
@@ -436,66 +486,16 @@ function list(){
          datatable()
     })
 }
-function idc(){
-    $.get('/idc',function(data){
-        data = JSON.parse(data)
-        data = JSON.parse(data['result'])
-        console.log(data)
-        str = ''
-        $.each(data.result,function(k,v){
-            str +=  '<option value="'+v['id']+'">'+v['idc_name']+'</option>'
-        })
-        $('.idc_info').html(str)
-    })
-}
-function cabinet(){
-    $.get('/cabinet',function(data){
-        data = JSON.parse(data)
-        data = JSON.parse(data['result'])
-        console.log(data)
-        str = ''
-        $.each(data.result,function(k,v){
-            str += '<option value="'+v['id']+'">'+v['name']+'</option>'
-        })
-        $('.cabinet_info').html(str)
-    })
-}
-function services(){
-    $.get('/services',function(data){
-        data = JSON.parse(data)
-        data = JSON.parse(data['result'])
-        console.log(data)
-        str = ''
-        $.each(data.result,function(k,v){
-            str += '<option value="'+v['id']+'">'+v['name']+'</option>'
-        })
-        $('.service_info').html(str)
-    })
-}
-function manufact(){
-    $.get('/manufact',function(data){
-        data = JSON.parse(data)
-        data = JSON.parse(data['result'])
-        console.log(data)
-        str_manufact = ''
-        str_supplier = ''
-        $.each(data.result,function(k,v){
-            str_manufact += '<option value="'+v['id']+'">'+v['name']+'</option>'
-            str_supplier += '<option value="'+v['id']+'">'+v['supplier_name']+'</option>'
-        })
-        $('.manufact_info').html(str_manufact)
-        $('.supplier_info').html(str_supplier)
-    })
-}
 list()
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){
-        idc()
-        cabinet()
-        services()
-        manufact()
 		$('#addModal').modal('show')
+        $('#idc').html(idc_select)
+        $('#cabinet_id').html(cabinet_select)
+        $('#service_id').html(services_select)
+        $('#manufacturer_id').html(manufact_select)
+        $('#supplier_id').html(supplier_select)
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
@@ -518,6 +518,12 @@ $('#addForm').on('submit',function(){
 
 /*get one data from id for update*/
 $('tbody').on('click','.update-btn',function(){
+    $('#upidc').html(idc_select)
+    $('#upcabinet_id').html(cabinet_select)
+    $('#upservice_id').html(services_select)
+    $('#upmanufacturer_id').html(manufact_select)
+    $('#upsupplier_id').html(supplier_select)
+	$('#updateModal').modal('show')  //show modal
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
     console.log(url)
@@ -550,11 +556,6 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
-    idc()
-    cabinet()
-    services()
-    manufact()
-	$('#updateModal').modal('show')  //show modal
 })
 
 /*update data*/

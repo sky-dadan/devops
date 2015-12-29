@@ -218,31 +218,27 @@ $('#datalist').DataTable({
     })
 })
 }
-
-function idc(){
-    $.get('/idc',function(data){
-        data = JSON.parse(data)
+var idc_array = {}
+var idc_select=''
+var cabinet_array = {}
+var cabinet_select =''
+var idc_url = "/listapi?method=idc"
+var cabinet_url = "/listapi?method=cabinet"
+$.ajaxSettings.async = false;  
+$.getJSON(idc_url,function(data){
         data = JSON.parse(data['result'])
-        console.log(data)
-        str = ''
         $.each(data.result,function(k,v){
-            str +=  '<option value="'+v['id']+'">'+v['idc_name']+'</option>'
+        idc_array[v['id']]=v['name']
+        idc_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
         })
-        $('.idc_info').html(str)
-    })
-}
-function cabinet(){
-    $.get('/cabinet',function(data){
-        data = JSON.parse(data)
+})
+$.getJSON(cabinet_url,function(data){
         data = JSON.parse(data['result'])
-        console.log(data)
-        str = ''
         $.each(data.result,function(k,v){
-            str += '<option value="'+v['id']+'">'+v['name']+'</option>'
+        cabinet_array[v['id']]=v['name']
+        cabinet_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
         })
-        $('.cabinet_info').html(str)
-    })
-}
+})
 
 /* list all data */
 function list(){
@@ -256,11 +252,17 @@ function list(){
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
         //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           if (v['status']==0){
+               v['status']="在线"
+           }
+           else{
+               v['status']="离线"
+           }
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
            '<td>'+v['type']+'</td>'+  
-           '<td>'+v['idc_id']+'</td>'+  
-           '<td>'+v['cabinet_id']+'</td>'+  
+           '<td>'+idc_array[v['idc_id']]+'</td>'+  
+           '<td>'+cabinet_array[v['cabinet_id']]+'</td>'+  
            '<td>'+v['port_num']+'</td>'+ 
            '<td>'+v['status']+'</td>'+ 
            '<td>'+v['remark']+'</td>'+ 
@@ -279,9 +281,9 @@ list()
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){
-        idc()
-        cabinet()
 		$('#addModal').modal('show')
+        $('#idc').html(idc_select)
+        $("#cabinet_id").html(cabinet_select)
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
@@ -304,6 +306,9 @@ $('#addForm').on('submit',function(){
 
 /*get one data from id for update*/
 $('tbody').on('click','.update-btn',function(){
+    $('#upidc').html(idc_select)
+    $('#upcabinet_id').html(cabinet_select)
+	$('#updateModal').modal('show')  //show modal
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
     console.log(url)
@@ -322,9 +327,6 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
-    idc()
-    cabinet()
-	$('#updateModal').modal('show')  //show modal
 })
 
 /*update data*/

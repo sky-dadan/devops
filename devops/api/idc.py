@@ -125,7 +125,7 @@ def idc_delete(auth_info, **kwargs):
 	try:
 		data = request.get_json()['params']
 		if not data.has_key('id'):
-			return json.dumps({'code':1,'errmsg':'you are not admin!'})
+			return json.dumps({'code':1,'errmsg':'you need give an id!'})
 		sql = 'delete from Idc where id = %d' % data['id']
 		app.config['cursor'].execute(sql)
 		util.write_log(username, 'delete idc  success')

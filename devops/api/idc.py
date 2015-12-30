@@ -9,7 +9,7 @@ import json,traceback
 
 @jsonrpc.method('idc.create')
 @auth_login
-def create(auth_info, **kwarts):
+def create(auth_info, **kwargs):
 	if auth_info['code'] == 1:
 		return json.dumps(auth_info)
 	username = auth_info['username']

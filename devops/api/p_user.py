@@ -63,7 +63,7 @@ def getlist(auth_info,**kwargs):
 				res[k]=v[i]
 			result.append(res)
 		util.write_log(username, "get permission success")
-		return json.dumps({'result':'1','result':result,'count':count})
+		return json.dumps({'result':0,'result':result,'count':count})
 	except:
 		logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})

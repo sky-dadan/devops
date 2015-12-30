@@ -94,33 +94,49 @@ def getlist(auth_info,**kwargs):
 			fields = ['name','name_cn','url','info']
 		else:
 			fields = output
-		sql = "select r_id from user where username = '%s'" % username
+		sql = "select %s from power" % ','.join(fields)
 		app.config['cursor'].execute(sql)
-		r_id = app.config['cursor'].fetchone()
-#		print r_id
-		r_id = getid_list(r_id)
-		sql_pid = "select p_id from groups where id in (%s)" % (','.join(r_id))
-		print sql_pid
-		app.config['cursor'].execute(sql_pid)
-		perm, perm_result = [],[]
-		for row in app.config['cursor'].fetchall():
-			perm.append(row)
-#		print perm
-		perm_result = getid_list(perm)
-		print perm_result
-		sql_perm = "select %s from power where id in %s" %  (','.join(fields),tuple(perm_result))
-		print sql_perm
-		app.config['cursor'].execute(sql_perm)
-		result =  []
+		result = []
 		count = 0
-		for v in app.config['cursor'].fetchall():
+		for row in app.config['cursor'].fetchall():
+			res = {}
 			count += 1
-			result.append(v)
-		util.write_log(username, "get permission success")
+			for i, k in enumerate(fields):
+				res[k] = row[i]
+			result.append(res)
+		util.write_log(username, 'select power list success')
 		return json.dumps({'code':0,'result':result,'count':count})
 	except:
 		logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
+
+@jsonrpc.method('power.getbyid')
+@auth_login
+def getbyid(auth_info,**kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output',[])
+		where = kwargs.get('where',None)
+		if len(output) == 0:
+			fields = ['id','name','name_cn','url','info']
+		else:
+			fields = output
+		if where.has_key('id'):
+			sql = "select %s from power where id=%d" % (','.join(fields), where['id'])
+			app.config['cursor'].execute(sql)
+			row = app.config['cursor'].fetchone()
+			result = {}
+			for i, k in enumerate(fields):
+				result[k]=row[i]
+			util.write_log(username,'select power by id successed!')
+			return json.dumps({'code':0, 'result':result})
+		else:
+			return json.dumps({'code':1, 'errmsg':'you need give an id!'})
+	except:
+		logging.getLogger().error("select power by id error: %s" %  traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'select error : %s' % traceback.format_exc()})
 
 
 @jsonrpc.method('power.update')

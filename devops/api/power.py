@@ -9,23 +9,6 @@ import json, traceback
 
 # 关于权限这一块的增删改查
 
-def getid_list(id):   #传递过来的参数  (u'1,2',) or  [(u'1,2',), (u'1,3,4',)]
-	p = [',']
-	if type(id) is list:
-		for i in id:    #取出来的值是元组  lv = (u'1,2',)
-			for j in i:
-				for k in j:
-					if k not in p:
-						p.append(k.encode('utf-8'))
-	else:
-		for value in str(id[0]):
-			for v in value:
-				if v not in p:
-					p.append(v)
-	p.remove(',')
-	return p
-
-
 @jsonrpc.method('power.create')
 @auth_login
 def create(auth_info,**kwargs):

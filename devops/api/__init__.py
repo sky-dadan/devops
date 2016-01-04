@@ -15,7 +15,7 @@ import idc
 import services
 import manufact
 import user_perm
-
+import power
 
 
 

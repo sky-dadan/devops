@@ -74,7 +74,7 @@ def getlist(auth_info,**kwargs):
 	try:
 		output = kwargs.get('output',[])
 		if len(output) == 0:
-			fields = ['name','name_cn','url','info']
+			fields = ['id','name','name_cn','url','info']
 		else:
 			fields = output
 		sql = "select %s from power" % ','.join(fields)

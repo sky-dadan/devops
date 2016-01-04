@@ -14,6 +14,7 @@ import switch
 import idc
 import services
 import manufact
+import user_perm
 
 
 

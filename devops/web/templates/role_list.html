@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="/static/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}组管理{% endblock %}
+{% block breadcrumb %}<a href="/role/list">组管理</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>组管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加组</button>
+  </div> <!--end widget-title-->
+
+<!--add modal-->                                                                                 
+<div id="addModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">添加组</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" name="addForm "id="addForm">
+     	<div class="form-group">
+            <label class="control-label">组名</label>
+     		 <div class="controls">
+       		 	<input id="name"  type="text"  name="name" >
+      		</div> 
+       	</div> <!--add name end-->
+     	<div class="form-group">
+            <label class="control-label">组中文名</label>
+     		 <div class="controls">
+       		 	<input id="name_cn"  type="text"  name="name_cn" >
+      		</div> 
+       	</div> <!--add manufacturer end-->
+             <div class="form-group">
+            <label class="control-label">所拥有权限</label>
+      		<div class="controls">
+                <!--       			<input id="p_id" type="text"  name="p_id" >-->
+                <select name="p_id" class="p_idinfo" multiple id="p_id">
+                </select>
+      		</div> 
+		</div><!--add store_date end -->
+             <div class="form-group">
+            <label class="control-label">备注</label>
+      		<div class="controls">
+                <textarea id="info" name="info">
+                </textarea>
+      		</div> 
+		</div><!--add remark end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+                <button class="btn btn-primary" >添加</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+  
+
+
+<!--update modal-->                                                                                 
+<div id="updateModal" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">组管理</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+     <form class="form-horizontal" id="updateForm">
+        <input type="hidden" id='upid' name="id">  <!--update need id-->
+     	<div class="form-group">
+            <label class="control-label">组名</label>
+     		 <div class="controls">
+       		 	<input id="upname"  type="text"  name="name" >
+      		</div> 
+       	</div> <!--update name end-->
+     	<div class="form-group">
+            <label class="control-label">组中文名</label>
+     		 <div class="controls">
+       		 	<input id="upname_cn"  type="text"  name="name_cn" >
+      		</div> 
+       	</div> <!--update name end-->
+     	        <div class="form-group">
+                    <label class="control-label">所拥有权限</label>
+      		<div class="controls">
+                <!--                <input id="upp_id" type="text"  name="p_id" >-->
+                <select name="upp_id" class="p_idinfo" multiple="multiple" id="p_id">
+                </select>
+      		</div> 
+		</div><!--update u_num  end -->
+            <div class="form-group">
+                <label class="control-label">备注</label>
+      		<div class="controls">
+                <!--       			<input id="upremark" type="text"  name="remark" >-->
+                <textarea id="upinfo" name="info">
+                </textarea>
+      		</div> 
+        </div><!--update power  end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-primary" >更新</button>
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+    </form><!--form end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+
+<div class="widget-content">
+   <table id ="datalist"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">组名</th>
+			<th scope="col">组中文名</th>
+            <th scope="col">所拥有权限</th>
+            <th scope="col">备注</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+var name="groups"
+function datatable(){
+$('#datalist').DataTable({
+   "bDestroy":true,
+   "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+            }
+        }  
+    })
+}
+/* list all data */
+function list(){
+    url = "/listapi?method="+name
+    $.getJSON(url,function(data){
+      // data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+       var count =  data['count']     
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+           str +='<tr class="odd gradeX">'+ 
+           '<td>'+v['name']+'</td>'+  
+           '<td>'+v['name_cn']+'</td>'+  
+           '<td>'+v['p_id']+'</td>'+  
+           '<td>'+v['info']+'</td>'+ 
+           '<td>'+
+           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '</td>'+ 
+           '</tr>'          
+       })       
+         $("tbody").html(str)
+         datatable()
+    })
+}
+
+list()
+/*  add data */
+function have_perm(){
+    var power_select = ''
+    url ="/listapi?method=power" 
+    $.getJSON(url,function(data){
+        console.log(data)
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        power_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        })
+        $(".p_idinfo").html(power_select)
+    })
+}
+
+/*click show modal*/
+$('#addBtn').on('click',function(){
+        have_perm()
+		$('#addModal').modal('show')
+})
+/* add data for ajax */ 
+$('#addForm').on('submit',function(){
+	   var str = $('#addForm').serialize()
+        console.log("str:",str)
+       var data = {"method":name,"formdata":str}
+	   $.post("/addapi",data,function(data){
+	     console.log(data)    //string
+         data = JSON.parse(data)  //object
+         data = JSON.parse(data['result']) //object
+         if (data['code']==0){
+            alert(data['result'])
+		    $('#addModal').modal('hide')
+            list()
+         }else{
+		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+         }
+       })
+	   return false
+})  //submit form
+
+/*get one data from id for update*/
+$('tbody').on('click','.update-btn',function(){
+	var id = $(this).attr('data-id')
+    var url = "/getapi?method="+name+"&id="+id
+    console.log(url)
+	$.getJSON(url,function(data){
+      data = JSON.parse(data['result'])
+      if (data['code']==0){
+          $('#upid').val(data['result']['id'])
+          $('#upname').val(data['result']['name'])
+          $('#upname_cn').val(data['result']['name_cn'])
+          $('#upp_id').val(data['result']['p_id'])
+          $('#upinfo').val(data['result']['info'])
+      }else{
+          alert(data['errmsg'])
+      }
+	})
+    have_perm()
+	$('#updateModal').modal('show')  //show modal
+})
+
+/*update data*/
+$('#updateForm').on('submit',function(){
+var str = $('#updateForm').serialize()
+    console.log(str)
+var data = {'method':name,'formdata':str}
+console.log(data)
+$.post('/updateapi',data, function(data){  // data is string
+    data = JSON.parse(data)    //object
+    data = JSON.parse(data['result']) //object
+    console.log(data)
+    if (data['code']==0){   
+        alert(data['result'])
+        $('#updateModal').modal('hide')
+        list()
+    }else{
+		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+    }
+})
+    return false   //get data and end
+})  //submit form
+
+/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
+$("tbody").on('click','.delete-btn',function(){
+	if(confirm("Are you sure delete")){
+        var that = this;
+		var id = $(this).attr('data-id')
+        var url = "/deleteapi?method="+name+"&id="+id
+		$.getJSON(url,function(data){
+      		data = JSON.parse(data['result'])
+			if (data['code']== 0 ){
+				alert(data['result'])
+                $(that).parents('tr').remove();
+                list()
+			}else{
+				alert(data['errmsg'])
+			}
+    	})
+    }  // end confirm
+    return false   //get data and end
+})
+
+</script>
+{% endblock %}

@@ -10,20 +10,17 @@ import json, traceback
 #这里是关于用户权限的查看，修改  组的增删改查
 
 def getid_list(id):   #传递过来的参数  (u'1,2',) or  [(u'1,2',), (u'1,3,4',)]
-	p = [',']
+	p = set()
 	if type(id) is list:
 		for i in id:    #取出来的值是元组  lv = (u'1,2',)
-			for j in i:
-				for k in j:
-					if k not in p:
-						p.append(k.encode('utf-8'))
-	else:
-		for value in str(id[0]):
-			for v in value:
-				if v not in p:
-					p.append(v)
-	p.remove(',')
-	return p
+			p.update(set(i[0].split(',')))
+	p = list(p)
+	p.sort()
+	id_list = []
+	for k in p:
+		id_list.append(k.encode('utf-8'))
+	print id_list
+	return  id_list
 
 @jsonrpc.method('p_user.select')
 @auth_login
@@ -37,10 +34,12 @@ def getlist(auth_info,**kwargs):
 			fields = ['name','name_cn','url','info']
 		else:
 			fields = output
+		r_id = []
 		sql = "select r_id from user where username = '%s'" % username
 		app.config['cursor'].execute(sql)
-		r_id = app.config['cursor'].fetchone()
-#		print r_id
+		tmp = app.config['cursor'].fetchone()
+		r_id.append(tmp)
+		print r_id
 		r_id = getid_list(r_id)
 		sql_pid = "select p_id from groups where id in (%s)" % (','.join(r_id))
 		print sql_pid
@@ -48,7 +47,7 @@ def getlist(auth_info,**kwargs):
 		perm, perm_result = [],[]
 		for row in app.config['cursor'].fetchall():
 			perm.append(row)
-#		print perm
+		print perm
 		perm_result = getid_list(perm)
 		print perm_result
 		sql_perm = "select %s from power where id in %s" %  (','.join(fields),tuple(perm_result))

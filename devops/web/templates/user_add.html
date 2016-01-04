@@ -24,6 +24,11 @@
             </select>
         </div>
     </div>
+	<div class="control-group">
+		<label class="control-label">所属组</label>
+		<div id="r_id" class="controls">
+		</div>
+	</div>
     <div class="control-group">
         <label class="control-label">用户名：</label>
         <div class="controls">
@@ -94,6 +99,7 @@
 <script>
 $("#submit_data_btn").on('click',function(){
     var str = $('#user_signup_form').serialize()
+	console.log(str)
     var url = 'http://192.168.1.243:1001/user/add'
     $.post(url,str,function(data){ 
         data=JSON.parse(data);   //将json串转换为对象，然后取值
@@ -109,6 +115,24 @@ $("form :input.required").each(function(){
     var $required = $("<strong class='high'> *</strong>"); //创建元素
     $(this).parent().append($required); //然后将它追加到文档中
 });
+
+function list(){
+	var url = "/listapi?method=groups"
+	$.getJSON(url, function(data){
+		data=JSON.parse(data['result'])
+		console.log(data)	
+		var count = data['count']
+		var str = ''
+		$.each(data.result, function(k,v){
+			console.log(v)
+			str += '<input type="checkbox"'+
+				'name="r_id" value='+v['id']+'>'+v['name']
+		})
+		$("#r_id").html(str)
+//		alert(str)
+})
+}
+list()
 
 </script>
 {% endblock %}

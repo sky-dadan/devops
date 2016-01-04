@@ -42,7 +42,7 @@ def role_select(auth_info,**kwargs):
                                 p_name.append(row[0])
                         result[i]['p_id']=p_namestr.join(p_name)
 		util.write_log(username, 'select groups list success')
-		return json.dumps({'code':0,'result':result})
+		return json.dumps({'code':0,'result':result,'count':count})
 	except:
 		logging.getLogger.error("select groups list error: %s"  %  traceback.format_exec())
 		return json.dumps({'code':1,'errmsg':'error : %s' %  traceback.format_exec()})

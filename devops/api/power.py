@@ -93,7 +93,7 @@ def getlist(auth_info,**kwargs):
 		logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
 
-@jsonrpc.method('power.getbyid')
+@jsonrpc.method('power.get')
 @auth_login
 def getbyid(auth_info,**kwargs):
 	if auth_info['code'] == 1:

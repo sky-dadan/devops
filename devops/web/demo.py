@@ -11,6 +11,15 @@ data = {
         "id":1,
 }
 
+@app.route('/power/list')
+def power_list():
+    if session.get('username') == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    name = session['username']
+    return render_template('power.html')
+
+
 @app.route('/cmdb/<template>')
 def render(template):
     if session.get('username') == None:

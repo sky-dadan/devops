@@ -19,7 +19,7 @@ def role_select(auth_info,**kwargs):
 		data = request.get_json()['params']
 		output = data.get('output',[])
 		if len(output) == 0:
-			fields = ['id','name','p_id','info']
+			fields = ['id','name','name_cn','p_id','info']
 		else:
 			fields = output
 		sql = "select %s from groups " % ','.join(fields)
@@ -32,6 +32,15 @@ def role_select(auth_info,**kwargs):
 			for i,k in enumerate(fields):
 				res[k] = row[i]
 			result.append(res)
+                for i in range(len(result)):
+                        p_id=result[i]['p_id'].split(',')
+                        sql = 'SELECT name FROM power WHERE id in(%s)' % ','.join(p_id)
+                        app.config['cursor'].execute(sql)
+                        p_name = []
+                        p_namestr=','
+                        for row in app.config['cursor'].fetchall():
+                                p_name.append(row[0])
+                        result[i]['p_id']=p_namestr.join(p_name)
 		util.write_log(username, 'select groups list success')
 		return json.dumps({'code':0,'result':result})
 	except:
@@ -48,7 +57,7 @@ def groups_get(auth_info, **kwargs):
 		output = kwargs.get('output',[])
 		where = kwargs.get('where',None)
 		if len(output) == 0:
-			fields = ['id','name','p_id','info']
+			fields = ['id','name','name_cn','p_id','info']
 		else:
 			fields = output
 		if where.has_key('id'):

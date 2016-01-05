@@ -58,7 +58,8 @@ def useradd():
         is_lock = int(request.form.get('lock'))
         password = request.form.get('user_pwd')
         user_repwd = request.form.get('user_repwd')
-        r_id = request.form.get('r_id')
+        r_id = request.form.getlist('r_id')
+        r_id = ','.join(r_id)
         data = {'role':role,'username':username,'r_id':r_id,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
         url = "http://192.168.1.243:1000/api/user"
         r = requests.post(url,headers=headers,json=json.dumps(data))

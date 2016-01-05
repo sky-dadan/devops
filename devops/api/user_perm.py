@@ -86,3 +86,39 @@ def update(auth_info, **kwargs):
 	except:
 		logging.getLogger().error(username,'update user permission error: %s' %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'error: %s' %  traceback.format_exc()})
+
+
+@jsonrpc.method('user_groups.getlist')
+@auth_login
+def user_groups(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json,dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output', [])
+		if len(output) == 0:
+			fields = ['id','name','p_id','info']
+		else:
+			fields = output
+		sql = "select r_id from user where username='%s'" % username
+		print sql
+		app.config['cursor'].execute(sql)
+		tmp = app.config['cursor'].fetchone()
+		r_id = []
+		r_id.append(tmp)
+		r_id = getid_list(r_id)
+		count = 0
+		result = []
+		sql_groups = "select %s from groups where id in (%s)" % (','.join(fields),','.join(r_id))
+		app.config['cursor'].execute(sql_groups)
+		for row in app.config['cursor'].fetchall():
+			res = {}
+			count+=1
+			for i, k in enumerate(fields):
+				res[k] = row[i]
+			result.append(res)
+		util.write_log(username, "get groups success")
+		return json.dumps({'code':0,'result':result,'count':count})
+	except:
+		logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
+		return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})

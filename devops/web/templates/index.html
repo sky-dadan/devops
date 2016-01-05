@@ -57,6 +57,8 @@
 							<tr>
                                 <td>Tel:{{result.mobile}}</td>
 							</tr>
+							<tr id="user_groups">
+							</tr>
 					</table>
 			    </div> <!--info end-->
 				<div class="span6">
@@ -110,5 +112,25 @@ $(".update-btn").on('click',function(){
    })
             return false
 })
+
+function listgroups() {
+	var name = "user_groups"
+	var url = "/listapi?method="+name
+	$.getJSON(url, function(data){
+		data=JSON.parse(data['result'])
+		console.log(data)
+		var count = data['count']
+		var str = '<td><b>用户组:</b></td>'
+		$.each(data.result, function(k,v){
+			console.log(v)
+			str += 
+			'<td><b>'+v['name']+'</b></td>'
+		})
+		console.log(str)
+		$("#user_groups").html(str)
+	})
+}
+	listgroups()
+
 </script>
 {% endblock %}

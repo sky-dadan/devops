@@ -11,6 +11,23 @@ data = {
         "id":1,
 }
 
+def Handleformdata(formdata):
+    print "Handleformdata:",formdata
+    res = {}
+    for x in formdata.split('&'):
+        if x.find('=') <= 0:
+            continue
+        k, v = x.split('=', 1)
+        if k in res and isinstance(res[k], list):
+            res[k].append(v)
+        elif k in res:
+            res[k] = [res[k], v]
+        else:
+            res[k] = v
+    p_idstr=','
+    res['p_id']=p_idstr.join(res['p_id'])
+    return res
+
 @app.route('/power/list')
 def power_list():
     if session.get('username') == None:
@@ -44,10 +61,12 @@ def addapi():
     method = request.args.get('method')
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
-    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    if 'p_id' in formdata:
+        formdata = Handleformdata(formdata)
+    else:
+        formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
     data['method'] = method+".create"
     data['params']=formdata
-    #print data
     r = requests.post(url,headers=headers,json=data)
     return r.text
 
@@ -68,7 +87,10 @@ def updateapi():
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
     formdata = urllib.unquote(formdata) 
-    formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    if 'p_id' in formdata:
+        formdata = Handleformdata(formdata)
+    else:
+        formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
     data['method'] = method+".update"
     data['params'] = {
         "data":formdata,

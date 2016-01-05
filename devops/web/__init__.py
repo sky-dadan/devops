@@ -4,4 +4,3 @@ app = Flask(__name__)
 import  test
 import  login
 import  demo
-import  getinfo

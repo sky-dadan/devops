@@ -121,7 +121,6 @@ function list(){
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		console.log(data)	
-		alert(data)
 		var count = data['count']
 		var str = ''
 		$.each(data.result, function(k,v){
@@ -130,7 +129,6 @@ function list(){
 				'name="r_id" value='+v['id']+'>'+v['name']
 		})
 		$("#r_id").html(str)
-		alert(str)
 })
 }
 list()

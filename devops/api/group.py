@@ -19,7 +19,7 @@ def role_select(auth_info,**kwargs):
 		data = request.get_json()['params']
 		output = data.get('output',[])
 		if len(output) == 0:
-			fields = ['id','name','name_cn','p_id','info']
+			fields = ['id','name','p_id','info']
 		else:
 			fields = output
 		sql = "select %s from groups " % ','.join(fields)
@@ -44,8 +44,8 @@ def role_select(auth_info,**kwargs):
 		util.write_log(username, 'select groups list success')
 		return json.dumps({'code':0,'result':result,'count':count})
 	except:
-		logging.getLogger.error("select groups list error: %s"  %  traceback.format_exec())
-		return json.dumps({'code':1,'errmsg':'error : %s' %  traceback.format_exec()})
+		logging.getLogger.error("select groups list error: %s"  %  traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error : %s' %  traceback.format_exc()})
 
 @jsonrpc.method('groups.get')
 @auth_login

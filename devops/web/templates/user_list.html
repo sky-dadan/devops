@@ -75,6 +75,16 @@
 				</select> 
       		</div> 
 		</div><!--update lock  end -->
+		<div class="form-group">
+			<label class="control-label">用户组</label>
+			<div class="controls">
+				<select name='r_id' multiple='multiple' id='r_id'>
+					<option value='1'>100xhs</option>
+					<option value=2>api</option>
+					<option value='4'>mall</option> 
+				</select>
+			</div>
+		</div>
     	<div class="form-group">
      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
@@ -199,6 +209,7 @@ $("tbody").on('click','.update-btn',function(){
 /*update */
 $('#updateForm').on('submit',function(){
        var str = $('#updateForm').serialize()
+	   alert(str)
        var url = '/user/update?'+str
        $.getJSON(url,function(result){
 			 console.log(result)
@@ -250,6 +261,25 @@ $("tbody").on('click','.delete-btn',function(){
     	})
     }  // end confirm
 })   
-    
+
+//get usr groups for update
+function user_groups(){
+	var name = "groups"
+	var url = "/listapi?method="+name
+	$.getJSON(url, function(data){
+		data=JSON.parse(data['result'])
+		console.log(data)
+		var str=''
+		$.each(data.result, function(k,v){
+			console.log(k,v)
+			str +='<option value='+v['id']+'>'+v['name']+
+			'</option>'
+		})
+		console.log(str)
+		$("#r_id").html(str)
+	})
+}
+
+user_groups()
 </script>
 {% endblock %}

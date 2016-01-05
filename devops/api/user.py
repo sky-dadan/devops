@@ -60,7 +60,7 @@ def User(auth_info,offset=0,size=100):
                         return json.dumps({'code':1,'errmsg':'User is not exist'})
                     else:
                         sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
-                               email="%(email)s",mobile="%(mobile)s",is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
+                               email="%(email)s",mobile="%(mobile)s",r_id="%(r_id)s", is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
                 sql = 'UPDATE user SET name="%(name)s",email="%(email)s", \
                         mobile="%(mobile)s" WHERE username="%%s"' % data %username

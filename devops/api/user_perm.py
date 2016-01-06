@@ -28,6 +28,7 @@ def getlist(auth_info,**kwargs):
 	if auth_info['code']==1:
 		return json.dumps(auth_info)
 	username = auth_info['username']
+	id = auth_info['uid']
 	try:
 		output = kwargs.get('output',[])
 		if len(output) == 0:
@@ -35,7 +36,7 @@ def getlist(auth_info,**kwargs):
 		else:
 			fields = output
 		r_id = []
-		sql = "select r_id from user where username = '%s'" % username
+		sql = "select r_id from user where id = '%s'" % id
 		app.config['cursor'].execute(sql)
 		tmp = app.config['cursor'].fetchone()
 		r_id.append(tmp)
@@ -68,6 +69,53 @@ def getlist(auth_info,**kwargs):
 		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
 
 
+@jsonrpc.method('user_perm.get')
+@auth_login
+def getlist_byid(auth_info,**kwargs):
+	if auth_info['code']==1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output',[])
+		if len(output) == 0:
+			fields = ['name','name_cn','url','info']
+		else:
+			fields = output
+		where = kwargs.get('where',None)
+		if where.has_key('id'):
+			id = where['id']
+		r_id = []
+		sql = "select r_id from user where id = '%s'" % id
+		app.config['cursor'].execute(sql)
+		tmp = app.config['cursor'].fetchone()
+		r_id.append(tmp)
+		print r_id
+		r_id = getid_list(r_id)
+		sql_pid = "select p_id from groups where id in (%s)" % (','.join(r_id))
+		print sql_pid
+		app.config['cursor'].execute(sql_pid)
+		perm, perm_result = [],[]
+		for row in app.config['cursor'].fetchall():
+			perm.append(row)
+		print perm
+		perm_result = getid_list(perm)
+		print perm_result
+		sql_perm = "select %s from power where id in %s" %  (','.join(fields),tuple(perm_result))
+		print sql_perm
+		app.config['cursor'].execute(sql_perm)
+		result =  []
+		count = 0
+		for v in app.config['cursor'].fetchall():
+			res = {}
+			count += 1
+			for i, k in enumerate(fields):
+				res[k]=v[i]
+			result.append(res)
+		util.write_log(username, "get permission success")
+		return json.dumps({'result':0,'result':result,'count':count})
+	except:
+		logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
 @jsonrpc.method('user_perm.update')
 @auth_login
 def update(auth_info, **kwargs):

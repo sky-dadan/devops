@@ -19,7 +19,7 @@ def role_select(auth_info,**kwargs):
 		data = request.get_json()['params']
 		output = data.get('output',[])
 		if len(output) == 0:
-			fields = ['id','name','p_id','info']
+			fields = ['id','name','name_cn','p_id','info']
 		else:
 			fields = output
 		sql = "select %s from groups " % ','.join(fields)

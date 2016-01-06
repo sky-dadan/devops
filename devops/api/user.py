@@ -55,11 +55,11 @@ def User(auth_info,offset=0,size=100):
             data = request.get_json()
             data = json.loads(data)
             if  role == 0 and data.has_key('user_id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
-                    user_id = data['user_id']
-                    if not util.if_userid_exist(user_id): 
-                        return json.dumps({'code':1,'errmsg':'User is not exist'})
-                    else:
-                        sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
+                user_id = data['user_id']
+                if not util.if_userid_exist(user_id): 
+                    return json.dumps({'code':1,'errmsg':'User is not exist'})
+                else:
+                    sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
                                email="%(email)s",mobile="%(mobile)s",r_id="%(r_id)s", is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
             else:                      #普通用户和管理都可以更新自己信息
                 sql = 'UPDATE user SET name="%(name)s",email="%(email)s", \

@@ -1,6 +1,5 @@
 import MySQLdb as mysql
 
-
 class Cursor():
     def __init__(self, config):
         self.config = dict([(k[6:], config[k]) for k in config if k.startswith('mysql_')])

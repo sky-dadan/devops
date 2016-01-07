@@ -116,6 +116,8 @@ def getlist_byid(auth_info,**kwargs):
 	except:
 		logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
+
+
 @jsonrpc.method('user_perm.update')
 @auth_login
 def update(auth_info, **kwargs):
@@ -145,7 +147,7 @@ def user_groups(auth_info, **kwargs):
 	try:
 		output = kwargs.get('output', [])
 		if len(output) == 0:
-			fields = ['id','name','p_id','info']
+			fields = ['id','name','name_cn','p_id','info']
 		else:
 			fields = output
 		sql = "select r_id from user where username='%s'" % username
@@ -170,3 +172,41 @@ def user_groups(auth_info, **kwargs):
 	except:
 		logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
 		return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})
+
+@jsonrpc.method('user_groups.get')
+@auth_login
+def user_group_byid(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output',[])
+		if len(output)==0:
+			fields = ['name','name_cn','id','p_id','info']
+		else:
+			fields = output
+		where = kwargs.get('where',None)
+		if where.has_key('id'):
+			id = where['id']
+		r_id = []
+		sql = "select r_id from user where id = '%s'"  % id
+		app.config['cursor'].execute(sql)
+		tmp = app.config['cursor'].fetchone()
+		r_id.append(tmp)
+		r_id=getid_list(r_id)
+		sql_groups = "select %s  from groups where id in (%s)"  %  (','.join(fields),','.join(r_id))
+		print sql_groups
+		app.config['cursor'].execute(sql_groups)
+		result = []
+		count = 0
+		for v in app.config['cursor'].fetchall():
+			res = {}
+			count += 1
+			for i, k in enumerate(fields):
+				res[k]=v[i]
+			result.append(res)
+		util.write_log(username, "get user_groups success")
+		return json.dumps({'result':0, 'result':result,'count':count})
+	except:
+		logging.getLogger().error('get list user_groups error: %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':"get list user_groups error  : %s" % traceback.format_exc()})

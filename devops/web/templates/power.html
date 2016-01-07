@@ -20,7 +20,7 @@ position:static;
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
       <h5>权限管理</h5>
-      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加服务</button>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加权限</button>  
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
@@ -144,6 +144,7 @@ var name='power'
 /* list all data */
 function list(){
     var name='power'
+	var host=window.location.host
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
        //  data = data['result']  //string
@@ -157,11 +158,11 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['name']+'</td>'+  
-           '<td><a href='+v['url']+'>'+v['url']+'</a></td>'+  
+           '<td><a href='+v['url']+' style="color: blue" >'+host+v['url']+'</a></td>'+  
            '<td>'+v['info']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
+ //          '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
            '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
            '</td>'+ 
            '</tr>'          
@@ -206,6 +207,7 @@ $('#addForm').on('submit',function(){
          data = JSON.parse(data['result']) //object
          if (data['code']==0){
             alert(data['result'])
+			window.location.reload();
 		    $('#addModal').modal('hide')
             list()
          }else{
@@ -244,6 +246,7 @@ $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data['result']) //object
     if (data['code']==0){   
         alert(data['result'])
+		window.location.reload();
         $('#updateModal').modal('hide')
         list()
     }else{
@@ -263,6 +266,7 @@ $("tbody").on('click','.delete-btn',function(){
       		data = JSON.parse(data['result'])
 			if (data['code']== 0 ){
 				alert(data['result'])
+				window.location.reload();
                 $(that).parents('tr').remove();
                 list()
 			}else{

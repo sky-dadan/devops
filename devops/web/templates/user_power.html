@@ -144,6 +144,7 @@ var name='power'
 function list(){
 	var id = GetQueryString('id')
 	var name='user_perm'
+	var host = window.location.host
 	if (id == null ){
     	var url = "/listapi?method="+name
 		}
@@ -162,13 +163,9 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['name']+'</td>'+  
-           '<td><a href='+v['url']+'>'+v['url']+'</a></td>'+  
+           '<td><a href='+v['url']+' style="color: green">'+host+v['url']+'</a></td>'+  
            '<td>'+v['info']+'</td>'+ 
            '<td>'+
-//          '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-//           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
-//           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
-//           '</td>'+ 
            '</tr>'          
        })       
          $("tbody").html(str)

@@ -144,6 +144,7 @@ var name='power'
 /* list all data */
 function list(){
     var name='power'
+	var host=window.location.host
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
        //  data = data['result']  //string
@@ -157,7 +158,7 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['name']+'</td>'+  
-           '<td><a href='+v['url']+'>'+v['url']+'</a></td>'+  
+           '<td><a href='+v['url']+' style="color: green" >'+host+v['url']+'</a></td>'+  
            '<td>'+v['info']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+

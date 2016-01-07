@@ -19,7 +19,7 @@ def User(auth_info,offset=0,size=100):
         try:
             users = []
             count = 0
-            fields = ['id','username','name','email','mobile','role','is_lock']
+            fields = ['id','username','name','email','mobile','role','is_lock','r_id']
             if role == 0  and request.args.get('list') =="true": #是管理员且传值list＝true才输出用户列表
                 if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
                     offset = request.args.get('offset')

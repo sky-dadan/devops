@@ -33,6 +33,13 @@ def User(auth_info,offset=0,size=100):
                     user = {}
                     for i, k in enumerate(fields):
                         user[k] = row[i]
+                    sql_role = "select * from groups where id in (%s)" % user['r_id']
+                    app.config['cursor'].execute(sql_role)
+                    group_name = []
+                    for row2 in app.config['cursor'].fetchall():
+                        group_name.append(row2[1])
+                    g_name = ','.join(group_name)
+                    user['r_id'] = g_name
                     users.append(user)
                 util.write_log(username, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})

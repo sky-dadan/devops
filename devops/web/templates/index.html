@@ -57,8 +57,6 @@
 							<tr>
                                 <td>Tel:{{result.mobile}}</td>
 							</tr>
-							<tr id="user_groups">
-							</tr>
 					</table>
 			    </div> <!--info end-->
 				<div class="span6">
@@ -75,6 +73,8 @@
 								<td>所属管理组:</td>
                                 <td><strong>{% if result.role==0 %}超级管理员{% else %} 
                                             普通用户 {% endif %}</strong></td>
+							</tr>
+                            <tr id="user_groups">
 							</tr>
 					</table> 
                 </div><!--detail end-->
@@ -113,24 +113,25 @@ $(".update-btn").on('click',function(){
             return false
 })
 
-function listgroups() {
-	var name = "user_groups"
-	var url = "/listapi?method="+name
-	$.getJSON(url, function(data){
-		data=JSON.parse(data['result'])
-		console.log(data)
-		var count = data['count']
-		var str = '<td><b>用户组:</b></td>'
-		$.each(data.result, function(k,v){
-			console.log(v)
-			str += 
-			'<td><b>'+v['name']+'</b></td>'
-		})
-		console.log(str)
+
+var groups_name=''
+var url = "/listapi?method=user_groups"
+var str = '<td>用户组:</td>'
+$.ajaxSettings.async=false;
+$.getJSON(url, function(data){
+	data=JSON.parse(data['result'])
+	console.log(data)
+	var count = data['count']
+	$.each(data.result, function(k,v){
+		console.log(v)
+        groups_name+=v['name']+','
+        console.log(groups_name.substring(0,groups_name.length-1))
+	})
+    groups_name=groups_name.substring(0,groups_name.length-1)
+    str += '<td><strong>'+groups_name+'</strong></td>'
 		$("#user_groups").html(str)
 	})
-}
-	listgroups()
+
 
 </script>
 {% endblock %}

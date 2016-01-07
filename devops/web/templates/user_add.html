@@ -125,8 +125,8 @@ function list(){
 		var str = ''
 		$.each(data.result, function(k,v){
 			console.log(v)
-			str += '<input type="checkbox"'+
-				'name="r_id" value='+v['id']+'>'+v['name']
+			str += '<label class="checkbox inline"><input type="checkbox"'+
+				'name="r_id" value='+v['id']+'>'+v['name']+'</label>'
 		})
 		$("#r_id").html(str)
 })

@@ -20,7 +20,6 @@ position:static;
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
       <h5>权限管理</h5>
-      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加服务</button>
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
@@ -125,7 +124,7 @@ position:static;
             <th scope="col">权限英文名</th>
             <th scope="col">url</th>
             <th scope="col">备注</th>
-            <th scope="col">操作</th>
+ <!--           <th scope="col">操作</th>   !-->
         </tr>
     </thead> 
     <tbody>
@@ -167,9 +166,9 @@ function list(){
            '<td>'+v['info']+'</td>'+ 
            '<td>'+
 //          '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
+//           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
 //           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
-           '</td>'+ 
+//           '</td>'+ 
            '</tr>'          
        })       
          $("tbody").html(str)

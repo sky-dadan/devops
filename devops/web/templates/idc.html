@@ -271,6 +271,7 @@ $('#addForm').on('submit',function(){
          data = JSON.parse(data['result']) //object
          if (data['code']==0){
             alert(data['result'])
+			window.location.reload();
 		    $('#addModal').modal('hide')
             list()
          }else{
@@ -314,6 +315,7 @@ $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data['result']) //object
     if (data['code']==0){   
         alert(data['result'])
+		window.location.reload();
         $('#updateModal').modal('hide')
         list()
     }else{
@@ -333,6 +335,7 @@ $("tbody").on('click','.delete-btn',function(){
       		data = JSON.parse(data['result'])
 			if (data['code']== 0 ){
 				alert(data['result'])
+				window.location.reload();
                 $(that).parents('tr').remove();
                 list()
 			}else{

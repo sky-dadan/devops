@@ -143,8 +143,14 @@ position:static;
 var name='power'
 /* list all data */
 function list(){
-    var name='user_perm'
-    var url = "/listapi?method="+name
+	var id = GetQueryString('id')
+	var name='user_perm'
+	if (id == null ){
+    	var url = "/listapi?method="+name
+		}
+	else{
+		var  url = "/getapi?method="+name+"&id="+id	
+	}
     $.getJSON(url,function(data){
        //  data = data['result']  //string
        data=JSON.parse(data['result']); //object 
@@ -171,6 +177,13 @@ function list(){
     })
 }
 list()
+function GetQueryString(name)
+{
+     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+     var r = window.location.search.substr(1).match(reg);
+     if(r!=null)return  unescape(r[2]); return null;
+}
+ 
 /* DataTable */
 function  datatable() {
 $('#datatable').DataTable({

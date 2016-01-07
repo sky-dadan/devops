@@ -151,7 +151,8 @@
             <td><span style="color:#5EDF47;">{%if user['is_lock']==1%}锁定{%else%}正常{%endif%}</span></td>
             <td>{%if user['role']==0 %}超级管理员{%else%}普通用户{% endif %}</td>
 			<td>
-//                <button  class='btn btn-info btn-sm powerinfo-btn' data-id='{{user['id']}}'>查看权限</button>
+				<a class='btn btn-info btn-sm' href="/power/user?id={{user['id']}}">查看权限</a>
+           <!--     <button  class='btn btn-info btn-sm powerinfo-btn' data-id='{{user['id']}}'>查看权限</button> --!>
                 <button  class='btn btn-info btn-sm update-btn' data-id='{{user['id']}}'>更新</button>
                 <button  class='btn btn-primary btn-sm passwd-btn' data-id='{{user['id']}}'>修改密码</button>
                 <button  class='btn btn-danger btn-sm delete-btn' data-id='{{user['id']}}'>删除</button>

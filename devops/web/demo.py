@@ -61,6 +61,7 @@ def addapi():
     method = request.args.get('method')
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
+    formdata = urllib.unquote(formdata) 
     if 'p_id' in formdata:
         formdata = Handleformdata(formdata)
     else:

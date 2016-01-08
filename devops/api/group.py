@@ -22,6 +22,11 @@ def role_select(auth_info,**kwargs):
 			fields = ['id','name','name_cn','p_id','info']
 		else:
 			fields = output
+                perm_name = {}    #{1:'git',2:'web'}
+                sql = 'SELECT id,name FROM power'
+                app.config['cursor'].execute(sql)
+                for row in app.config['cursor'].fetchall():
+                        perm_name[row[0]] = row[1]
 		sql = "select %s from groups " % ','.join(fields)
 		app.config['cursor'].execute(sql)
 		result = []
@@ -31,16 +36,13 @@ def role_select(auth_info,**kwargs):
 			res = {}
 			for i,k in enumerate(fields):
 				res[k] = row[i]
-			result.append(res)
-                for i in range(len(result)):
-                        p_id=result[i]['p_id'].split(',')
-                        sql = 'SELECT name FROM power WHERE id in(%s)' % ','.join(p_id)
-                        app.config['cursor'].execute(sql)
-                        p_name = []
+                        p_name=[]
                         p_namestr=','
-                        for row in app.config['cursor'].fetchall():
-                                p_name.append(row[0])
-                        result[i]['p_id']=p_namestr.join(p_name)
+                        p_id = res['p_id'].split(',')
+                        for pid in p_id:
+                                p_name.append(perm_name[int(pid)])
+                        res['p_id']=p_namestr.join(p_name)
+			result.append(res)
 		util.write_log(username, 'select groups list success')
 		return json.dumps({'code':0,'result':result,'count':count})
 	except:

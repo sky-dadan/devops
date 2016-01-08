@@ -36,7 +36,7 @@ def getlist(auth_info,**kwargs):
 		else:
 			fields = output
 		r_id = []
-		sql = "select r_id from user where id = '%s'" % id
+		sql = "select r_id from user where username = '%s'" % username
 		app.config['cursor'].execute(sql)
 		tmp = app.config['cursor'].fetchone()
 		r_id.append(tmp)

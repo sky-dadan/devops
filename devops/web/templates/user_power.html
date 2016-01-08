@@ -144,7 +144,6 @@ var name='power'
 function list(){
 	var id = GetQueryString('id')
 	var name='user_perm'
-	var host = window.location.host
 	if (id == null ){
     	var url = "/listapi?method="+name
 		}
@@ -163,7 +162,7 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['name']+'</td>'+  
-           '<td><a href='+v['url']+' style="color: blue">'+host+v['url']+'</a></td>'+  
+           '<td><a href='+v['url']+' style="color: blue">'+v['url']+'</a></td>'+  
            '<td>'+v['info']+'</td>'+ 
            '</tr>'          
        })       

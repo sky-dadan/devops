@@ -48,7 +48,8 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>URL</label>
 			<div class='controls'>
-				<input id='add_url' type='text' name='url'>
+				<input  type="url" ng-model="user.url" value="http://" name="url" id="add_url" />
+                <span for="required" generated="true" class="help-inline"></span>
 			</div>
 		</div>
 		<div class='form-group'>
@@ -97,7 +98,8 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>url</label>
 			<div class='controls'>
-				<input id='up_url' type='text' name='url'>
+				 <input  type="url" ng-model="user.url" name="url" id="up_url" />
+				<span for="required" generated="true" class="help-inline"></span>
 			</div>
 		</div>
 		<div class='form-group'>
@@ -144,7 +146,6 @@ var name='power'
 /* list all data */
 function list(){
     var name='power'
-	var host=window.location.host
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
        //  data = data['result']  //string
@@ -158,7 +159,7 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['name']+'</td>'+  
-           '<td><a href='+v['url']+' style="color: blue" >'+host+v['url']+'</a></td>'+  
+           '<td><a href='+v['url']+' style="color: blue" >'+v['url']+'</a></td>'+  
            '<td>'+v['info']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
@@ -200,6 +201,7 @@ $('#addBtn').on('click',function(){
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
 	   var str = $('#addForm').serialize()
+	   console.log(str)
        var data = {"method":name,"formdata":str}
 	   $.post("/addapi",data,function(data){
 	     //console.log(data)    //string

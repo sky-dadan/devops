@@ -140,7 +140,7 @@ def role_update(auth_info, **kwargs):
 		print where
 		if not where.has_key('id'):
 			return json.dumps({'code':1, 'errmsg':'you need give an id!'})
-		sql = "update groups set name='%(name)s', p_id='%(p_id)s', info='%(info)s' where id='%%d'" % data % where['id']	
+		sql = "update groups set name='%(name)s', name_cn='%(name_cn)s',p_id='%(p_id)s', info='%(info)s' where id='%%d'" % data % where['id']	
 		print sql
 		app.config['cursor'].execute(sql)
 		util.write_log(username, 'update groups %s success!' % data['name'])

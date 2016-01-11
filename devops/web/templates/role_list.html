@@ -208,6 +208,21 @@ function have_perm(){
     })
 }
 
+function uphave_perm(id){
+	var url = "/getapi?method=power_sel&id="+id
+	$.getJSON(url, function(data){
+		data=JSON.parse(data['result'])
+		var str=''
+		$.each(data.result, function(k,v){
+			console.log(k,v)
+			str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
+			'</option>'
+		})
+		console.log(str)
+		$("#upp_id").html(str)
+	})
+
+}
 /*click show modal*/
 $('#addBtn').on('click',function(){
         have_perm()
@@ -250,7 +265,7 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
-    have_perm()
+    uphave_perm(id)
 	$('#updateModal').modal('show')  //show modal
 })
 
@@ -286,6 +301,7 @@ $("tbody").on('click','.delete-btn',function(){
 			if (data['code']== 0 ){
 				alert(data['result'])
                 $(that).parents('tr').remove();
+                location.reload()
                 list()
 			}else{
 				alert(data['errmsg'])

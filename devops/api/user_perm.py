@@ -253,3 +253,43 @@ def get_color(auth_info, **kwargs):
     except:
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
 
+
+@jsonrpc.method('power_sel.get')
+@auth_login
+def get_color(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        where = kwargs.get('where',None)
+        id = where['id']
+        print id
+        if id == None:
+            return json.dumps({'code':1, 'errmsg':'You must give an id!'})
+        sql_rid = "select p_id from  groups  where id=%s"  % id
+        app.config['cursor'].execute(sql_rid)
+        p_id = app.config['cursor'].fetchone()
+        plist=[]
+        plist.append(p_id)
+        p_id = getid_list(plist)
+        print p_id
+        sql = "select id, name from power "
+        app.config['cursor'].execute(sql)
+        result = []
+        power_id = []
+        for row in app.config['cursor'].fetchall():
+            res = {}
+            power_id.append(str(row[0]))
+            for i, k in enumerate(['id','name']):
+                res[k]=row[i]
+            select = set(p_id)  &  set(power_id)
+            if str(res['id'])  in select:
+                print res['id'], select
+                res['selected'] = "selected = selected"
+            else:
+                print res['id'],  type(res['id'])
+                res['selected'] = ""
+            result.append(res)
+        return json.dumps({'code':0,'result':result})
+    except:
+        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})

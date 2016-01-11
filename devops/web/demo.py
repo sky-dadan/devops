@@ -5,7 +5,7 @@ import requests,json
 import util,urllib
 
 headers = {"Content-Type": "application/json"}
-url = 'http://127.0.0.1:1000/api'
+url = 'http://127.0.0.1:3000/api'
 data = {
         "jsonrpc": "2.0",
         "id":1,
@@ -78,7 +78,9 @@ def getapi():
     id  = int(request.args.get('id'))
     data['method'] = method+".get"
     data['params'] = {"where":{"id":id}}
+    print data
     r = requests.post(url,headers=headers,json=data)
+    print r.text
     return r.text
 
 

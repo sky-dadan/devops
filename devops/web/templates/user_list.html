@@ -291,7 +291,6 @@ $("tbody").on('click','.powerinfo-btn', function(){
 //get usr groups for update
 function user_groups(id){
 	var url = "/getapi?method=groups_sel&id="+id
-	alert(url)
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		var str=''

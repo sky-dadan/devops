@@ -210,3 +210,46 @@ def user_group_byid(auth_info, **kwargs):
 	except:
 		logging.getLogger().error('get list user_groups error: %s' % traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':"get list user_groups error  : %s" % traceback.format_exc()})
+
+
+@jsonrpc.method('groups_sel.get')
+@auth_login
+def get_color(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        where = kwargs.get('where',None)
+        id = where['id']
+        print id
+        if id == None:
+            return json.dumps({'code':1, 'errmsg':'You must give an id!'})
+        sql_rid = "select r_id from  user  where id=%s"  % id
+        app.config['cursor'].execute(sql_rid)
+        r_id = app.config['cursor'].fetchone()
+        rlist=[]
+        rlist.append(r_id)
+        r_id = getid_list(rlist)
+        print r_id
+        sql = "select id, name from groups "
+        app.config['cursor'].execute(sql)
+        result = []
+        groups_id = []
+        for row in app.config['cursor'].fetchall():
+            res = {}
+            groups_id.append(str(row[0]))
+            for i, k in enumerate(['id','name']):
+                res[k]=row[i]
+            select = set(r_id)  &  set(groups_id)
+            if str(res['id'])  in select:
+                print res['id'], select
+                res['selected'] = "selected = selected"
+            else:
+                print res['id'],  type(res['id'])
+                res['selected'] = ""
+            result.append(res)
+        print groups_id
+        return json.dumps({'code':0,'result':result})
+    except:
+        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+

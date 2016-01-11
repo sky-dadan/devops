@@ -194,7 +194,7 @@ $("tbody").on('click','.update-btn',function(){
     var getbyid = "/getbyid?id="+id
     $('#updateModal').modal('show')  //show modal
     $.getJSON(getbyid,function(result){
-      console.log(result)//for test
+//      console.log(result)//for test
       if (result['code']==0){
           $('#id').val(result['user']['id']) 
           $('#upname').val(result['user']['name']) 
@@ -203,6 +203,7 @@ $("tbody").on('click','.update-btn',function(){
           $('#upmobile').val(result['user']['mobile']) 
           $('#uprole').val(result['user']['role']) 
           $('#uplock').val(result['user']['is_lock']) 
+		  user_groups(id)
       }else{
          $('#errorMsg').html('failed '+result['errmsg']).show()
       }
@@ -214,7 +215,7 @@ $('#updateForm').on('submit',function(){
        var str = $('#updateForm').serialize()
        var url = '/user/update?'+str
        $.getJSON(url,function(result){
-			 console.log(result)
+//			 console.log(result)
 			 if (result['code']==0){   //recevie json object
                 alert("更新成功")
 				$('#updateModal').modal('hide')
@@ -272,7 +273,7 @@ $("tbody").on('click','.powerinfo-btn', function(){
 	$.getJSON(getinfo_url, function(data){
 		data = JSON.parse(data['result'])
 //		alert(data['count'])
-		console.log(data.result)
+//		console.log(data.result)
 		str = ''
 		$.each(data.result, function(k,v){
 //			alert(v)
@@ -288,23 +289,20 @@ $("tbody").on('click','.powerinfo-btn', function(){
 })
 
 //get usr groups for update
-function user_groups(){
-	var name = "groups"
-	var url = "/listapi?method="+name
+function user_groups(id){
+	var url = "/getapi?method=groups_sel&id="+id
+	alert(url)
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
-		console.log(data)
 		var str=''
 		$.each(data.result, function(k,v){
 			console.log(k,v)
-			str +='<option value='+v['id']+'>'+v['name']+
+			str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
 			'</option>'
 		})
 		console.log(str)
 		$("#r_id").html(str)
 	})
 }
-
-user_groups()
 </script>
 {% endblock %}

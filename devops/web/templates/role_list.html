@@ -204,7 +204,7 @@ function have_perm(){
         $.each(data.result,function(k,v){
         power_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
         })
-        $(".p_idinfo").html(power_select)
+        $("#p_id").html(power_select)
     })
 }
 
@@ -261,11 +261,11 @@ $('tbody').on('click','.update-btn',function(){
           $('#upname_cn').val(data['result']['name_cn'])
           $('#upp_id').val(data['result']['p_id'])
           $('#upinfo').val(data['result']['info'])
+          uphave_perm(id)
       }else{
           alert(data['errmsg'])
       }
 	})
-    uphave_perm(id)
 	$('#updateModal').modal('show')  //show modal
 })
 

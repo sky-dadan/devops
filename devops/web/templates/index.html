@@ -76,6 +76,10 @@
 							</tr>
                             <tr id="user_groups">
 							</tr>
+							<tr>
+								<td>用户权限:</td>
+								<td id="user_power"><a href="www.baidu.com" style="color:green">baidu<a></td>
+							</tr>
 					</table> 
                 </div><!--detail end-->
            </div> <!--row-fluid end-->
@@ -102,7 +106,6 @@ $(".update-btn").on('click',function(){
    var url = '/user/chpwdoneself'
    $.post(url,str,function(data){
        data=JSON.parse(data)
-        console.log(data)
         if (data['code']==0){   //recevie json object
              alert("更新成功")
              $('#updateModal').modal('hide')
@@ -120,18 +123,31 @@ var str = '<td>用户组:</td>'
 $.ajaxSettings.async=false;
 $.getJSON(url, function(data){
 	data=JSON.parse(data['result'])
-	console.log(data)
 	var count = data['count']
 	$.each(data.result, function(k,v){
-		console.log(v)
+//		console.log(v)
         groups_name+=v['name']+','
-        console.log(groups_name.substring(0,groups_name.length-1))
+//        console.log(groups_name.substring(0,groups_name.length-1))
 	})
     groups_name=groups_name.substring(0,groups_name.length-1)
     str += '<td><strong>'+groups_name+'</strong></td>'
 		$("#user_groups").html(str)
 	})
 
+function user_power(){
+	var url = "/listapi?method=user_perm"
+	var str = ''
+	$.getJSON(url, function(data){
+		data = JSON.parse(data['result'])
+		$.each(data.result, function(k,v){
+			console.log(k,v)
+			str+='<a href="'+v['url']+'" style="color:green">'+v['name_cn']+'</a>'+',   '
+	})
+		$("#user_power").html(str)
+})
+}
+
+user_power()
 
 </script>
 {% endblock %}

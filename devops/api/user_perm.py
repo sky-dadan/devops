@@ -81,11 +81,12 @@ def getlist_byid(auth_info,**kwargs):
 			fields = ['name','name_cn','url','info']
 		else:
 			fields = output
-		where = kwargs.get('where',None)
+		where = kwargs.get('where')
 		if where.has_key('id'):
-			id = where['id']
+				id = where['id']
 		r_id = []
 		sql = "select r_id from user where id = '%s'" % id
+		print sql
 		app.config['cursor'].execute(sql)
 		tmp = app.config['cursor'].fetchone()
 		r_id.append(tmp)
@@ -230,13 +231,13 @@ def get_color(auth_info, **kwargs):
         rlist=[]
         rlist.append(r_id)
         r_id = getid_list(rlist)
-        print r_id
         sql = "select id, name from groups "
         app.config['cursor'].execute(sql)
         result = []
         groups_id = []
         for row in app.config['cursor'].fetchall():
             res = {}
+            res['selected'] = ''
             groups_id.append(str(row[0]))
             for i, k in enumerate(['id','name']):
                 res[k]=row[i]
@@ -244,13 +245,12 @@ def get_color(auth_info, **kwargs):
             if str(res['id'])  in select:
                 print res['id'], select
                 res['selected'] = "selected = selected"
-            else:
-                print res['id'],  type(res['id'])
-                res['selected'] = ""
             result.append(res)
         print groups_id
+        util.write_log(username, "groups_sel.get successful!")
         return json.dumps({'code':0,'result':result})
     except:
+        logging.getLogger().error('groups_sel.get error!')
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
 
 
@@ -272,24 +272,22 @@ def get_color(auth_info, **kwargs):
         plist=[]
         plist.append(p_id)
         p_id = getid_list(plist)
-        print p_id
         sql = "select id, name from power "
         app.config['cursor'].execute(sql)
         result = []
         power_id = []
         for row in app.config['cursor'].fetchall():
             res = {}
+            res['selected'] = ''
             power_id.append(str(row[0]))
             for i, k in enumerate(['id','name']):
                 res[k]=row[i]
             select = set(p_id)  &  set(power_id)
             if str(res['id'])  in select:
-                print res['id'], select
                 res['selected'] = "selected = selected"
-            else:
-                print res['id'],  type(res['id'])
-                res['selected'] = ""
             result.append(res)
+        util.write_log(username,"power_sel.get successful!")
         return json.dumps({'code':0,'result':result})
     except:
+        logging.getLogger().error('power_sel.get error!')
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})

@@ -59,8 +59,10 @@ def useradd():
         password = request.form.get('user_pwd')
         user_repwd = request.form.get('user_repwd')
         r_id = request.form.getlist('r_id')
+        print r_id
         r_id = ','.join(r_id)
-
+        if len(r_id) == 0:
+            return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!!!'})
         data = {'role':role,'r_id':r_id,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
         url = "http://192.168.1.243:1000/api/user"
         r = requests.post(url,headers=headers,json=json.dumps(data))

@@ -19,15 +19,15 @@ position:static;
 <div class="widget-box">
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
-      <h5>软资产管理</h5>
-      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加软资产</button>
+      <h5>机柜管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加机柜</button>
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
 <div id="addModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">添加软资产</h4>
+        <h4 class="modal-title">添加机柜</h4>
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
@@ -268,7 +268,6 @@ function list(){
            '<td>'+v['remark']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-info btn-sm more-btn" data-id="'+v['id']+'">更多</button>'+
            '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
            '</td>'+ 
            '</tr>'          
@@ -297,6 +296,7 @@ $('#addForm').on('submit',function(){
             alert(data['result'])
 		    $('#addModal').modal('hide')
             list()
+            location.reload()
          }else{
 		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
          }
@@ -343,6 +343,7 @@ $.post('/updateapi',data, function(data){  // data is string
         alert(data['result'])
         $('#updateModal').modal('hide')
         list()
+        location.reload()
     }else{
 		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
     }
@@ -362,6 +363,7 @@ $("tbody").on('click','.delete-btn',function(){
 				alert(data['result'])
                 $(that).parents('tr').remove();
                 list()
+                location.reload()
 			}else{
 				alert(data['errmsg'])
 			}

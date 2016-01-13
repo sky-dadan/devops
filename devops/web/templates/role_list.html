@@ -241,6 +241,7 @@ $('#addForm').on('submit',function(){
             alert(data['result'])
 		    $('#addModal').modal('hide')
             list()
+            location.reload()
          }else{
 		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
          }
@@ -283,6 +284,7 @@ $.post('/updateapi',data, function(data){  // data is string
         alert(data['result'])
         $('#updateModal').modal('hide')
         list()
+        location.reload()
     }else{
 		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
     }
@@ -303,6 +305,7 @@ $("tbody").on('click','.delete-btn',function(){
                 $(that).parents('tr').remove();
                 location.reload()
                 list()
+                location.reload()
 			}else{
 				alert(data['errmsg'])
 			}

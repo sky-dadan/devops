@@ -42,13 +42,16 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>开发对接人</label>
 			<div class='controls'>
-				<input id=s_devinterface type='text' name='dev_interface'>
+					<select name='dev_interface' class="user_list">
+					</select>
 			</div>
 		</div>
 		<div class='form-group'>
 			<label class='control-label'>运维对接人</label>
 			<div class='controls'>
-				<input id=s_sainterface type='text' name='sa_interface'>
+				<select name='sa_interface'  class="user_list">
+						<option value="sky-du">sky-du</option>
+				</select>
 			</div>
 		</div>
 		<div class='form-group'>
@@ -90,14 +93,16 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>开发对接人</label>
 			<div class='controls'>
-				<input id='up_dev_interface' type='text' name='dev_interface'>
+				<select name='dev_interface' class='user_list'>
+				</select>
 			</div>
 		</div>
 
 		<div class='form-group'>
 			<label class='control-label'>运维对接人</label>
 			<div class='controls'>
-				<input id='up_sa_interface' type='text' name='sa_interface'>
+				<select name='sa_interface' class='user_list'>
+				</select>
 			</div>
 		</div>
 		<div class='form-group'>
@@ -148,15 +153,15 @@ function list(){
     $.getJSON(url,function(data){
        //  data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+//       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+ //          console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
-           '<td>'+v['dev_interface']+'</td>'+  
-           '<td>'+v['sa_interface']+'</td>'+  
+           '<td><button class="btn btn-info btn-sm dev_userinfo" data-name="'+v['dev_interface']+'">'+v['dev_interface']+'</button></td>'+
+           '<td><button class="btn btn-info btn-sm sa_userinfo" data-name="'+v['sa_interface']+'">'+v['sa_interface']+'</button></td>'+
            '<td>'+v['remark']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
@@ -219,13 +224,13 @@ $('tbody').on('click','.update-btn',function(){
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
 	$.getJSON(url,function(data){
-	  console.log(data)  
+//	  console.log(data)  
       data = JSON.parse(data['result'])
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
 		  $('#up_name').val(data['result']['name'])
-		  $('#up_dev_interface').val(data['result']['dev_interface'])
-		  $('#up_sa_interface').val(data['result']['sa_interface'])
+//		  $('#up_dev_interface').val(data['result']['dev_interface'])
+//		  $('#up_sa_interface').val(data['result']['sa_interface'])
 		  $('#up_remark').val(data['result']['remark'])
       }else{
           alert(data['errmsg'])
@@ -273,5 +278,53 @@ $("tbody").on('click','.delete-btn',function(){
     }  // end confirm
     return false   //get data and end
 })   
+
+
+$("tbody").on('click', '.sa_userinfo',function(){
+	var that = this
+	var username = $(this).attr('data-name')
+	userinfo(username)
+})
+
+
+$("tbody").on('click', '.dev_userinfo',function(){
+	var that = this
+	var username = $(this).attr('data-name')
+	userinfo(username)
+})
+
+
+//获得所有的用户信息
+function userlist(){
+	var url = "/listapi?method=user"
+	var str = ''
+	$.getJSON(url, function(data){
+		data = JSON.parse(data.result)
+		console.log(data)
+		$.each(data.result, function(k,v){
+			console.log(v)
+			str += '<option value="'+v['username']+'">'+v['username']+'</option>'
+		})
+		$(".user_list").html(str)
+	})	
+}
+userlist()
+
+//获得某个用户的信息
+function userinfo(username){
+	var url = "/getapi?method=user&id="+username
+	var str = ''
+	$.getJSON(url,function(data){
+		data = JSON.parse(data.result)
+		console.log(data.result)
+		$.each(data.result, function(k,v){
+			console.log(v)
+			str += '姓名:'+v['name']+'  email:'+v['email']+'  mobile:'+v['mobile']
+	})
+			console.log(str)
+			alert(str)
+	})
+}
+
 </script>
 {% endblock %}

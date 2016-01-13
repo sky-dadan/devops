@@ -5,7 +5,7 @@ import requests,json
 import util,urllib
 
 headers = {"Content-Type": "application/json"}
-url = 'http://127.0.0.1:1000/api'
+url = 'http://127.0.0.1:3000/api'
 data = {
         "jsonrpc": "2.0",
         "id":1,
@@ -51,6 +51,7 @@ def listapi():
     data['method'] = method+".getlist"
     data['params'] = {}
     r = requests.post(url,headers=headers,json=data)
+    print r.text
     return r.text
 
 @app.route('/addapi', methods=['GET','POST'])
@@ -59,7 +60,7 @@ def addapi():
     method = request.args.get('method')
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
-    formdata = urllib.unquote(formdata) 
+    formdata = urllib.unquote(formdata).encode('iso-8859-1', 'ignore')
     if 'p_id' in formdata:
         formdata = Handleformdata(formdata)
     else:
@@ -73,10 +74,12 @@ def addapi():
 def getapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
-    id  = int(request.args.get('id'))
+    id  = request.args.get('id')
     data['method'] = method+".get"
     data['params'] = {"where":{"id":id}}
+    print data
     r = requests.post(url,headers=headers,json=data)
+    print r.text
     return r.text
 
 
@@ -85,7 +88,7 @@ def updateapi():
     headers['authorization'] = session['author']
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
-    formdata = urllib.unquote(formdata) 
+    formdata = urllib.unquote(formdata).encode('iso-8859-1', 'ignore')
     if 'p_id' in formdata:
         formdata = Handleformdata(formdata)
     else:

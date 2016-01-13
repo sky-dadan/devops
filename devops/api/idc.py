@@ -45,7 +45,7 @@ def idc_get(auth_info,**kwargs):
 		else:
 			fields = output
 		if where.has_key('id'):
-			sql = "select %s from Idc where id = %d" % (','.join(fields), where['id'])
+			sql = "select %s from Idc where id = %s" % (','.join(fields), where['id'])
 			app.config['cursor'].execute(sql)
 			row = app.config['cursor'].fetchone()
 			result = {}
@@ -121,7 +121,7 @@ def idc_delete(auth_info, **kwargs):
 	username = auth_info['username']
 	role = int(auth_info['role'])
 	if role != 0:
-		return json.dumps({'code':0, 'errmsg':'you are not admin!'})
+		return json.dumps({'code':1, 'errmsg':'you are not admin!'})
 	try:
 		data = request.get_json()['params']
 		if not data.has_key('id'):

@@ -50,8 +50,9 @@ def User(auth_info,offset=0,size=100):
                 res = app.config['cursor'].fetchone()    #返回结果为元组(id,username,……)
                 for i,k in enumerate(fields):     #取出元组的值及对应的索引号 0.1,2……
                     user[k]=res[i]                #fields中的列名作为user字典的k,索引作为数据库返回列表的k,实现字典赋值
+                users.append(user)
                 util.write_log(username, 'get_one_users') 
-                return json.dumps({'code':0,'user':user})
+                return json.dumps({'code':0,'users':users})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'Get users error'})

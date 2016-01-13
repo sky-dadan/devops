@@ -298,11 +298,11 @@ $('tbody').on('click','.update-btn',function(){
 		  $('#up_pact_cabinet_num').val(data['result']['pact_cabinet_num'])
 		  $('#up_rel_cabinet_num').val(data['result']['rel_cabinet_num'])
 		  $('#up_remark').val(data['result']['remark'])
+		$('#updateModal').modal('show')  //show modal
       }else{
           alert(data['errmsg'])
       }
 	})
-	$('#updateModal').modal('show')  //show modal
 })
 
 /*update data*/

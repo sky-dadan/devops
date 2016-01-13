@@ -283,5 +283,67 @@ def get_color(auth_info, **kwargs):
         util.write_log(username,"power_sel.get successful!")
         return json.dumps({'code':0,'result':result})
     except:
-        logging.getLogger().error('power_sel.get error!')
+        logging.getLogger().error('power_sel.get error! %s'  %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+
+
+@jsonrpc.method('user.getlist')
+@auth_login
+def user_getlist(auth_info,**kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output',[])
+		if len(output)==0:
+			fields = ['id','username','name','email','mobile','is_lock']
+		else:
+			fields = output
+		sql = "SELECT %s from user "  %  ','.join(fields)
+		app.config['cursor'].execute(sql)
+		result = []
+		for row in app.config['cursor'].fetchall():
+			res = {}
+			for i , k in enumerate(fields):
+				res[k] = row[i]
+			result.append(res)
+		util.write_log(username, 'user.getlist successed!')
+		return json.dumps({'code':0,'result':result,'count':len(result)})
+	except:
+		logging.getLogger().error('user.getlist error : %s')
+		return json.dumps({'code':1,'errmsg':'user.getlist error:  %s'  %  traceback.format_exc()})
+
+
+@jsonrpc.method('user.get')
+@auth_login
+def user_get(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		output = kwargs.get('output',[])
+		if len(output) == 0:
+			fields = ['id','username','name','email','mobile','is_lock']
+		else:	
+			fields = output
+		where = kwargs.get('where')
+		if where.has_key('id'):
+			id = where['id']
+		try:
+			sql = "select %s from user where id = %s"  % (','.join(fields), id)
+			app.config['cursor'].execute(sql)
+		except:
+			sql = "select %s from user where username='%s'" % (','.join(fields), id)
+			print sql	
+			app.config['cursor'].execute(sql)
+		result = []
+		for row in app.config['cursor'].fetchall():
+			res = {}
+			for i, k in enumerate(fields):
+				res[k]=row[i]
+			result.append(res)
+		util.write_log(username,'user.get successed!')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('user.get error: %s' %  traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'user.get error: %s' %  traceback.format_exc()})

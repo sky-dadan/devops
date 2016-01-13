@@ -141,7 +141,7 @@ function user_power(){
 		data = JSON.parse(data['result'])
 		$.each(data.result, function(k,v){
 			console.log(k,v)
-			str+='<a href="'+v['url']+'" style="color:green">'+v['name_cn']+'</a>'+',   '
+			str+='<a href="'+v['url']+'" style="color:blue">'+v['name_cn']+'</a>'+',   '
 	})
 		$("#user_power").html(str)
 })

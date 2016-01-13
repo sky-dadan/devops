@@ -222,9 +222,6 @@ def get_color(auth_info, **kwargs):
     try:
         where = kwargs.get('where',None)
         id = where['id']
-        print id
-        if id == None:
-            return json.dumps({'code':1, 'errmsg':'You must give an id!'})
         sql_rid = "select r_id from  user  where id=%s"  % id
         app.config['cursor'].execute(sql_rid)
         r_id = app.config['cursor'].fetchone()
@@ -263,9 +260,6 @@ def get_color(auth_info, **kwargs):
     try:
         where = kwargs.get('where',None)
         id = where['id']
-        print id
-        if id == None:
-            return json.dumps({'code':1, 'errmsg':'You must give an id!'})
         sql_rid = "select p_id from  groups  where id=%s"  % id
         app.config['cursor'].execute(sql_rid)
         p_id = app.config['cursor'].fetchone()

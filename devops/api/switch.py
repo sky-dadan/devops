@@ -41,7 +41,7 @@ def get(auth_info,**kwargs):
         output = kwargs.get('output',[])
         where = kwargs.get('where',None)
         if len(output) == 0:
-            fields =['id','name','type','idc_id','cabinet_id','port_num','status','remark']
+            fields =['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
         else:
             fields=output
         if where.has_key('id'):
@@ -66,26 +66,22 @@ def getlist(auth_info,**kwargs):
 	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
-        fields =['id','name','type','idc_id','cabinet_id','port_num','status','remark']
+        fields =['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
 	data = request.get_json()	
 	data = data['params']
-	sql = "select * from Switch" 
+	sql = "select %s from Switch" % ','.join(fields)
 	app.config['cursor'].execute(sql)
 	result = []
-        count = 0
         for row in app.config['cursor'].fetchall():
-            count += 1
 	    res = {}
 	    for i,k in enumerate(fields):
                res[k] = row[i]
 	    result.append(res)
 	util.write_log(username, 'select Switch list sucess') 
-        return json.dumps({'code':0,'result':result,'count':count},cls=MyEncoder)
+        return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
 	logging.getLogger().error("select Switch list error: %s" % traceback.format_exc())
 	return json.dumps({'code': 1, 'errmsg': 'select Switch list error'})
-
-
 
 @jsonrpc.method('switch.update')     
 @auth_login
@@ -106,7 +102,7 @@ def update(auth_info,**kwargs):
         print data,where
         if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
-	sql = 'UPDATE Switch SET name="%(name)s",type="%(type)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",\
+	sql = 'UPDATE Switch SET name="%(name)s",ip="%(ip)s",type="%(type)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",\
                 port_num="%(port_num)d",status="%(status)d",remark="%(remark)s" WHERE id=%%d'  % data % where['id']
         print sql
 	app.config['cursor'].execute(sql)

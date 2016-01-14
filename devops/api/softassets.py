@@ -69,23 +69,19 @@ def getlist(auth_info,**kwargs):
         fields = ['id','type','manufacturer','store_date','expire','remark']
 	data = request.get_json()	
 	data = data['params']
-	sql = "select * from Soft_Assets" 
+	sql = "select %s from Soft_Assets" % ','.join(fields)
 	app.config['cursor'].execute(sql)
 	result = []
-        count = 0
         for row in app.config['cursor'].fetchall():
-            count += 1
 	    res = {}
 	    for i,k in enumerate(fields):
                res[k] = row[i]
 	    result.append(res)
 	util.write_log(username, 'select Soft_Assets list sucess') 
-        return json.dumps({'code':0,'result':result,'count':count},cls=MyEncoder)
+        return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
 	logging.getLogger().error("select Soft_Assets list error: %s" % traceback.format_exc())
 	return json.dumps({'code': 1, 'errmsg': 'select Soft_Assets list error'})
-
-
 
 @jsonrpc.method('softassets.update')     
 @auth_login

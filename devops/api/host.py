@@ -107,7 +107,6 @@ def update(auth_info,**kwargs):
 
         data['host_no']=int(data['host_no'])
         data['cpu_num']=int(data['cpu_num'])
-        data['disk_num']=int(data['disk_num'])
         data['mem_num']=int(data['mem_num'])
         data['manufacturer_id']=int(data['manufacturer_id'])
         data['supplier_id']=int(data['supplier_id'])
@@ -120,7 +119,7 @@ def update(auth_info,**kwargs):
         if not where.has_key("id"):
             return json.dumps({'code':1,'errmsg':'must need id '})
 	sql = 'update Host set hostname="%(hostname)s",sn="%(sn)s",host_no="%(host_no)d", inner_ip="%(inner_ip)s",mac_address="%(mac_address)s",\
-                remote_ip="%(remote_ip)s",os_info="%(os_info)s",cpu_num="%(cpu_num)d",disk_num="%(disk_num)d",mem_num="%(mem_num)d",\
+                remote_ip="%(remote_ip)s",os_info="%(os_info)s",cpu_num="%(cpu_num)d",disk_num="%(disk_num)s",mem_num="%(mem_num)d",\
                 host_type="%(host_type)s",manufacturer_id="%(manufacturer_id)d",supplier_id="%(supplier_id)d",store_date="%(store_date)s",\
                 expire="%(expire)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",service_id="%(service_id)d",status="%(status)d",\
                 vm_status="%(vm_status)d",remark="%(remark)s" WHERE id=%%d' % data % where['id']
@@ -150,5 +149,4 @@ def delete(auth_info,**kwargs):
         return json.dumps({'code':0,'result':'delete %s success' % data['hostname']})
     except:
 	logging.getLogger().error('delete Host error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'delete Host error'})
-
+        return json.dumps({'code':1,'errmsg':'delete Host error'}) 

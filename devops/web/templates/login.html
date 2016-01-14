@@ -21,7 +21,7 @@
         </div>
         <!--loginbox again-->
         <div id="loginbox">
-            <form  accept-charset="UTF-8" method="POST"  autocomplete="off">
+            <form  accept-charset="UTF-8" method="POST"  autocomplete="off" id="loginform">
                 <div style="display:block; padding-top:15px; height:26px; color:#FF0000;">
                     <div id="error_hint"></div>
                 </div>
@@ -45,7 +45,7 @@
 
                 <div class="form-actions" style="margin-top:0px;">
                     <span class="pull-left">
-                        <a href="/login" class="flip-link" id="to-recover">忘记密码?</a>
+                        <a href="#" class="flip-link" id="to-recover">忘记密码?</a>
                     </span>
                     <span class="pull-right">
                         <input type="submit" class="btn btn-inverse" id="submit_data_btn" value="登录">
@@ -62,9 +62,29 @@
 
 <script type="text/javascript" src="{{url_for('static',filename='js/jquery.min.js')}}"></script>
 <script type="text/javascript">
-	$("#to-recover").click(function() {
-        alert("如果您忘记了密码，请联系系统管理员帮您重置密码，管理员邮箱是：liuziping@yuanxin-inc.com")
-	});
+/* 忘记密码提示*/
+$("#to-recover").click(function() {
+    str="请联系系统管理员帮您重置密码.管理员邮箱：liuziping@yuanxin-inc.com"
+    alert(str)
+});
+
+/*用户登录*/
+$('#loginform').on('submit',function(){
+    var str = $('#loginform').serialize()
+    $.post('/login',str,function(data){
+        data = JSON.parse(data)
+        if (data['code']==0){
+            location.href="/"
+        }else{
+            str = data['errmsg']
+            alert(str)
+            location.href="/login"
+        }
+    })
+        return false;
+
+})
+
 </script>
 
 

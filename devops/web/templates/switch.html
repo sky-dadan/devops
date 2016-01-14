@@ -39,6 +39,12 @@ position:static;
        		 	<input id="name"  type="text"  name="name" >
       		</div> 
        	</div> <!--add name end-->
+        <div class="form-group">
+            <label class="control-label">IP地址</label>
+     		 <div class="controls">
+       		 	<input id="ipaddr"  type="text"  name="ipaddr" >
+      		</div> 
+        </div> <!--add ip end-->
      	<div class="form-group">
             <label class="control-label">设备类型</label>
      		 <div class="controls">
@@ -113,6 +119,12 @@ position:static;
        		 	<input id="upname"  type="text"  name="name" >
       		</div> 
        	</div> <!--update name end-->
+        <div class="form-group">
+            <label class="control-label">IP地址</label>
+     		 <div class="controls">
+       		 	<input id="upipaddr"  type="text"  name="ipaddr" >
+      		</div> 
+        </div> <!--add name end-->
      	<div class="form-group">
             <label class="control-label">设备类型</label>
      		 <div class="controls">
@@ -173,6 +185,7 @@ position:static;
 	<thead>
 		<tr>
             <th scope="col">网络设备名称</th>
+            <th scope="col">IP地址</th>
             <th scope="col">设备类型</th>
             <th scope="col">机房</th>
             <th scope="col">机柜</th>
@@ -258,6 +271,7 @@ function list(){
            }
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
+           '<td>'+v['ip']+'</td>'+  
            '<td>'+v['type']+'</td>'+  
            '<td>'+idc_array[v['idc_id']]+'</td>'+  
            '<td>'+cabinet_array[v['cabinet_id']]+'</td>'+  
@@ -315,6 +329,7 @@ $('tbody').on('click','.update-btn',function(){
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
           $('#upname').val(data['result']['name'])
+          $('#upipaddr').val(data['result']['ip'])
           $('#uptype').val(data['result']['type'])
           $('#upidc_id').val(data['result']['idc_id'])
           $('#upcabinet_id').val(data['result']['cabinet_id'])

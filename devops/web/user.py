@@ -190,8 +190,8 @@ def role_list():
 #权限列表
 @app.route("/power/user", methods=['GET','POST'])
 def power_user():
-     if session.get('username')== None:
-        return redirect('/login')
-    headers['authorization'] = session['author']
-    name = session['username']
-    return render_template('user_power.html',name=name)
+	if session.get('username')== None:
+	    return redirect('/login')
+	headers['authorization'] = session['author']
+	name = session['username']
+	return render_template('user_power.html',name=name)

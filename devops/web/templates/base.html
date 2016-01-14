@@ -58,9 +58,9 @@
                 <span class="arrow icon-chevron-down"></span>
             </a>
             <ul>
-                <li><a href="/user/add">添加用户</a></li>
-                <li><a href="/user/list">用户列表</a></li>
-                <li><a href="/role/list">角色管理</a></li>
+                <li class="sa"><a href="/user/add">添加用户</a></li>
+                <li class="sa"><a href="/user/list">用户列表</a></li>
+                <li class="sa"><a href="/role/list">角色管理</a></li>
             </ul>
         </li>  <!--end user-->
         <li class="submenu open">
@@ -70,7 +70,7 @@
         </a>
         <ul>
             <!--  <li><a href="/power/user">用户权限</a></li> -->
-            <li><a href="/power/list">权限列表</a></li>
+            <li class="sa"><a href="/power/list">权限列表</a></li>
         </ul>
         </li> <!--end priviage-->
         <li class="submenu open">
@@ -79,13 +79,13 @@
             <span class="arrow icon-chevron-down"></span>
         </a>
         <ul>
-            <li><a href="/cmdb/host">主机管理</a></li>
-            <li><a href="/cmdb/switch">网络设备管理</a></li>
-            <li><a href="/cmdb/idc">机房管理</a></li>
-            <li><a href="/cmdb/cabinet">机柜管理</a></li>
-            <li><a href="/cmdb/manufact">供应商管理</a></li>
-            <li><a href="/cmdb/services">服务管理</a></li>
-            <li><a href="/cmdb/softassets">软资产管理</a></li>
+            <li class="sa"><a href="/cmdb/host">主机管理</a></li>
+            <li class="sa"><a href="/cmdb/switch">网络设备管理</a></li>
+            <li class="sa"><a href="/cmdb/idc">机房管理</a></li>
+            <li class="sa"><a href="/cmdb/cabinet">机柜管理</a></li>
+            <li class="sa"><a href="/cmdb/manufact">供应商管理</a></li>
+            <li class="sa"><a href="/cmdb/services">服务管理</a></li>
+            <li class="sa"><a href="/cmdb/softassets">软资产管理</a></li>
         </ul>
         </li> <!--end cmdb-->
     </ul>
@@ -125,6 +125,9 @@
 <script type="text/javascript" src="{{url_for('static',filename='js/jquery.ui.custom.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static',filename='js/matrix.js')}}"></script>
+<script>
+//$(".sa").hide();   
+</script>
 {% block js%}
 {% endblock %}
 

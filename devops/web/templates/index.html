@@ -15,12 +15,12 @@
           <h5 style="float:right;" id = "passwd">
               (<i class="icon-edit"></i><strong>修改密码</strong>)</h5>
 	   </div> <!--end widget-title-->
-<!--模态窗-->
+<!--更新密码模态窗-->
 <div id="updateModal"  class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 	<h3>修改个人密码</h3>
-  </div>
+  </div> <!--modal-header end-->
   <div class="modal-body">
     <form class="form-horizontal" id="updateForm" method="POST">
      	<div class="form-group">
@@ -47,7 +47,7 @@
 </div> <!--modal end-->
 <!--模态窗结束-->
 
-	   <div class="widget-content">
+	<div class="widget-content">
            <div class="row-fluid">
                <div class="span6">
 					<table class="" id = "info">
@@ -63,44 +63,40 @@
 					<table class="table table-bordered table-invoice" id = "detail">
 							<tr>
 								<td class="width30">E-mail地址：</td>
-                                <td class="width70"><strong>{{result.email}}</strong></td>
+                                 <td class="width70"><strong>{{result.email}}</strong></td>
 							</tr>
 							<tr>
-								<td>加入时间:</td>
+					 			<td>加入时间:</td>
 								<td><strong>2015-10-13 15:19:52</strong></td>
 							</tr>
 							<tr>
 								<td>所属管理组:</td>
                                 <td><strong>{% if result.role==0 %}超级管理员{% else %} 
-                                            普通用户 {% endif %}</strong></td>
+                                             普通用户 {% endif %}</strong></td>
 							</tr>
                             <tr id="user_groups">
 							</tr>
 							<tr>
 								<td>用户权限:</td>
-								<td id="user_power"></td>
-							</tr>
+					 			<td id="user_power"></td>
+ 							</tr>
 					</table> 
                 </div><!--detail end-->
            </div> <!--row-fluid end-->
-
     </div> <!--widget-content  end -->
+
 </div><!--widget-box end-->
 
 
 {% endblock %}
 {% block js %}
 <script>
-/*get data for update */
-$("body").on('click','#passwd',function(){
-    $('#updateModal').modal('show')  //show modal
-    /*$.getJSON(getbyid,function(result){
-      console.log(result)   //for test
-      $('#upname').val(result['name']) 
-    })*/
-    
+/*点击按钮，显示修改密码的模态窗 */
+$("#passwd").on('click',function(){
+    $('#updateModal').modal('show')  
 })
 
+/*用户自己修改密码*/
 $(".update-btn").on('click',function(){
    var str = $("#updateForm").serialize()
    var url = '/user/chpwdoneself'
@@ -113,10 +109,10 @@ $(".update-btn").on('click',function(){
              alert("更新失败")
             }
    })
-            return false
+        return false
 })
 
-
+/*获取用户组信息*/
 var groups_name=''
 var url = "/listapi?method=user_groups"
 var str = '<td>用户组:</td>'
@@ -125,29 +121,29 @@ $.getJSON(url, function(data){
 	data=JSON.parse(data['result'])
 	var count = data['count']
 	$.each(data.result, function(k,v){
-//		console.log(v)
+        //console.log(v)
         groups_name+=v['name']+','
-//        console.log(groups_name.substring(0,groups_name.length-1))
 	})
-    groups_name=groups_name.substring(0,groups_name.length-1)
-    str += '<td><strong>'+groups_name+'</strong></td>'
+        groups_name=groups_name.substring(0,groups_name.length-1)
+        str += '<td><strong>'+groups_name+'</strong></td>'
 		$("#user_groups").html(str)
 	})
 
+/*获取用户权限*/
 function user_power(){
 	var url = "/listapi?method=user_perm"
 	var str = ''
 	$.getJSON(url, function(data){
-		data = JSON.parse(data['result'])
+ 		data = JSON.parse(data['result'])
 		$.each(data.result, function(k,v){
 			console.log(k,v)
-			str+='<a href="'+v['url']+'" style="color:blue">'+v['name_cn']+'</a>'+',   '
+ 			str+='<a href="'+v['url']+'" style="color:blue">'+v['name_cn']+'</a>'+','
 	})
-		$("#user_power").html(str)
+    		$("#user_power").html(str)
 })
 }
-
 user_power()
 
+/*通过用户组信息，判断是否显示列表*/
 </script>
 {% endblock %}

@@ -29,17 +29,17 @@ def role_select(auth_info,**kwargs):
             perm_name[row[0]] = row[1]
         sql = "select %s from groups " % ','.join(fields)
         app.config['cursor'].execute(sql)
-	result = []
+        result = []
         for row in app.config['cursor'].fetchall():
-	    res = {}
-	    for i,k in enumerate(fields):
-		res[k] = row[i]
+            res = {}
+            for i,k in enumerate(fields):
+                res[k] = row[i]
             p_name=[]
             p_namestr=','
             p_id = res['p_id'].split(',')
             for pid in p_id:
                 p_name.append(perm_name[int(pid)])
-                res['p_id']=p_namestr.join(p_name)
+            res['p_id']=p_namestr.join(p_name)
 	    result.append(res)
 	util.write_log(username, 'select groups list success')
         return json.dumps({'code':0,'result':result,'count':len(result)})

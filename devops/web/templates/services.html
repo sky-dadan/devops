@@ -279,14 +279,14 @@ $("tbody").on('click','.delete-btn',function(){
     return false   //get data and end
 })   
 
-
+//弹出运维接口人的详细信息
 $("tbody").on('click', '.sa_userinfo',function(){
 	var that = this
 	var username = $(this).attr('data-name')
 	userinfo(username)
 })
 
-
+//弹出开发接口人的详细信息
 $("tbody").on('click', '.dev_userinfo',function(){
 	var that = this
 	var username = $(this).attr('data-name')
@@ -294,7 +294,7 @@ $("tbody").on('click', '.dev_userinfo',function(){
 })
 
 
-//获得所有的用户信息
+//获得所有的用户名字列表信息
 function userlist(){
 	var url = "/listapi?method=user"
 	var str = ''

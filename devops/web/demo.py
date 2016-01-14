@@ -23,8 +23,10 @@ def Handleformdata(formdata):
             res[k] = [res[k], v]
         else:
             res[k] = v
-    p_idstr=','
-    res['p_id']=p_idstr.join(res['p_id'])
+
+    for k in res:
+        if isinstance(res[k], list):
+            res[k] = ','.join(res[k])
     return res
 
 @app.route('/power/list')
@@ -61,10 +63,7 @@ def addapi():
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
     formdata = urllib.unquote(formdata).encode('iso-8859-1', 'ignore')
-    if 'p_id' in formdata:
-        formdata = Handleformdata(formdata)
-    else:
-        formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    formdata = Handleformdata(formdata)
     data['method'] = method+".create"
     data['params']=formdata
     r = requests.post(url,headers=headers,json=data)
@@ -89,10 +88,7 @@ def updateapi():
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
     formdata = urllib.unquote(formdata).encode('iso-8859-1', 'ignore')
-    if 'p_id' in formdata:
-        formdata = Handleformdata(formdata)
-    else:
-        formdata = dict([x.split('=', ) for x in formdata.split('&')])  #dict
+    formdata = Handleformdata(formdata)
     data['method'] = method+".update"
     data['params'] = {
         "data":formdata,
@@ -113,6 +109,4 @@ def deleteapi():
     data['params'] = {"id":id}
     r = requests.post(url,headers=headers,json=data)
     return r.text
-
-
 

@@ -1,5 +1,10 @@
+import sys
+
 from flask import Flask
 from flask_jsonrpc import JSONRPC
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 app = Flask(__name__)
 jsonrpc = JSONRPC(app, '/api')

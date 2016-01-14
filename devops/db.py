@@ -29,3 +29,75 @@ class Cursor():
 
     def fetchall(self):
         return self.cur.fetchall()
+
+    def insert_sql(self, table_name, data):
+        fields, values = [], []
+        for k, v in data.items():
+            fields.append(k)
+            values.append("'%s'" % v)
+        sql = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(values))
+        print sql
+        return sql
+
+    def execute_insert_sql(self, table_name, data):
+        sql = self.insert_sql(table_name, data)
+        return self.execute(sql)
+
+    def select_sql(self, table_name, fields, where=None):
+        if isinstance(where, dict):
+            conditions = ['%s=%s' % (k, v) for k,v in where.items()]
+            sql = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table_name, ' AND '.join(conditions))
+        elif where is None:
+            sql = "SELECT %s FROM %s" % (','.join(fields), table_name)
+        else:
+            sql = ""
+        print sql
+        return sql
+
+    def get_one_result(self, table_name, fields, where=None):
+        sql = self.select_sql(table_name, fields, where)
+        if not sql:
+            return None
+        self.execute(sql)
+        result_set = self.fetchone()
+        return dict([(k, result_set[i]) for i,k in enumerate(fields)])
+
+    def get_results(self, table_name, fields, where=None):
+        sql = self.select_sql(table_name, fields, where)
+        self.execute(sql)
+        result_sets = self.fetchall()
+        return [dict([(k, row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+
+    def update_sql(self, table_name, data, where, fields=None):
+        if not (where and isinstance(where, dict)):
+            return ""
+        where_cond = ['%s=%s' % (k, v) for k,v in where.items()]
+        if fields:
+            conditions = ["%s='%s'" % (k, data[k]) for k in fields]
+        else:
+            conditions = ["%s='%s'" % (k, data[k]) for k in data]
+        sql = "UPDATE %s SET %s WHERE %s" % (table_name, ','.join(conditions), ' AND '.join(where_cond))
+        print sql
+        return sql
+
+    def execute_update_sql(self, table_name, data, where, fields=None):
+        sql = self.update_sql(table_name, data, where, fields)
+        if sql:
+            return self.execute(sql)
+        else:
+            return ""
+
+    def delete_sql(self, table_name, where):
+        if not (where and isinstance(where, dict)):
+            return ""
+        where_cond = ['%s=%s' % (k, v) for k,v in where.items()]
+        sql = "DELETE FROM %s WHERE %s" % (table_name, ' AND '.join(where_cond))
+        print sql
+        return sql
+
+    def execute_delete_sql(self, table_name, where):
+        sql = self.delete_sql(table_name, where)
+        if sql:
+            return self.execute(sql)
+        else:
+            return ""

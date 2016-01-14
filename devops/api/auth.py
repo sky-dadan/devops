@@ -14,8 +14,6 @@ def auth_login(func):
             authorization = request.headers.get('authorization', 'None')
             res = util.validate(authorization, app.config['passport_key'])
             res = json.loads(res)
-#            print res
-#            print type(res)
             if int(res['code']) == 1:
                 logging.getLogger().warning("Request forbiden:%s" % res['errmsg'])
                 return json.dumps({'code': 1, 'errmsg': '%s' % res['errmsg']})

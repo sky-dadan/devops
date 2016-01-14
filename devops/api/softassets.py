@@ -7,6 +7,7 @@ import logging,util
 from auth import auth_login
 import json,traceback
 from jsondate import MyEncoder
+
 @jsonrpc.method('softassets.create')     
 @auth_login
 def create(auth_info,**kwargs):
@@ -17,19 +18,13 @@ def create(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-	fields, values = [], [] 
-	for k,v in data.items():
-	    fields.append(k)
-	    values.append("'%s'" % v)
-	sql = "INSERT INTO Soft_Assets (%s) VALUES (%s)" % \
-		(','.join(fields),','.join(values))
-	app.config['cursor'].execute(sql)
-	util.write_log(username, "create Soft_Assets %s sucess" % data['type'])
-	return json.dumps({'code': 0, 'result': 'Create Soft_Assets %s success' % data['type']})
+        data = request.get_json()['params']
+        app.config['cursor'].execute_insert_sql('Soft_Assets', data)
+        util.write_log(username, "create Soft_Assets %s sucess" % data['type'])
+        return json.dumps({'code': 0, 'result': 'Create Soft_Assets %s success' % data['type']})
     except:
-	logging.getLogger().error("Create Soft_Assets error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'Create Soft_Assets error'})
+        logging.getLogger().error("Create Soft_Assets error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'Create Soft_Assets error'})
 
 @jsonrpc.method('softassets.get')     
 @auth_login
@@ -38,52 +33,37 @@ def get(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = kwargs.get('output',[])
+        output =['id','type','manufacturer','store_date','expire','remark']
+        fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        if len(output) == 0:
-            fields =['id','type','manufacturer','store_date','expire','remark']
-        else:
-            fields=output
-        if where.has_key('id'):
-            sql = "SELECT %s FROM Soft_Assets WHERE id = %d" % (','.join(fields),where['id'])
-	    app.config['cursor'].execute(sql)
-	    row = app.config['cursor'].fetchone()
-            result = {}
-	    for i,k in enumerate(fields):
-		result[k]=row[i]
-	    util.write_log(username, 'select Soft_Assets sucess') 
+        result = app.config['cursor'].get_one_result('Soft_Assets', fields, where)
+        if result:
+            util.write_log(username, 'select Soft_Assets sucess') 
             return json.dumps({'code':0,'result':result},cls=MyEncoder)
-	else:
-	    return json.dumps({'code':1,'errmsg':'must input Soft_Assets id'})
+        else:
+            return json.dumps({'code':1,'errmsg':'must input Soft_Assets id'})
     except:
-	logging.getLogger().error("select Soft_Assets error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'select Soft_Assets error'})
+        logging.getLogger().error("select Soft_Assets error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'select Soft_Assets error'})
 
 @jsonrpc.method('softassets.getlist')     
 @auth_login
 def getlist(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
         fields = ['id','type','manufacturer','store_date','expire','remark']
-	data = request.get_json()	
-	data = data['params']
-	sql = "select %s from Soft_Assets" % ','.join(fields)
-	app.config['cursor'].execute(sql)
-	result = []
-        for row in app.config['cursor'].fetchall():
-	    res = {}
-	    for i,k in enumerate(fields):
-               res[k] = row[i]
-	    result.append(res)
-	util.write_log(username, 'select Soft_Assets list sucess') 
+        data = request.get_json()
+        data = data['params']
+        result = app.config['cursor'].get_results('Soft_Assets', fields)
+        util.write_log(username, 'select Soft_Assets list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
-	logging.getLogger().error("select Soft_Assets list error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'select Soft_Assets list error'})
+        logging.getLogger().error("select Soft_Assets list error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'select Soft_Assets list error'})
 
-@jsonrpc.method('softassets.update')     
+@jsonrpc.method('softassets.update')
 @auth_login
 def update(auth_info,**kwargs):
     if auth_info['code'] == 1:   
@@ -93,20 +73,17 @@ def update(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = kwargs.get('data',None)
+        data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        print "where:",where 
-        if not where.has_key("id"):
+        result = app.config['cursor'].execute_update_sql('Soft_Assets', data, where,
+                    ['type','manufacturer','store_date','expire','remark'])
+        if result == '':
             return json.dumps({'code':1,'errmsg':'must need id1'})
-	sql = 'UPDATE Soft_Assets SET type="%(type)s",manufacturer="%(manufacturer)s",store_date="%(store_date)s",\
-                expire="%(expire)s",remark="%(remark)s" WHERE id=%%d'  % data % where['id']
-        print sql
-	app.config['cursor'].execute(sql)
-	util.write_log(username,'update Soft_Assets %s sucess' % data['type'])
-	return json.dumps({'code':0,'result':'update Soft_Assets %s success' % data['type']})
+        util.write_log(username,'update Soft_Assets %s sucess' % data['type'])
+        return json.dumps({'code':0,'result':'update Soft_Assets %s success' % data['type']})
     except:
-	logging.getLogger().error('update Soft_Assets error : %s' % traceback.format_exc())
-	return json.dumps({'code':1,'errmsg':'update Soft_Assets error'})
+        logging.getLogger().error('update Soft_Assets error : %s' % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'update Soft_Assets error'})
 
 @jsonrpc.method('softassets.delete')     
 @auth_login
@@ -118,14 +95,13 @@ def delete(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+        data = request.get_json()['params']
+        result = app.config['cursor'].execute_delete_sql('Soft_Assets', data)
+        if result == '':
             return json.dumps({'code':1,'errmsg':'must need id '})
-	sql = 'DELETE FROM Soft_Assets WHERE id = %d' % data['id']
-	app.config['cursor'].execute(sql)
-	util.write_log(username,'delete Soft_Assets %s sucess' % data['type'])
-        return json.dumps({'code':0,'result':'delete %s success' % data['type']})
+        util.write_log(username,'delete Soft_Assets %s sucess' % data['id'])
+        return json.dumps({'code':0,'result':'delete %s success' % data['id']})
     except:
-	logging.getLogger().error('delete Soft_Assets error : %s' % traceback.format_exc())
+        logging.getLogger().error('delete Soft_Assets error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'delete Soft_Assets error'})
 

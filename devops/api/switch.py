@@ -7,6 +7,7 @@ import logging,util
 from auth import auth_login
 import json,traceback
 from jsondate import MyEncoder
+
 @jsonrpc.method('switch.create')     
 @auth_login
 def create(auth_info,**kwargs):
@@ -17,19 +18,13 @@ def create(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-	fields, values = [], [] 
-	for k,v in data.items():
-	    fields.append(k)
-	    values.append("'%s'" % v)
-	sql = "INSERT INTO Switch (%s) VALUES (%s)" % \
-		(','.join(fields),','.join(values))
-	app.config['cursor'].execute(sql)
-	util.write_log(username, "create Switch %s sucess" % data['name'])
-	return json.dumps({'code': 0, 'result': 'Create Switch %s success' % data['name']})
+        data = request.get_json()['params']
+        app.config['cursor'].execute_insert_sql('Switch', data)
+        util.write_log(username, "create Switch %s sucess" % data['name'])
+        return json.dumps({'code': 0, 'result': 'Create Switch %s success' % data['name']})
     except:
-	logging.getLogger().error("Create Switch error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'Create Switch error'})
+        logging.getLogger().error("Create Switch error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'Create Switch error'})
 
 @jsonrpc.method('switch.get')     
 @auth_login
@@ -38,79 +33,55 @@ def get(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = kwargs.get('output',[])
+        output = ['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
+        fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        if len(output) == 0:
-            fields =['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
-        else:
-            fields=output
-        if where.has_key('id'):
-            sql = "SELECT %s FROM Switch WHERE id = %s" % (','.join(fields),where['id'])
-	    app.config['cursor'].execute(sql)
-	    row = app.config['cursor'].fetchone()
-            result = {}
-	    for i,k in enumerate(fields):
-		result[k]=row[i]
-	    util.write_log(username, 'select Switch sucess') 
+        result = app.config['cursor'].get_one_result('Switch', fields, where)
+        if result:
+            util.write_log(username, 'select Switch sucess') 
             return json.dumps({'code':0,'result':result},cls=MyEncoder)
-	else:
-	    return json.dumps({'code':1,'errmsg':'must input Switch id'})
+        else:
+            return json.dumps({'code':1,'errmsg':'must input Switch id'})
     except:
-	logging.getLogger().error("select Switch error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'select Switch error'})
+        logging.getLogger().error("select Switch error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'select Switch error'})
 
 @jsonrpc.method('switch.getlist')     
 @auth_login
 def getlist(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-	return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
         fields =['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
-	data = request.get_json()	
-	data = data['params']
-	sql = "select %s from Switch" % ','.join(fields)
-	app.config['cursor'].execute(sql)
-	result = []
-        for row in app.config['cursor'].fetchall():
-	    res = {}
-	    for i,k in enumerate(fields):
-               res[k] = row[i]
-	    result.append(res)
-	util.write_log(username, 'select Switch list sucess') 
+        result = app.config['cursor'].get_results('Switch', fields)
+        util.write_log(username, 'select Switch list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
-	logging.getLogger().error("select Switch list error: %s" % traceback.format_exc())
-	return json.dumps({'code': 1, 'errmsg': 'select Switch list error'})
+        logging.getLogger().error("select Switch list error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'select Switch list error'})
 
 @jsonrpc.method('switch.update')     
 @auth_login
 def update(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = kwargs.get('data',None)
-        data['idc_id']=int(data['idc_id'])
-        data['cabinet_id']=int(data['cabinet_id'])
-        data['port_num']=int(data['port_num'])
-        data['status']=int(data['status'])
+        data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        print data,where
-        if not where.has_key("id"):
+        fields = ['name', 'ip', 'type', 'idc_id', 'cabinet_id', 'port_num', 'status', 'remark']
+        result = app.config['cursor'].execute_update_sql('Switch', data, where, fields)
+        if result == '':
             return json.dumps({'code':1,'errmsg':'must need id '})
-	sql = 'UPDATE Switch SET name="%(name)s",ip="%(ip)s",type="%(type)s",idc_id="%(idc_id)d",cabinet_id="%(cabinet_id)d",\
-                port_num="%(port_num)d",status="%(status)d",remark="%(remark)s" WHERE id=%%d'  % data % where['id']
-        print sql
-	app.config['cursor'].execute(sql)
-	util.write_log(username,'update Switch %s sucess' % data['name'])
-	return json.dumps({'code':0,'result':'update Switch %s success' % data['name']})
+        util.write_log(username,'update Switch %s sucess' % data['name'])
+        return json.dumps({'code':0,'result':'update Switch %s success' % data['name']})
     except:
-	logging.getLogger().error('update Switch error : %s' % traceback.format_exc())
-	return json.dumps({'code':1,'errmsg':'update Switch error'})
+        logging.getLogger().error('update Switch error : %s' % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'update Switch error'})
 
 @jsonrpc.method('switch.delete')     
 @auth_login
@@ -122,13 +93,12 @@ def delete(auth_info,**kwargs):
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you not admin '})
     try:
-	data = request.get_json()['params']
-        if not data.has_key("id"):
+        data = request.get_json()['params']
+        result = app.config['cursor'].execute_delete_sql('Switch', data)
+        if result == '':
             return json.dumps({'code':1,'errmsg':'must need id '})
-	sql = 'DELETE FROM Switch WHERE id = %d' % data['id']
-	app.config['cursor'].execute(sql)
-	util.write_log(username,'delete Switch %s sucess' % data['name'])
-        return json.dumps({'code':0,'result':'delete %s success' % data['name']})
+        util.write_log(username,'delete Switch %s sucess' % data['id'])
+        return json.dumps({'code':0,'result':'delete %s success' % data['id']})
     except:
-	logging.getLogger().error('delete Switch error : %s' % traceback.format_exc())
+        logging.getLogger().error('delete Switch error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'delete Switch error'})

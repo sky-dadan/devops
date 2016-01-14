@@ -52,7 +52,7 @@ def User(auth_info,offset=0,size=100):
                     user[k]=res[i]                #fields中的列名作为user字典的k,索引作为数据库返回列表的k,实现字典赋值
                 users.append(user)
                 util.write_log(username, 'get_one_users') 
-                return json.dumps({'code':0,'users':users})
+                return json.dumps({'code':0,'user':user})
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'Get users error'})

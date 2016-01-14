@@ -14,7 +14,7 @@ def index():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:3000/api/user"
+    url = "http://192.168.1.243:1000/api/user"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -34,7 +34,7 @@ def user_edit():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:3000/api/user"
+    url = "http://192.168.1.243:1000/api/user"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -64,7 +64,7 @@ def useradd():
         if len(r_id) == 0:
             return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!!!'})
         data = {'role':role,'r_id':r_id,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
-        url = "http://192.168.1.243:3000/api/user"
+        url = "http://192.168.1.243:1000/api/user"
         r = requests.post(url,headers=headers,json=json.dumps(data))
         return r.content
     else:
@@ -76,7 +76,7 @@ def user_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://192.168.1.243:3000/api/user?list=true"
+    url = "http://192.168.1.243:1000/api/user?list=true"
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
@@ -92,7 +92,7 @@ def getbyid():
     if not id:
     	return "need an id"
     headers['authorization'] = session['author']
-    url = "http://192.168.1.243:3000/api/user/getbyid/%d" % id
+    url = "http://192.168.1.243:1000/api/user/getbyid/%d" % id
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     return json.dumps(result)
@@ -115,7 +115,7 @@ def user_update():
 
     data = {'user_id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
     print data
-    url = "http://192.168.1.243:3000/api/user"
+    url = "http://192.168.1.243:1000/api/user"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
     return json.dumps(result)
@@ -129,7 +129,7 @@ def updateoneself():
     email = request.args.get('user_email')
     mobile = request.args.get('user_mobile')
     data = {'name':name,'email':email,'mobile':mobile}
-    url = "http://192.168.1.243:3000/api/user"
+    url = "http://192.168.1.243:1000/api/user"
     r = requests.put(url,headers=headers,json=json.dumps(data))
     return r.content
 
@@ -142,7 +142,7 @@ def changepasswd():
         user_id = int(request.form.get('passwdid'))
         password = request.form.get('changepasswd')
         data = {'user_id':user_id,'password':password}
-        url = "http://192.168.1.243:3000/api/password"
+        url = "http://192.168.1.243:1000/api/password"
         r = requests.put(url, headers=headers,json=json.dumps(data))
         result = json.loads(r.content)
         return json.dumps(result)
@@ -156,7 +156,7 @@ def chpwdoneself():
         oldpasswd = request.form.get('oldpasswd')
         newpasswd = request.form.get('newpasswd')
         data = {'oldpassword':oldpasswd,'password':newpasswd}
-        url = "http://192.168.1.243:3000/api/password"
+        url = "http://192.168.1.243:1000/api/password"
         r = requests.put(url, headers=headers,json=json.dumps(data))
         result = json.loads(r.content)
         return json.dumps(result)
@@ -167,7 +167,7 @@ def userdelete():
        return redirect('/login')
     headers['authorization'] = session['author']
     user_id = int(request.args.get('id'))
-    url = "http://192.168.1.243:3000/api/user"
+    url = "http://192.168.1.243:1000/api/user"
     data = {"user_id":user_id}
     r = requests.delete(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)

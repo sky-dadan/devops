@@ -5,7 +5,7 @@ import requests,json
 import util,urllib
 
 headers = {"Content-Type": "application/json"}
-url = 'http://127.0.0.1:3000/api'
+url = 'http://127.0.0.1:1000/api'
 data = {
         "jsonrpc": "2.0",
         "id":1,

@@ -46,7 +46,7 @@ def get(auth_info,**kwargs):
             fields=output
         where = kwargs.get('where',None)
         if where.has_key('id'):
-            sql = "SELECT %s FROM Host WHERE id = %d" % (','.join(fields),where['id'])
+            sql = "SELECT %s FROM Host WHERE id = %s" % (','.join(fields),where['id'])
 	    app.config['cursor'].execute(sql)
 	    row = app.config['cursor'].fetchone()
             result = {}

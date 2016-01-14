@@ -160,8 +160,8 @@ function list(){
  //          console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
-           '<td><button class="btn btn-info btn-sm dev_userinfo" data-name="'+v['dev_interface']+'">'+v['dev_interface']+'</button></td>'+
-           '<td><button class="btn btn-info btn-sm sa_userinfo" data-name="'+v['sa_interface']+'">'+v['sa_interface']+'</button></td>'+
+           '<td><span class="dev_userinfo" style="color:blue" data-name="'+v['dev_interface']+'">'+v['dev_interface']+'</span></td>'+
+           '<td><span class="sa_userinfo" style="color:blue" data-name="'+v['sa_interface']+'">'+v['sa_interface']+'</span></td>'+
            '<td>'+v['remark']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+

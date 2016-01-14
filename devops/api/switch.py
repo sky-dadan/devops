@@ -45,7 +45,7 @@ def get(auth_info,**kwargs):
         else:
             fields=output
         if where.has_key('id'):
-            sql = "SELECT %s FROM Switch WHERE id = %d" % (','.join(fields),where['id'])
+            sql = "SELECT %s FROM Switch WHERE id = %s" % (','.join(fields),where['id'])
 	    app.config['cursor'].execute(sql)
 	    row = app.config['cursor'].fetchone()
             result = {}

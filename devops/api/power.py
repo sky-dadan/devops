@@ -107,7 +107,7 @@ def getbyid(auth_info,**kwargs):
 		else:
 			fields = output
 		if where.has_key('id'):
-			sql = "select %s from power where id=%d" % (','.join(fields), where['id'])
+			sql = "select %s from power where id='%s'" % (','.join(fields), where['id'])
 			app.config['cursor'].execute(sql)
 			row = app.config['cursor'].fetchone()
 			result = {}

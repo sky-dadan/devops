@@ -18,7 +18,7 @@ def index():
     r = requests.get(url, headers=headers)      
     result = json.loads(r.content)
     if int(result['code']) == 0:
-        return render_template('index.html',name=name,result=result['users'])
+        return render_template('index.html',name=name,result=result['user'])
     else:
         return redirect('/login')
 

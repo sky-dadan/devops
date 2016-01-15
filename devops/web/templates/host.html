@@ -498,6 +498,8 @@ $('#addBtn').on('click',function(){
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
 	   var str = $('#addForm').serialize()
+       str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
+       str = decodeURIComponent(str)  //对serialize后的内容进行解码
        var data = {"method":name,"formdata":str}
 	   $.post("/addapi",data,function(data){
 	     //console.log(data)    //string
@@ -560,6 +562,8 @@ $('tbody').on('click','.update-btn',function(){
 /*update data*/
 $('#updateForm').on('submit',function(){
 var str = $('#updateForm').serialize()
+       str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
+       str = decodeURIComponent(str)  //对serialize后的内容进行解码
     console.log(str)
 var data = {'method':name,'formdata':str}
 console.log(data)

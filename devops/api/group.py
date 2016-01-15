@@ -15,6 +15,8 @@ def role_select(auth_info,**kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
         data = request.get_json()['params']
         output = data.get('output',[])
@@ -52,6 +54,8 @@ def groups_get(auth_info, **kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
         output = kwargs.get('output',[])
         where = kwargs.get('where',None)

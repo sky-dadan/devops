@@ -44,15 +44,14 @@ position:static;
      		 <div class="controls">
        		 	<input id="name_cn"  type="text"  name="name_cn" >
       		</div> 
-       	</div> <!--add manufacturer end-->
+       	</div> <!--add name_cn end-->
              <div class="form-group">
             <label class="control-label">所拥有权限</label>
       		<div class="controls">
-                <!--       			<input id="p_id" type="text"  name="p_id" >-->
                 <select name="p_id" class="p_idinfo" multiple id="p_id">
                 </select>
       		</div> 
-		</div><!--add store_date end -->
+		</div><!--add p_id end -->
              <div class="form-group">
             <label class="control-label">备注</label>
       		<div class="controls">
@@ -94,22 +93,20 @@ position:static;
      		 <div class="controls">
        		 	<input id="upname_cn"  type="text"  name="name_cn" >
       		</div> 
-       	</div> <!--update name end-->
+       	</div> <!--update name_cn end-->
      	        <div class="form-group">
                     <label class="control-label">所拥有权限</label>
       		<div class="controls">
-                <!--                <input id="upp_id" type="text"  name="p_id" >-->
                 <select name="p_id" class="p_idinfo" multiple="multiple" id="upp_id">
                 </select>
       		</div> 
-		</div><!--update u_num  end -->
+		</div><!--update p_id  end -->
             <div class="form-group">
                 <label class="control-label">备注</label>
       		<div class="controls">
-                <!--       			<input id="upremark" type="text"  name="remark" >-->
                 <textarea class="form-control" rows="3" id="upinfo" name="info"></textarea>
       		</div> 
-        </div><!--update power  end -->
+        </div><!--update remark end -->
     	<div class="form-group">
      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
@@ -197,11 +194,16 @@ function have_perm(){
     var power_select = ''
     url ="/listapi?method=power" 
     $.getJSON(url,function(data){
-        console.log(data)
         data = JSON.parse(data['result'])
-        $.each(data.result,function(k,v){
-        power_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
-        })
+        console.log(data)
+        if (data['code'] == 0){
+            $.each(data.result,function(k,v){
+            power_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+            })
+        }
+        else{
+            $('#errorMsg').html('Failed: '+data['errmsg']).show()
+        }
         $("#p_id").html(power_select)
     })
 }

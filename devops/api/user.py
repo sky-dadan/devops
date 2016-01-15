@@ -43,6 +43,9 @@ def User(auth_info,offset=0,size=100):
                     users.append(user)
                 util.write_log(username, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':count})
+            elif role != 0  and request.args.get('list') =="true": #普通用户查看用户列表会报错
+                return json.dumps({'code': 1,'errmsg':'you not admin ,Cannot look userlist' })
+
             else:    #普通用户和管理员都是通过自己的登陆用户名查询自己的信息
                 user = {}
                 sql = 'SELECT %s FROM user WHERE username="%s"' % (','.join(fields),username)

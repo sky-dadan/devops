@@ -71,8 +71,7 @@
 							</tr>
 							<tr>
 								<td>所属管理组:</td>
-                                <td><strong>{% if result.role==0 %}超级管理员{% else %} 
-                                             普通用户 {% endif %}</strong></td>
+                                <td id='role' data={{result.role}}><strong>{% if result.role==0 %}超级管理员{% else %}普通用户 {% endif %}</strong></td>
 							</tr>
                             <tr id="user_groups">
 							</tr>
@@ -145,5 +144,9 @@ function user_power(){
 user_power()
 
 /*通过用户组信息，判断是否显示列表*/
+role = $('#role').attr("data")
+if (role != 0){
+    $('.sa').hide();
+}
 </script>
 {% endblock %}

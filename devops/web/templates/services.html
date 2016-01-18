@@ -153,11 +153,9 @@ function list(){
     $.getJSON(url,function(data){
        //  data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-//       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
- //          console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
            '<td><span class="dev_userinfo" style="color:blue" data-name="'+v['dev_interface']+'">'+v['dev_interface']+'</span></td>'+
@@ -242,6 +240,8 @@ $('tbody').on('click','.update-btn',function(){
 /*update data*/
 $('#updateForm').on('submit',function(){
 var str = $('#updateForm').serialize()
+var tmp = str.replace(/\+/g," ")
+str = decodeURIComponent(tmp)
 var data = {'method':name,'formdata':str}
 $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data)    //object
@@ -302,7 +302,6 @@ function userlist(){
 		data = JSON.parse(data.result)
 		console.log(data)
 		$.each(data.result, function(k,v){
-			console.log(v)
 			str += '<option value="'+v['username']+'">'+v['username']+'</option>'
 		})
 		$(".user_list").html(str)
@@ -312,14 +311,16 @@ userlist()
 
 //获得某个用户的信息
 function userinfo(username){
-	var url = "/getapi?method=user&id="+username
+	var url = "/getapi?method=user&username="+username
 	var str = ''
 	$.getJSON(url,function(data){
 		data = JSON.parse(data.result)
 		console.log(data.result)
-		$.each(data.result, function(k,v){
+		$.each(data, function(k,v){
+			if (v!=0){
 			console.log(v)
 			str += '姓名:'+v['name']+'  email:'+v['email']+'  mobile:'+v['mobile']
+			}
 	})
 			console.log(str)
 			alert(str)

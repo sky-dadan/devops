@@ -45,7 +45,7 @@ class Cursor():
 
     def select_sql(self, table_name, fields, where=None):
         if isinstance(where, dict):
-            conditions = ['%s=%s' % (k, v) for k,v in where.items()]
+            conditions = ["%s='%s'" % (k, v) for k,v in where.items()]
             sql = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table_name, ' AND '.join(conditions))
         elif where is None:
             sql = "SELECT %s FROM %s" % (','.join(fields), table_name)

@@ -74,9 +74,9 @@ def getapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
     username = request.args.get('username')
-    id = request.args.get('id')
-    if id is not None:
-        data['params'] = {"where":{'id':id}}
+    uid = request.args.get('id')
+    if uid is not None:
+        data['params'] = {"where":{'id':uid}}
     else:
         data['params'] = {"where":{'username':username}}
     data['method'] = method+".get"

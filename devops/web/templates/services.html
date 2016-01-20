@@ -240,8 +240,6 @@ $('tbody').on('click','.update-btn',function(){
 /*update data*/
 $('#updateForm').on('submit',function(){
 var str = $('#updateForm').serialize()
-var tmp = str.replace(/\+/g," ")
-str = decodeURIComponent(tmp)
 var data = {'method':name,'formdata':str}
 $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data)    //object

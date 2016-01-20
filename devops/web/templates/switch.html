@@ -10,8 +10,8 @@ position:static;
 }
 </style>
 {% endblock %}
-{% block title %}机柜管理{% endblock %}
-{% block breadcrumb %}<a href="/cmdb/switch">机柜管理</a>{% endblock %}
+{% block title %}网络设备管理{% endblock %}
+{% block breadcrumb %}<a href="/cmdb/switch">网络设备管理</a>{% endblock %}
 
 <!--主体内容-->
 {% block row %}
@@ -19,15 +19,15 @@ position:static;
 <div class="widget-box">
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
-      <h5>机柜管理</h5>
-      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加机柜</button>
+      <h5>网络设备管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加网络设备</button>
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
 <div id="addModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">添加机柜</h4>
+        <h4 class="modal-title">添加网络设备</h4>
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
@@ -51,6 +51,20 @@ position:static;
        		 	<input id="type"  type="text"  name="type" >
       		</div> 
        	</div> <!--add type end-->
+     	<div class="form-group">
+            <label class="control-label">生产商</label>
+     		 <div class="controls">
+                 <select name="manufacturer_id" class="manufact_info" id="manufacturer_id">
+                 </select>
+      		</div> 
+       	</div> <!--add manufacturer end-->
+        <div class="form-group">
+            <label class="control-label">供应商</label>
+     		 <div class="controls">
+                 <select name="supplier_id" class="supplier_info" id="supplier_id">
+                 </select>
+      		</div> 
+        </div> <!--add supplier end-->
              <div class="form-group">
             <label class="control-label">机房</label>
       		<div class="controls">
@@ -106,7 +120,7 @@ position:static;
 <div id="updateModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">软资产管理</h4>
+        <h4 class="modal-title">网络设备管理</h4>
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
@@ -131,6 +145,20 @@ position:static;
        		 	<input id="uptype"  type="text"  name="type" >
       		</div> 
        	</div> <!--update type end-->
+        <div class="form-group">
+            <label class="control-label">生产商</label>
+      		<div class="controls">
+                <select name="manufacturer_id" class="manufact_info" id="upmanufacturer_id"> 
+                </select>
+      		</div> 
+        </div><!--update manufacturer_id end -->
+        <div class="form-group">
+            <label class="control-label">供应商</label>
+      		<div class="controls">
+                <select name="supplier_id" class="supplier_info" id="upsupplier_id"> 
+                </select>
+      		</div> 
+        </div><!--update supplier_id end -->
      	        <div class="form-group">
             <label class="control-label">机房</label>
       		<div class="controls">
@@ -233,8 +261,11 @@ var idc_array = {}
 var idc_select=''
 var cabinet_array = {}
 var cabinet_select =''
+var manufact_select = ''
+var supplier_select = ''
 var idc_url = "/listapi?method=idc"
 var cabinet_url = "/listapi?method=cabinet"
+var manufact_url="/listapi?method=manufact"
 $.ajaxSettings.async = false;  
 $.getJSON(idc_url,function(data){
         data = JSON.parse(data['result'])
@@ -248,6 +279,14 @@ $.getJSON(cabinet_url,function(data){
         $.each(data.result,function(k,v){
         cabinet_array[v['id']]=v['name']
         cabinet_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        })
+})
+
+$.getJSON(manufact_url,function(data){
+        data = JSON.parse(data['result'])
+        $.each(data.result,function(k,v){
+        manufact_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        supplier_select += '<option value="'+v['id']+'">'+v['supplier_name']+'</option>'
         })
 })
 
@@ -295,6 +334,8 @@ $('#addBtn').on('click',function(){
 		$('#addModal').modal('show')
         $('#idc').html(idc_select)
         $("#cabinet_id").html(cabinet_select)
+        $('#manufacturer_id').html(manufact_select)
+        $('#supplier_id').html(supplier_select)
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
@@ -322,6 +363,8 @@ $('#addForm').on('submit',function(){
 $('tbody').on('click','.update-btn',function(){
     $('#upidc').html(idc_select)
     $('#upcabinet_id').html(cabinet_select)
+    $('#upmanufacturer_id').html(manufact_select)
+    $('#upsupplier_id').html(supplier_select)
 	$('#updateModal').modal('show')  //show modal
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
@@ -333,6 +376,8 @@ $('tbody').on('click','.update-btn',function(){
           $('#upname').val(data['result']['name'])
           $('#upipaddr').val(data['result']['ip'])
           $('#uptype').val(data['result']['type'])
+          $('#upmanufacturer_id').val(data['result']['manufacturer_id'])
+          $('#upsupplier_id').val(data['result']['supplier_id'])
           $('#upidc_id').val(data['result']['idc_id'])
           $('#upcabinet_id').val(data['result']['cabinet_id'])
           $('#upport_num').val(data['result']['port_num'])

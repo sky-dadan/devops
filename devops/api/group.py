@@ -89,6 +89,8 @@ def role_create(auth_info, **kwargs):
     try:
 	data = request.get_json()['params']
 	print data
+        if not data.has_key('p_id'):
+            return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
 	fields, values = [], []
         for k,v in data.items():
             fields.append(k)

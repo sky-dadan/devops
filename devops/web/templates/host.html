@@ -63,6 +63,12 @@ position:static;
        		 	<input id="mac_address"  type="text"  name="mac_address" >
       		</div> 
        	</div> <!--add mac_address end-->
+    	<div class="form-group">
+            <label class="control-label">外网IP</label>
+     		 <div class="controls">
+       		 	<input id="wan_ip"  type="text"  name="wan_ip" >
+      		</div> 
+        </div> <!--add wan_ip end-->
              <div class="form-group">
             <label class="control-label">远程控制卡IP</label>
       		<div class="controls">
@@ -217,7 +223,7 @@ position:static;
        		 	<input id="uphost_no"  type="text"  name="host_no" >
       		</div> 
        	</div> <!--update hostname end-->
-     	     	<div class="form-group">
+     	    <div class="form-group">
             <label class="control-label">内网IP</label>
      		 <div class="controls">
        		 	<input id="upinner_ip"  type="text"  name="inner_ip" >
@@ -229,6 +235,12 @@ position:static;
        		 	<input id="upmac_address"  type="text"  name="mac_address" >
       		</div> 
         </div> <!--update hostname end-->
+         <div class="form-group">
+             <label class="control-label">外网IP</label>
+     		 <div class="controls">
+       		 	<input id="upwan_ip"  type="text"  name="wan_ip" >
+      		</div> 
+       	</div> <!--update wan_ip end-->
      	<div class="form-group">
             <label class="control-label">远程控制卡IP</label>
       		<div class="controls">
@@ -361,7 +373,7 @@ position:static;
 		<tr>
             <th scope="col">主机名</th>
 			<th scope="col">内网IP</th>
-            <th scope="col">远程控制卡IP</th>
+            <th scope="col">外网IP</th>
             <th scope="col">系统类型</th>
             <th scope="col">机房</th>
             <th scope="col">机柜</th>
@@ -467,7 +479,7 @@ function list(){
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['hostname']+'</td>'+  
            '<td>'+v['inner_ip']+'</td>'+  
-           '<td>'+v['remote_ip']+'</td>'+  
+           '<td>'+v['wan_ip']+'</td>'+  
            '<td>'+v['os_info']+'</td>'+ 
            '<td>'+idc_array[v['idc_id']]+'</td>'+ 
            '<td>'+cabinet_array[v['cabinet_id']]+'</td>'+ 
@@ -537,6 +549,7 @@ $('tbody').on('click','.update-btn',function(){
           $('#uphost_no').val(data['result']['host_no'])
           $('#upinner_ip').val(data['result']['inner_ip'])
           $('#upmac_address').val(data['result']['mac_address'])
+          $('#upwan_ip').val(data['result']['wan_ip'])
           $('#upremote_ip').val(data['result']['remote_ip'])
           $('#upos_info').val(data['result']['os_info'])
           $('#upcpu_num').val(data['result']['cpu_num'])

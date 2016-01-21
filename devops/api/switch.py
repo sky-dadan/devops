@@ -33,7 +33,7 @@ def get(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = ['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
+        output = ['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('Switch', fields, where)
@@ -53,7 +53,7 @@ def getlist(auth_info,**kwargs):
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
     try:
-        fields =['id','name','ip','type','idc_id','cabinet_id','port_num','status','remark']
+        fields =['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
         result = app.config['cursor'].get_results('Switch', fields)
         util.write_log(username, 'select Switch list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
@@ -73,7 +73,7 @@ def update(auth_info,**kwargs):
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        fields = ['name', 'ip', 'type', 'idc_id', 'cabinet_id', 'port_num', 'status', 'remark']
+        fields = ['name', 'ip', 'type','manufacturer_id','supplier_id','idc_id', 'cabinet_id', 'port_num', 'status', 'remark']
         result = app.config['cursor'].execute_update_sql('Switch', data, where, fields)
         if result == '':
             return json.dumps({'code':1,'errmsg':'must need id '})

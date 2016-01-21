@@ -34,7 +34,7 @@ def get(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num',\
+        output = ['id','hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                 'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
@@ -56,7 +56,7 @@ def getlist(auth_info,**kwargs):
     username = auth_info['username']
     print "kwargs = ",kwargs
     try:
-        output = ['id','hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num',\
+        output = ['id','hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                 'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
         fields = kwargs.get('output', output)
         result = app.config['cursor'].get_results('Host', fields)
@@ -78,7 +78,7 @@ def update(auth_info,**kwargs):
     try:
         data = kwargs.get('data',None)
         #fields_int = ['host_no','cpu_num','disk_num','mem_num','manufacturer_id','supplier_id','idc_id','cabinet_id','service_id','status','vm_status']
-        fields = ['hostname','sn','host_no','inner_ip','mac_address','remote_ip','os_info','cpu_num','disk_num','mem_num',\
+        fields = ['hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                  'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
         where = kwargs.get('where',None)
         result = app.config['cursor'].execute_update_sql('Host', data, where, fields)

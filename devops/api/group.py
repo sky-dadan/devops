@@ -18,36 +18,26 @@ def role_select(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
+        output = ['id','name','name_cn','p_id','info']
         data = request.get_json()['params']
-        output = data.get('output',[])
-        if len(output) == 0:
-            fields = ['id','name','name_cn','p_id','info']
-        else:
-            fields = output
-        perm_name = {}    #{1:'git',2:'web'}
-        sql = 'SELECT id,name FROM power'
-        app.config['cursor'].execute(sql)
-        for row in app.config['cursor'].fetchall():
-            perm_name[row[0]] = row[1]
-        sql = "select %s from groups " % ','.join(fields)
-        app.config['cursor'].execute(sql)
+        fields = data.get('output', output)
+
+        result = app.config['cursor'].get_results('power', ['id', 'name'])
+        perm_name = dict([(x['id'], x['name']) for x in result])
+
         result = []
-        for row in app.config['cursor'].fetchall():
-            res = {}
-            for i,k in enumerate(fields):
-                res[k] = row[i]
-            p_name=[]
-            p_namestr=','
-            p_id = res['p_id'].split(',')
-            for pid in p_id:
-                p_name.append(perm_name[int(pid)])
-            res['p_id']=p_namestr.join(p_name)
-	    result.append(res)
+        res = app.config['cursor'].get_results('groups', fields)
+        for x in res:
+            p_name = [perm_name[int(p_id)] for p_id in x['p_id'].split(',')]
+            x['p_id'] = ','.join(p_name)
+            result.append(x)
+
 	util.write_log(username, 'select groups list success')
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("select groups list error: %s"  %  traceback.format_exc())
 	return json.dumps({'code':1,'errmsg':'error : %s' %  traceback.format_exc()})
+
 @jsonrpc.method('groups.get')
 @auth_login
 def groups_get(auth_info, **kwargs):
@@ -57,23 +47,15 @@ def groups_get(auth_info, **kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
-        output = kwargs.get('output',[])
+        output = ['id','name','name_cn','p_id','info']
+        fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        if len(output) == 0:
-            fields = ['id','name','name_cn','p_id','info']
+        result = app.config['cursor'].get_one_result('groups', fields, where)
+        if result is None:
+            return json.dumps({'code':1, 'errmsg':'must need give an id'})
         else:
-            fields = output
-        if where.has_key('id'):
-            sql = "select %s from groups where id = %s"  %  (','.join(fields), where['id'])
-	    app.config['cursor'].execute(sql)
-	    row = app.config['cursor'].fetchone()
-	    result = {}
-            for i, k in enumerate(fields):
-                result[k] = row[i]
 	    util.write_log(username, "select groups by id success")
 	    return json.dumps({'code':0,'result':result})
-        else:
-            return json.dumps({'code':1, 'errmsg':'must need give an id'})
     except:
         logging.getLogger().error('select groups by id error: %s'  % traceback.format_exc())
         return  json.dumps({'code':1,'errmsg':'select groups error'})
@@ -91,13 +73,7 @@ def role_create(auth_info, **kwargs):
 	print data
         if not data.has_key('p_id'):
             return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
-	fields, values = [], []
-        for k,v in data.items():
-            fields.append(k)
-	    values.append("'%s'" % v)
-	sql = "insert into groups (%s) values (%s)"  % (','.join(fields),','.join(values))
-	print sql
-	app.config['cursor'].execute(sql)
+        app.config['cursor'].execute_insert_sql('groups', data)
 	util.write_log(username, "create groups %s scucess" %  data['name'])
 	return json.dumps({'code':0,'result':'create groups %s successed' % data['name']})
     except:
@@ -114,10 +90,9 @@ def role_delete(auth_info,**kwargs):
         return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
         data = request.get_json()['params']
-        if not data.has_key('id'):
+        result = app.config['cursor'].execute_delete_sql('groups', data)
+        if result == '':
             return json.dumps({'code':1,'errmsg':'you need give an id!'})
-	sql = "delete from groups where id='%s'"  % data['id']
-	app.config['cursor'].execute(sql)
 	util.write_log(username, 'delete groups successed')
 	return json.dumps({'code':0,'result':'delete groups successed'})
     except:
@@ -136,10 +111,9 @@ def role_update(auth_info, **kwargs):
         data = request.get_json()['params']
 	where = data.get('where',None)
 	data = data.get('data',None)
-        if not where.has_key('id'):
+        result = app.config['cursor'].execute_update_sql('groups', data, where, ['name', 'name_cn', 'p_id', 'info'])
+        if result == '':
             return json.dumps({'code':1, 'errmsg':'you need give an id!'})
-        sql = "update groups set name='%(name)s', name_cn='%(name_cn)s',p_id='%(p_id)s', info='%(info)s' where id='%%d'" % data % where['id']	
-	app.config['cursor'].execute(sql)
 	util.write_log(username, 'update groups %s success!' % data['name'])
 	return json.dumps({'code':0,'result':'update groups %s successed' % data['name']})
     except:

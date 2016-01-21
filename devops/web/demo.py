@@ -73,10 +73,13 @@ def addapi():
 def getapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
-    id  = request.args.get('id')
+    username = request.args.get('username')
+    uid = request.args.get('id')
+    if uid is not None:
+        data['params'] = {"where":{'id':uid}}
+    else:
+        data['params'] = {"where":{'username':username}}
     data['method'] = method+".get"
-    data['params'] = {"where":{"id":id}}
-    print data
     r = requests.post(url,headers=headers,json=data)
     print r.text
     return r.text

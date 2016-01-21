@@ -100,7 +100,7 @@
 $("#submit_data_btn").on('click',function(){
     var str = $('#user_signup_form').serialize()
 	console.log(str)
-    var url = 'http://192.168.1.243:3001/user/add'
+    var url = 'http://192.168.1.243:1001/user/add'
     $.post(url,str,function(data){ 
         data=JSON.parse(data);   //将json串转换为对象，然后取值
         if (data['code']==0){

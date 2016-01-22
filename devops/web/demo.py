@@ -35,12 +35,12 @@ def power_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    return render_template('power.html')
+    return render_template('power.html',name=name)
 
 
 @app.route('/cmdb/<template>')
 def render(template):
-    if session.get('username') == None:
+    if session.get('username')  == None:
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
@@ -54,7 +54,7 @@ def listapi():
     data['params'] = {}
     r = requests.post(url,headers=headers,json=data)
     print r.text
-    return r.text
+    return r.text 
 
 @app.route('/addapi', methods=['GET','POST'])
 def addapi():

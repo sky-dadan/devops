@@ -79,14 +79,16 @@ $('#loginform').on('submit',function(){
             location.href="/"
         }else{
             str = data['errmsg']
-            swal({
+           swal({
                 title: "Error",
                 text:str,
                 type:"error",
                 confirmButtonText: "Cool"
+            },function(){
+                location.href="/login"
             }); 
+
             //alert(str)
-            location.href="/login"
         }
     })
         return false;

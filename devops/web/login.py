@@ -29,7 +29,7 @@ def login():
     	    return json.dumps({'code':0})
         else:
             #return redirect('/login')
-        return json.dumps({'code':1,'errmsg':result['errmsg']})
+            return json.dumps({'code':1,'errmsg':result['errmsg']})
     return render_template('login.html')
 
 @app.route("/logout",methods=['GET','POST'])

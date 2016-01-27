@@ -18,7 +18,6 @@ def User(auth_info,offset=0,size=100):
     if request.method == 'GET':  #get all user info from user_id
         try:
             users = []
-            count = 0
             fields = ['id','username','name','email','mobile','role','is_lock','r_id']
             if role == 0  and request.args.get('list') =="true": #是管理员且传值list＝true才输出用户列表
                 if request.args.get('offset')  is not  None and request.args.get('size') is  not None:
@@ -28,8 +27,9 @@ def User(auth_info,offset=0,size=100):
                         return json.dumps({'code': 1, 'errmsg': 'you input size too big '})
                 sql = "SELECT %s FROM user LIMIT %d,%d" % (','.join(fields),int(offset),int(size))
                 app.config['cursor'].execute(sql)
-                for row in app.config['cursor'].fetchall():
-                    count +=1
+                result = app.config['cursor'].fetchall()
+                count = len(result)
+                for row in result:
                     user = {}
                     for i, k in enumerate(fields):
                         user[k] = row[i]

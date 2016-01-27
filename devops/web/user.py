@@ -109,7 +109,7 @@ def user_update():
     r_id = request.args.getlist('r_id')
     r_id=','.join(r_id) 
 
-    data = {'user_id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
+    data = {'id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
     url = "http://192.168.1.243:1000/api/user"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)

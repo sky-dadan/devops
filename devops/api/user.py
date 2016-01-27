@@ -65,16 +65,17 @@ def User(auth_info,offset=0,size=100):
         try:
             data = request.get_json()
             data = json.loads(data)
-            if  role == 0 and data.has_key('user_id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
-                user_id = data['user_id']
+            if  role == 0 and data.has_key('id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
+                user_id = data['id']
                 if not util.if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
                 else:
-                    sql = 'UPDATE user SET username="%(username)s",name="%(name)s", \
-                               email="%(email)s",mobile="%(mobile)s",r_id="%(r_id)s", is_lock="%(is_lock)d",role="%(role)d" WHERE id=%%d' % data %user_id
+                    conditions = ["%s='%s'" % (k,data[k]) for k in data]
+                    sql = "update user SET %s where id = %%d" % ','.join(conditions) % user_id
+
             else:                      #普通用户和管理都可以更新自己信息
-                sql = 'UPDATE user SET name="%(name)s",email="%(email)s", \
-                        mobile="%(mobile)s" WHERE username="%%s"' % data %username
+                conditions = ["%s='%s'" % (k,data[k]) for k in data]
+                sql = "update user SET %s where id = %%d" % ','.join(conditions) % uid
             app.config['cursor'].execute(sql)
             util.write_log(username,'update user %s' % username)
             return json.dumps({'code':0,'result':'update %s success' % username})
@@ -242,13 +243,3 @@ def login():
     else:
         return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return json.dumps({'code':1,'errmsg':'your request is not found'})
- #   return render_template('404.html'), 404 
-    
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return json.dumps({'code':1,'errmsg':'server is too busy'})
-#    return render_template('500.html'), 500 

@@ -22,12 +22,6 @@ def index():
     else:
         return redirect('/login')
 
-#修改个人密码
-@app.route("/user/passwd",methods=['GET','POST'])
-def change_passwd():
-    if session.get('username') == None:
-       return redirect('/login')
-    return render_template('change_passwd.html')
 
 #获取个人信息，为后面的编辑获取数据,需要和管理员获取信息合并
 @app.route("/user/edit",methods=['GET','POST'])

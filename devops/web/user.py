@@ -22,12 +22,6 @@ def index():
     else:
         return redirect('/login')
 
-#修改个人密码
-@app.route("/user/passwd",methods=['GET','POST'])
-def change_passwd():
-    if session.get('username') == None:
-       return redirect('/login')
-    return render_template('change_passwd.html')
 
 #获取个人信息，为后面的编辑获取数据,需要和管理员获取信息合并
 @app.route("/user/edit",methods=['GET','POST'])
@@ -115,7 +109,7 @@ def user_update():
     r_id = request.args.getlist('r_id')
     r_id=','.join(r_id) 
 
-    data = {'user_id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
+    data = {'id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
     url = "http://192.168.1.243:1000/api/user"
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)

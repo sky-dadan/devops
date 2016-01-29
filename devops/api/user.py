@@ -51,16 +51,14 @@ def User(auth_info,offset=0,size=100):
         try:
             data = request.get_json()
             data = json.loads(data)
-            if  role == 0 and data.has_key('user_id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
-                user_id = data['user_id']
+            if  role == 0 and data.has_key('id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
+                user_id = data['id']
                 if not util.if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
                 else:
-                    sql = app.config['cursor'].execute_update_sql('user', data, {'id': user_id},
-                                ['username', 'name', 'email', 'mobile', 'r_id', 'is_lock', 'role'])
+                    sql = app.config['cursor'].execute_update_sql('user', data, {'id': user_id})
             else:                      #普通用户和管理都可以更新自己信息
-                sql = app.config['cursor'].execute_update_sql('user', data, {'username': username},
-                            ['name', 'email', 'mobile'])
+                sql = app.config['cursor'].execute_update_sql('user', data, {'id': uid})
             util.write_log(username,'update user %s' % username)
             return json.dumps({'code':0,'result':'update %s success' % username})
         except:
@@ -207,13 +205,3 @@ def login():
     else:
         return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return json.dumps({'code':1,'errmsg':'your request is not found'})
- #   return render_template('404.html'), 404 
-    
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return json.dumps({'code':1,'errmsg':'server is too busy'})
-#    return render_template('500.html'), 500 

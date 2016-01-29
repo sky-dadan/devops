@@ -153,27 +153,6 @@ def get_color(auth_info, **kwargs):
         logging.getLogger().error('groups_sel.get error!')
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
 
-@jsonrpc.method('power_sel.get')
-@auth_login
-def get_color(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        where = kwargs.get('where',None)
-        res = app.config['cursor'].get_one_result('groups', ['p_id'], where)
-        p_id = getid_list([res['p_id']])
-
-        result = app.config['cursor'].get_results('power', ['id', 'name'])
-        ids = set([str(x['id']) for x in result]) & set(p_id)
-        for x in result:
-            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
-        util.write_log(username,"power_sel.get successful!")
-        return json.dumps({'code':0,'result':result})
-    except:
-        logging.getLogger().error('power_sel.get error! %s'  %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
-
 
 @jsonrpc.method('user.getlist')
 @auth_login
@@ -190,7 +169,6 @@ def user_getlist(auth_info,**kwargs):
     except:
         logging.getLogger().error('user.getlist error : %s')
         return json.dumps({'code':1,'errmsg':'user.getlist error:  %s'  %  traceback.format_exc()})
-
 
 @jsonrpc.method('user.get')
 @auth_login

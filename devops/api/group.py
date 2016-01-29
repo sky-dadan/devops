@@ -6,8 +6,28 @@ from . import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json, traceback
+from user_perm import getid_list
 
 #这里是关于用户权限的查看，修改  组的增删改查
+@jsonrpc.method('groups.create')
+@auth_login
+def role_create(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'you are not admin!'})
+    try:
+	data = request.get_json()['params']
+	print data
+        if not data.has_key('p_id'):
+            return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
+        app.config['cursor'].execute_insert_sql('groups', data)
+	util.write_log(username, "create groups %s scucess" %  data['name'])
+	return json.dumps({'code':0,'result':'create groups %s successed' % data['name']})
+    except:
+        logging.getLogger().error(username,"create groups    error: %s" % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'error:%s' % traceback.format_exc()})
 
 @jsonrpc.method('groups.getlist')
 @auth_login
@@ -60,45 +80,6 @@ def groups_get(auth_info, **kwargs):
         logging.getLogger().error('select groups by id error: %s'  % traceback.format_exc())
         return  json.dumps({'code':1,'errmsg':'select groups error'})
 
-@jsonrpc.method('groups.create')
-@auth_login
-def role_create(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'you are not admin!'})
-    try:
-	data = request.get_json()['params']
-	print data
-        if not data.has_key('p_id'):
-            return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
-        app.config['cursor'].execute_insert_sql('groups', data)
-	util.write_log(username, "create groups %s scucess" %  data['name'])
-	return json.dumps({'code':0,'result':'create groups %s successed' % data['name']})
-    except:
-        logging.getLogger().error(username,"create groups    error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error:%s' % traceback.format_exc()})
-
-@jsonrpc.method('groups.delete')
-@auth_login
-def role_delete(auth_info,**kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'you are not admin'})
-    try:
-        data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('groups', data)
-        if result == '':
-            return json.dumps({'code':1,'errmsg':'you need give an id!'})
-	util.write_log(username, 'delete groups successed')
-	return json.dumps({'code':0,'result':'delete groups successed'})
-    except:
-        logging.getLogger().error('delete groups error: %s' %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s'  % traceback.format_exc()})
-
 @jsonrpc.method('groups.update')
 @auth_login
 def role_update(auth_info, **kwargs):
@@ -119,4 +100,46 @@ def role_update(auth_info, **kwargs):
     except:
         logging.getLogger().error("update error: %s"  % traceback.format_exc())
 	return json.dumps({'code':1,'errmsg':"error : %s" % traceback.format_exc()})
+
+@jsonrpc.method('groups.delete')
+@auth_login
+def role_delete(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
+    try:
+        data = request.get_json()['params']
+        result = app.config['cursor'].execute_delete_sql('groups', data)
+        if result == '':
+            return json.dumps({'code':1,'errmsg':'you need give an id!'})
+	util.write_log(username, 'delete groups successed')
+	return json.dumps({'code':0,'result':'delete groups successed'})
+    except:
+        logging.getLogger().error('delete groups error: %s' %  traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'error: %s'  % traceback.format_exc()})
+
+#组管理显示本来有的权限（给select多选加一个selected属性）
+@jsonrpc.method('power_sel.get')
+@auth_login
+def get_color(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        where = kwargs.get('where',None)
+        res = app.config['cursor'].get_one_result('groups', ['p_id'], where)
+        p_id = getid_list([res['p_id']])
+
+        result = app.config['cursor'].get_results('power', ['id', 'name'])
+        ids = set([str(x['id']) for x in result]) & set(p_id)
+        for x in result:
+            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
+        util.write_log(username,"power_sel.get successful!")
+        return json.dumps({'code':0,'result':result})
+    except:
+        logging.getLogger().error('power_sel.get error! %s'  %  traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+
 

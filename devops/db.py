@@ -43,7 +43,7 @@ class Cursor():
         sql = self.insert_sql(table_name, data)
         return self.execute(sql)
 
-    def select_sql(self, table_name, fields, where=None):
+    def select_sql(self, table_name, fields, where=None, limit=None):
         if isinstance(where, dict):
             conditions = []
             for k, v in where.items():
@@ -59,19 +59,21 @@ class Cursor():
             sql = "SELECT %s FROM %s" % (','.join(fields), table_name)
         else:
             sql = ""
+        if limit and isinstance(limit, tuple) and len(limit) == 2:
+            sql = "%s LIMIT %s,%s" % (sql, limit[0], limit[1])
         print sql
         return sql
 
-    def get_one_result(self, table_name, fields, where=None):
-        sql = self.select_sql(table_name, fields, where)
+    def get_one_result(self, table_name, fields, where=None, limit=None):
+        sql = self.select_sql(table_name, fields, where, limit)
         if not sql:
             return None
         self.execute(sql)
         result_set = self.fetchone()
         return dict([(k, result_set[i]) for i,k in enumerate(fields)])
 
-    def get_results(self, table_name, fields, where=None):
-        sql = self.select_sql(table_name, fields, where)
+    def get_results(self, table_name, fields, where=None, limit=None):
+        sql = self.select_sql(table_name, fields, where, limit)
         self.execute(sql)
         result_sets = self.fetchall()
         return [dict([(k, row[i]) for i,k in enumerate(fields)]) for row in result_sets]
@@ -79,7 +81,7 @@ class Cursor():
     def update_sql(self, table_name, data, where, fields=None):
         if not (where and isinstance(where, dict)):
             return ""
-        where_cond = ['%s=%s' % (k, v) for k,v in where.items()]
+        where_cond = ["%s='%s'" % (k, v) for k,v in where.items()]
         if fields:
             conditions = ["%s='%s'" % (k, data[k]) for k in fields]
         else:
@@ -98,7 +100,7 @@ class Cursor():
     def delete_sql(self, table_name, where):
         if not (where and isinstance(where, dict)):
             return ""
-        where_cond = ['%s=%s' % (k, v) for k,v in where.items()]
+        where_cond = ["%s='%s'" % (k, v) for k,v in where.items()]
         sql = "DELETE FROM %s WHERE %s" % (table_name, ' AND '.join(where_cond))
         print sql
         return sql

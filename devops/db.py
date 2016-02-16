@@ -1,3 +1,4 @@
+import logging
 import MySQLdb as mysql
 
 class Cursor():
@@ -36,7 +37,7 @@ class Cursor():
             fields.append(k)
             values.append("'%s'" % v)
         sql = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(values))
-        print sql
+        logging.getLogger().info("Insert sql: %s" % sql)
         return sql
 
     def execute_insert_sql(self, table_name, data):
@@ -44,7 +45,7 @@ class Cursor():
         return self.execute(sql)
 
     def select_sql(self, table_name, fields, where=None, limit=None):
-        if isinstance(where, dict):
+        if isinstance(where, dict) and where:
             conditions = []
             for k, v in where.items():
                 if isinstance(v, list):
@@ -55,13 +56,13 @@ class Cursor():
                     conditions.append("%s=%s" % (k, v))
  
             sql = "SELECT %s FROM %s WHERE %s" % (','.join(fields), table_name, ' AND '.join(conditions))
-        elif where is None:
+        elif not where:
             sql = "SELECT %s FROM %s" % (','.join(fields), table_name)
         else:
             sql = ""
         if limit and isinstance(limit, tuple) and len(limit) == 2:
             sql = "%s LIMIT %s,%s" % (sql, limit[0], limit[1])
-        print sql
+        logging.getLogger().info("Select sql: %s" % sql)
         return sql
 
     def get_one_result(self, table_name, fields, where=None, limit=None):
@@ -70,7 +71,10 @@ class Cursor():
             return None
         self.execute(sql)
         result_set = self.fetchone()
-        return dict([(k, result_set[i]) for i,k in enumerate(fields)])
+        if result_set:
+            return dict([(k, result_set[i]) for i,k in enumerate(fields)])
+        else:
+            return {}
 
     def get_results(self, table_name, fields, where=None, limit=None):
         sql = self.select_sql(table_name, fields, where, limit)
@@ -87,7 +91,7 @@ class Cursor():
         else:
             conditions = ["%s='%s'" % (k, data[k]) for k in data]
         sql = "UPDATE %s SET %s WHERE %s" % (table_name, ','.join(conditions), ' AND '.join(where_cond))
-        print sql
+        logging.getLogger().info("Update sql: %s" % sql)
         return sql
 
     def execute_update_sql(self, table_name, data, where, fields=None):
@@ -102,7 +106,7 @@ class Cursor():
             return ""
         where_cond = ["%s='%s'" % (k, v) for k,v in where.items()]
         sql = "DELETE FROM %s WHERE %s" % (table_name, ' AND '.join(where_cond))
-        print sql
+        logging.getLogger().info("Delete sql: %s" % sql)
         return sql
 
     def execute_delete_sql(self, table_name, where):
@@ -111,3 +115,19 @@ class Cursor():
             return self.execute(sql)
         else:
             return ""
+
+    def if_userid_exist(self, user_id):
+        result = self.get_one_result('user', ['id'], {'id': user_id})
+        if result:
+            return True
+        else:
+            logging.getLogger().error("user '%s' is not exist" % user_id)
+            return False
+
+    def if_groupid_exist(self, group_id):
+        result = self.get_one_result('groups', ['id'], {'id': group_id})
+        if result:
+            return True
+        else:
+            logging.getLogger().error("group '%s' is not exist" % group_id)
+            return False

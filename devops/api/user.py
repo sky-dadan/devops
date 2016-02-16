@@ -53,7 +53,7 @@ def User(auth_info,offset=0,size=100):
             data = json.loads(data)
             if  role == 0 and data.has_key('id'): #是管理员且带有用户id,才说明是管理员更新其他用户   
                 user_id = data['id']
-                if not util.if_userid_exist(user_id): 
+                if not app.config['cursor'].if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
                 else:
                     sql = app.config['cursor'].execute_update_sql('user', data, {'id': user_id})
@@ -94,7 +94,7 @@ def User(auth_info,offset=0,size=100):
                     return json.dumps({'code':1,'errmsg':'must input user_id'})
                 else:
                     user_id = data['user_id']
-            if not util.if_userid_exist(user_id):
+            if not app.config['cursor'].if_userid_exist(user_id):
                 return json.dumps({'code':1,'errmsg':'User is not exist'})
             app.config['cursor'].execute_delete_sql('user', {'id': user_id})
             util.write_log(username,'delete user %d' % user_id)
@@ -155,7 +155,7 @@ def passwd(auth_info):
                     return json.dumps({'code':1,'errmsg':'admin must input user_id'})
             else:
                 user_id = data['user_id']
-                if not util.if_userid_exist(user_id): 
+                if not app.config['cursor'].if_userid_exist(user_id): 
                     return json.dumps({'code':1,'errmsg':'User is not exist'})
                 password = hashlib.md5(data['password']).hexdigest()
                 app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})

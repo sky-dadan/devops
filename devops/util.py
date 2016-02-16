@@ -74,25 +74,4 @@ def validate(key, fix_pwd):
     else:
         logging.getLogger().warning("密码不正确")
         return json.dumps({'code':1,'errmsg':'密码不正确'})
-        
-
-def if_userid_exist(user_id):
-    sql = 'select * from user where id = %d ' % (user_id)
-    app.config['cursor'].execute(sql)
-    res = app.config['cursor'].fetchone()
-    if res is None:
-        logging.getLogger().error("user is not exist")
-        return False
-    else:
-        return True
-
-def if_groupid_exist(group_id):
-    sql = 'SELECT * FROM groups WHERE id = %d' % (group_id)
-    app.config['cursor'].execute(sql)
-    res = app.config['cursor'].fetchone()
-    if res is None:
-        logging.getLogger().error("group is not exist")
-        return False
-    else:
-        return True
 

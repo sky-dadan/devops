@@ -50,7 +50,7 @@ def get(auth_info,**kwargs):
 @auth_login
 def getlist(auth_info,**kwargs):
     if auth_info['code'] == 1:   
-        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+        return json.dumps(auth_info)
     username = auth_info['username']
     try:
         output = ['id','name','idc_id','u_num','power']

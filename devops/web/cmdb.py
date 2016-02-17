@@ -6,11 +6,13 @@ import requests,json
 import util,urllib
 
 headers = {"Content-Type": "application/json"}
-url = 'http://127.0.0.1:1000/api'
 data = {
         "jsonrpc": "2.0",
         "id":1,
 }
+
+def get_url():
+    return "http://%s/api" % app.config['api_host']
 
 def Handleformdata(formdata):
     res = {}
@@ -53,7 +55,7 @@ def listapi():
     method = request.args.get('method')
     data['method'] = method+".getlist"
     data['params'] = {}
-    r = requests.post(url,headers=headers,json=data)
+    r = requests.post(get_url(),headers=headers,json=data)
     return r.text 
 
 @app.route('/addapi', methods=['GET','POST'])
@@ -71,7 +73,7 @@ def addapi():
     formdata = Handleformdata(formdata)
     data['method'] = method+".create"
     data['params']=formdata
-    r = requests.post(url,headers=headers,json=data)
+    r = requests.post(get_url(),headers=headers,json=data)
     return r.text
 
 @app.route('/getapi')
@@ -85,7 +87,7 @@ def getapi():
     else:
         data['params'] = {"where":{'username':username}}
     data['method'] = method+".get"
-    r = requests.post(url,headers=headers,json=data)
+    r = requests.post(get_url(),headers=headers,json=data)
     print r.text
     return r.text
 
@@ -108,7 +110,7 @@ def updateapi():
         }
     }
     print data
-    r = requests.post(url, headers=headers, json=data)
+    r = requests.post(get_url(), headers=headers, json=data)
     return r.content
 
 @app.route('/deleteapi')
@@ -118,6 +120,6 @@ def deleteapi():
     id  = int(request.args.get('id'))
     data['method'] = method+".delete"
     data['params'] = {"id":id}
-    r = requests.post(url,headers=headers,json=data)
+    r = requests.post(get_url(),headers=headers,json=data)
     return r.text
 

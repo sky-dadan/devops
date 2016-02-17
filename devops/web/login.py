@@ -12,7 +12,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('user_mail')
         password = request.form.get('user_pwd')
-        url = "http://192.168.1.243:1000/api/auth?username=%s&passwd=%s" % (username,password)
+        url = "http://%s/api/auth?username=%s&passwd=%s" % (app.config['api_host'],username,password)
         r = requests.get(url, headers=headers)      #for get all user
         result = json.loads(r.content)
         if result['code'] == 0:

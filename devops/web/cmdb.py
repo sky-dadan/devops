@@ -32,14 +32,6 @@ def Handleformdata(formdata):
             res[k] = ','.join(res[k])
     return res
 
-@app.route('/power/list')
-def power_list():
-    if session.get('username') == None:
-       return redirect('/login')
-    headers['authorization'] = session['author']
-    name = session['username']
-    return render_template('power.html',name=name)
-
 
 @app.route('/cmdb/<template>')
 def render(template):

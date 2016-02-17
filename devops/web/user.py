@@ -181,11 +181,20 @@ def role_list():
     name = session['username']
     return render_template('role_list.html',name=name)
 
-#权限列表web页面，数据走cmdb.py统一的JSONRPC  后期需要整合
-@app.route("/power/user", methods=['GET','POST'])
-def power_user():
-	if session.get('username')== None:
-	    return redirect('/login')
-	headers['authorization'] = session['author']
-	name = session['username']
-	return render_template('user_power.html',name=name)
+#用户权限列表web页面，数据走cmdb.py统一的JSONRPC  后期需要整合
+#@app.route("/power/user", methods=['GET','POST'])
+#def power_user():
+#  	if session.get('username')== None:
+#	    return redirect('/login')
+#	headers['authorization'] = session['author']
+#	name = session['username']
+#	return render_template('user_power.html',name=name)
+#权限列表web页面，数据走cmdb.py统一的jsonrpc,冗余代码后期需要整合
+@app.route('/power/list')
+def power_list():
+    if session.get('username') == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    name = session['username']
+    return render_template('power.html',name=name)
+

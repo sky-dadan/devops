@@ -172,7 +172,7 @@ def userdelete():
     result = json.loads(r.content)
     return json.dumps(result)
 
-#角色列表
+#角色列表web页面，数据走cmdb.py中统一的JSONRPC, 后期需要整合
 @app.route("/role/list",methods=['GET','POST'])
 def role_list():
     if session.get('username') == None :
@@ -181,7 +181,7 @@ def role_list():
     name = session['username']
     return render_template('role_list.html',name=name)
 
-#权限列表
+#权限列表web页面，数据走cmdb.py统一的JSONRPC  后期需要整合
 @app.route("/power/user", methods=['GET','POST'])
 def power_user():
 	if session.get('username')== None:

@@ -109,7 +109,7 @@ $("#submit_data_btn").on('click',function(){
         }else{
             alert("创建用户失败," + data['errmsg'])
         }
-    })
+     })
 })
 
 $("form :input.required").each(function(){
@@ -117,19 +117,19 @@ $("form :input.required").each(function(){
     $(this).parent().append($required); //然后将它追加到文档中
 });
 
+/*列出所有组的信息，并拼接成复选框,API调用的是cmdb.py中统一的jsonrpc格式，与上面/user/add的restfulapi 风格不搭配，后期需要优化统一*/
 function list(){
 	var url = "/listapi?method=groups"
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		console.log(data)	
-		var count = data['count']
 		var str = ''
 		$.each(data.result, function(k,v){
-			console.log(v)
+			//console.log(v)
 			str += '<label class="checkbox inline"><input type="checkbox"'+
-				'name="r_id" value='+v['id']+'>'+v['name']+'</label>'
+ 				'name="r_id" value='+v['id']+'>'+v['name']+'</label>'
 		})
-		$("#r_id").html(str)
+  		$("#r_id").html(str)
 })
 }
 list()

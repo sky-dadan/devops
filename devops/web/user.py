@@ -60,7 +60,7 @@ def useradd():
             return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!!!'})
         data = {'role':role,'r_id':r_id,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
         url = "http://%s/api/user" % app.config['api_host']
-        r = requests.post(url,headers=headers,json=json.dumps(data))
+        r = requests.post(url,headers=headers,json=data)
         return r.content
     else:
         return render_template('user_add.html',name=name)

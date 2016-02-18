@@ -7,7 +7,7 @@ import logging, util
 from auth import auth_login
 import json, traceback
 
-#这里是关于用户权限的查看，修改  组的增删改查
+#本文件只为个人中心提供 用户所在组，所有权限的显示
 
 def getid_list(ids):   #传递过来的列表参数  [u'1,2'] or  [u'1,2', u'1,3,4']
     if not isinstance(ids, list):
@@ -20,6 +20,7 @@ def getid_list(ids):   #传递过来的列表参数  [u'1,2'] or  [u'1,2', u'1,3
     print id_list
     return  id_list
 
+#用户登录成功后通过用户username获取自己的权限信息，个人中心用户权限部分使用，点击权限名会连接到响应的url
 @jsonrpc.method('user_perm.getlist')
 @auth_login
 def getlist(auth_info,**kwargs):
@@ -44,7 +45,50 @@ def getlist(auth_info,**kwargs):
         logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
 
+#用户登录成功后通过用户username获取自己的组信息，个人中心调用
+@jsonrpc.method('user_groups.getlist')
+@auth_login
+def user_groups(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json,dumps(auth_info)
+    username = auth_info['username']
+    try:
+        output = ['id','name','name_cn','p_id','info']
+        fields = kwargs.get('output', output)
 
+        res = app.config['cursor'].get_one_result('user', ['r_id'], {'username': username})
+        r_id= getid_list([res['r_id']])
+
+        result = app.config['cursor'].get_results('groups', fields, {'id': r_id})
+        util.write_log(username, "get groups success")
+        return json.dumps({'code':0,'result':result,'count':len(result)})
+    except:
+        logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
+        return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})
+#用户列表更新时，用户所属的组被选中
+@jsonrpc.method('groups_sel.get')
+@auth_login
+def get_color(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        where = kwargs.get('where',None)
+        print where
+        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
+        r_id = getid_list([res['r_id']])
+
+        result = app.config['cursor'].get_results('groups', ['id', 'name'])
+        ids = set([str(x['id']) for x in result]) & set(r_id)
+        for x in result:
+            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
+        util.write_log(username, "groups_sel.get successful!")
+        return json.dumps({'code':0,'result':result})
+    except:
+        logging.getLogger().error('groups_sel.get error!')
+        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+'''
+#通过用户的id获取到某个用户的所有权限内容，不会根据个人对权限做更新，没什么用。且与上面代码冗余，需要整合
 @jsonrpc.method('user_perm.get')
 @auth_login
 def getlist_byid(auth_info,**kwargs):
@@ -74,7 +118,7 @@ def getlist_byid(auth_info,**kwargs):
 @jsonrpc.method('user_perm.update')
 @auth_login
 def update(auth_info, **kwargs):
-    if auth_info['code'] == 1:
+    if auth_info['code'] == 1: 
         return json.dumps(auth_info)
     username = auth_info['username']
     if auth_info['role'] != '0':
@@ -87,27 +131,6 @@ def update(auth_info, **kwargs):
     except:
         logging.getLogger().error(username,'update user permission error: %s' %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'error: %s' %  traceback.format_exc()})
-
-@jsonrpc.method('user_groups.getlist')
-@auth_login
-def user_groups(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json,dumps(auth_info)
-    username = auth_info['username']
-    try:
-        output = ['id','name','name_cn','p_id','info']
-        fields = kwargs.get('output', output)
-
-        res = app.config['cursor'].get_one_result('user', ['r_id'], {'username': username})
-        r_id= getid_list([res['r_id']])
-
-        result = app.config['cursor'].get_results('groups', fields, {'id': r_id})
-        util.write_log(username, "get groups success")
-        return json.dumps({'code':0,'result':result,'count':len(result)})
-    except:
-        logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
-        return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})
-
 @jsonrpc.method('user_groups.get')
 @auth_login
 def user_group_byid(auth_info, **kwargs):
@@ -131,27 +154,6 @@ def user_group_byid(auth_info, **kwargs):
         logging.getLogger().error('get list user_groups error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"get list user_groups error  : %s" % traceback.format_exc()})
 
-@jsonrpc.method('groups_sel.get')
-@auth_login
-def get_color(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        where = kwargs.get('where',None)
-        print where
-        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
-        r_id = getid_list([res['r_id']])
-
-        result = app.config['cursor'].get_results('groups', ['id', 'name'])
-        ids = set([str(x['id']) for x in result]) & set(r_id)
-        for x in result:
-            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
-        util.write_log(username, "groups_sel.get successful!")
-        return json.dumps({'code':0,'result':result})
-    except:
-        logging.getLogger().error('groups_sel.get error!')
-        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
 
 
 @jsonrpc.method('user.getlist')
@@ -186,3 +188,5 @@ def user_get(auth_info, **kwargs):
     except:
         logging.getLogger().error('user.get error: %s' %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'user.get error: %s' %  traceback.format_exc()})
+
+'''        

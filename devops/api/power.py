@@ -101,9 +101,9 @@ def update(auth_info, **kwargs):
         data = request.get_json()['params']
         where = data.get('where',None)
         data = data.get('data',None)
-        if not where.has_key('id'):
-            return json.dumps({'code':1,'errmsg':'you need give an id!'})
-        app.config['cursor'].execute_update_sql('power', data, ['name', 'name_cn', 'url', 'info'])
+        result=app.config['cursor'].execute_update_sql('power', data, where, ['name', 'name_cn', 'url', 'info'])
+        if result == '': 
+            return json.dumps({'code':1, 'errmsg':'you need give an id!'})
         util.write_log(username,"update %s successed" % data['name'])
         return json.dumps({'code':0,'result':'update %s successed' % data['name']})
     except:

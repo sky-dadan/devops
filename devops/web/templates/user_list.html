@@ -124,8 +124,6 @@
       </div>
 </div>
 
-<div id="getpowerinfo" class="modal hide fade">
-</div>
 
   <div class="widget-content">
 
@@ -265,28 +263,6 @@ $("tbody").on('click','.delete-btn',function(){
     }  // end confirm
 })   
 
-// getpower info
-$("tbody").on('click','.powerinfo-btn', function(){
-	$('#getpowerinfo').modal('show')
-	var id = $(this).attr('data-id')
-	var getinfo_url = '/getapi?method=user_perm&id='+id
-	$.getJSON(getinfo_url, function(data){
-		data = JSON.parse(data['result'])
-//		alert(data['count'])
-//		console.log(data.result)
-		str = ''
-		$.each(data.result, function(k,v){
-//			alert(v)
-			str += '<tr>'+
-					'<td>'+v['name_cn']+'</td>'+
-					'<td>'+v['name']+'</td>'+
-					'<td>'+v['url']+'</td>'
-					'<td>'+v['info']+'</td>'+
-					'</tr>'
-		})
-		$("#getpowerinfo").html(str)
-	})
-})
 
 //get usr groups for update
 function user_groups(id){

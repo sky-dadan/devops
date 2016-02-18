@@ -25,12 +25,12 @@ def User(auth_info,offset=0,size=100):
                     size = request.args.get('size')
                     if int(size) >= 1000:
                         return json.dumps({'code': 1, 'errmsg': 'you input size too big '})
-
+                #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
                 gids = app.config['cursor'].get_results('groups', ['id', 'name'])
                 gids = dict([(str(x['id']), x['name']) for x in gids])
 
                 result = app.config['cursor'].get_results('user', fields, limit=(offset, size))
-                for user in result:
+                for user in result: #查询user表中的r_id,与groups表生成的字典对比，一致的则将对应的id替换为name,如，"sa,php"
                     user['r_id'] = ','.join([gids[x] for x in user['r_id'].split(',') if x in gids])
                     users.append(user)
                 util.write_log(username, 'get_all_users')
@@ -103,6 +103,7 @@ def User(auth_info,offset=0,size=100):
    
     return json.dumps({'code': 1, 'errmsg': "Cannot support '%s' method" % request.method })
 
+#管理员更新数据时需要通过id获取用户信息
 @app.route('/api/user/getbyid/<int:user_id>',methods=['GET'])
 @auth_login
 def getbyid(auth_info,user_id):

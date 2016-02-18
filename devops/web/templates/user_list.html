@@ -257,7 +257,7 @@ $("tbody").on('click','.delete-btn',function(){
 		$.getJSON(delete_url,function(result){
 			if (result['code']== 0 ){
 				alert('success')
-                $(that).parents('tr').remove();
+				location.reload()
 			}else{
 				alert(result['errmsg'])
 			}

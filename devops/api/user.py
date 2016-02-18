@@ -71,8 +71,6 @@ def User(auth_info,offset=0,size=100):
             if role != 0:
                 return json.dumps({'code':1,'errmsg':'you not admin '})
             data = request.get_json()
-            data = json.loads(data)
-#            password = '3b53871ffb407966fc330307500ce968'
             data['password'] = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_insert_sql('user', data)
             util.write_log(username, "create_user %s" % data['username'])

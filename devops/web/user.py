@@ -45,6 +45,7 @@ def useradd():
         return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
+    '''
     if request.method == 'POST':
         role = int(request.form.get('role'))
         username = request.form.get('username')
@@ -60,10 +61,12 @@ def useradd():
             return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!!!'})
         data = {'role':role,'r_id':r_id,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
         url = "http://%s/api/user" % app.config['api_host']
+
         r = requests.post(url,headers=headers,json=data)
         return r.content
     else:
-        return render_template('user_add.html',name=name)
+    '''    
+    return render_template('user_add.html',name=name)
  
 #管理员查看用户列表
 @app.route("/user/list",methods=['GET','POST'])

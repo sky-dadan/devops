@@ -35,38 +35,34 @@
         <label class="control-label">用户名：</label>
         <div class="controls">
             <input type="text" name="username" id="username"/>
-            <input type="hidden" id="user_name_status" value="0" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">姓名：</label>
         <div class="controls">
-            <input  type="text" name="user_name" id="user_name" />
-            <input type="hidden" id="user_name_status" value="0" />
+            <input  type="text" name="name" id="name" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">E-mail：</label>
         <div class="controls">
-            <input  type="email" ng-model="user.email" name="user_mail" id="user_mail" />
-            <input type="hidden" id="user_mail_status" value="0" />
+            <input  type="email" ng-model="user.email" name="email" id="email" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">手机：</label>
         <div class="controls">
-            <input type="text" name="user_phone" id="user_phone" />
-            <input type="hidden" id="user_phone_status" value="0" />
+            <input type="text" name="mobile" id="mobile" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">状态：</label>
         <div class="controls">
-            <select name='lock' id='lock' style='width:120px'> 
+            <select name='is_lock' id='is_lock' style='width:120px'> 
                 <option value=0>正常</option>
                 <option value=1>锁定</option>
             </select>
@@ -75,20 +71,19 @@
     <div class="control-group">
         <label class="control-label">登录密码：</label>
         <div class="controls">
-            <input  type="password" name="user_pwd" id="user_pwd" />
-            <input type="hidden" id="user_pwd_status" value="0" />
+            <input  type="password" name="password" id="password" />
             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">重复输入密码：</label>
         <div class="controls">
-            <input  type="password" name="user_repwd" id="user_repwd" />
-            <span for="required" generated="true" class="help-inline"></span>
+            <input  type="password" name="repwd" id="repwd" />
+             <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
     <div class="form-actions">
-        <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定添加" class="btn btn-success global_radius_4">
+         <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定添加" class="btn btn-success global_radius_4">
     </div>
     </form> 
        
@@ -99,6 +94,7 @@
 
 {% block js %}
 <script>
+/* 原理通过restfulapi 方式提交的请求
 $("#submit_data_btn").on('click',function(){
     var str = $('#user_signup_form').serialize()
 	console.log(str)
@@ -113,7 +109,26 @@ $("#submit_data_btn").on('click',function(){
         }
      })
 })
+*/
+name="user"
+/*通过jsonrpc接口统一处理*/
+$("#submit_data_btn").on('click',function(){
+    var str = $('#user_signup_form').serialize()
+	console.log(str)
+    var data={'method':name,'formdata':str}
+    $.post('/addapi',data,function(data){ 
+        data=JSON.parse(data);   //将json串转换为对象，然后取值
+        data = JSON.parse(data['result']) //object
+        if (data['code']==0){
+            alert("创建用户成功")
+			window.location='/user/list'
+        }else{
+            alert("创建用户失败," + data['errmsg'])
+        }
+     })
+})
 
+/*检查输入的表单内容是否合法*/
 $("form :input.required").each(function(){
     var $required = $("<strong class='high'> *</strong>"); //创建元素
     $(this).parent().append($required); //然后将它追加到文档中

@@ -5,11 +5,12 @@ from flask_jsonrpc import JSONRPC
 from . import app , jsonrpc
 import logging, util
 from auth import auth_login
-import json, traceback
+import json, traceback,hashlib
 
 #本文件只为个人中心提供 用户所在组，所有权限的显示
 
-def getid_list(ids):   #传递过来的列表参数  [u'1,2'] or  [u'1,2', u'1,3,4']
+#处理将多选参数转为列表 传入的参数[u'1,2'] or  [u'1,2', u'1,3,4']，结果为['1','2','3','4']
+def getid_list(ids):   
     if not isinstance(ids, list):
         return None
     id_list = set()
@@ -87,6 +88,36 @@ def get_color(auth_info, **kwargs):
     except:
         logging.getLogger().error('groups_sel.get error!')
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+
+#创建用户
+@jsonrpc.method('user.create')
+@auth_login
+def createuser(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return  json.dump(auth_info)
+    username = auth_info['username']
+    try:
+        data = request.get_json()['params']
+        print data 
+        data.pop('repwd')    #因为表单是整体打包过来的，第二次输入的密码字段不存在，需要删除
+        data['password'] = hashlib.md5(data['password']).hexdigest()
+        app.config['cursor'].execute_insert_sql('user', data)
+        util.write_log(username, "create_user %s" % data['username'])
+        return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
+    except:
+        logging.getLogger().error("Create user error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': 'Create user error'})
+#获取用户列表
+
+#通过id获取单条记录信息
+
+#更新用户信息
+
+#删除用户
+
+#修改密码
+
+#用户登录
 '''
 #通过用户的id获取到某个用户的所有权限内容，不会根据个人对权限做更新，没什么用。且与上面代码冗余，需要整合
 @jsonrpc.method('user_perm.get')
@@ -113,7 +144,7 @@ def getlist_byid(auth_info,**kwargs):
         return json.dumps({'result':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
+        r eturn json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
 
 @jsonrpc.method('user_perm.update')
 @auth_login
@@ -134,7 +165,7 @@ def update(auth_info, **kwargs):
 @jsonrpc.method('user_groups.get')
 @auth_login
 def user_group_byid(auth_info, **kwargs):
-    if auth_info['code'] == 1:
+    if auth_ info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
@@ -149,7 +180,7 @@ def user_group_byid(auth_info, **kwargs):
 
         result = app.config['cursor'].get_reuslts('groups', fields, {'id': r_id})
         util.write_log(username, "get user_groups success")
-        return json.dumps({'result':0, 'result':result,'count':len(result)})
+        retur n json.dumps({'result':0, 'result':result,'count':len(result)})
     except:
         logging.getLogger().error('get list user_groups error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"get list user_groups error  : %s" % traceback.format_exc()})
@@ -167,10 +198,10 @@ def user_getlist(auth_info,**kwargs):
         fields = kwargs.get('output', output)
         result = app.config['cursor'].get_results('user', fields)
         util.write_log(username, 'user.getlist successed!')
-        return json.dumps({'code':0,'result':result,'count':len(result)})
+        re turn json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error('user.getlist error : %s')
-        return json.dumps({'code':1,'errmsg':'user.getlist error:  %s'  %  traceback.format_exc()})
+        r eturn json.dumps({'code':1,'errmsg':'user.getlist error:  %s'  %  traceback.format_exc()})
 
 @jsonrpc.method('user.get')
 @auth_login
@@ -187,6 +218,6 @@ def user_get(auth_info, **kwargs):
         return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error('user.get error: %s' %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'user.get error: %s' %  traceback.format_exc()})
+        ret urn json.dumps({'code':1,'errmsg':'user.get error: %s' %  traceback.format_exc()})
 
 '''        

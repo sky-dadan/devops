@@ -45,6 +45,7 @@ def useradd():
         return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
+    '''
     if request.method == 'POST':
         r_id = request.form.getlist('r_id')     #获取多一个属性r_id的多个值，保存为列表
         r_id = ','.join(r_id)
@@ -58,10 +59,12 @@ def useradd():
             return json.dumps({'code':1, 'errmsg': '两次输入的密码不一致!'})
         data['r_id'] = r_id
         url = "http://%s/api/user" % app.config['api_host']
+
         r = requests.post(url,headers=headers,json=data)
         return r.content
     else:
-        return render_template('user_add.html',name=name)
+    '''    
+    return render_template('user_add.html',name=name)
  
 #管理员查看用户列表
 @app.route("/user/list",methods=['GET','POST'])

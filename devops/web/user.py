@@ -35,26 +35,6 @@ def user_list():
     return render_template('user_list.html',name=name)
 
 
-#管理员更新用户信息
-@app.route("/user/update",methods=['GET','POST'])
-def user_update():
-    if session.get('usern ame') == None:
-        return redirect('/login')
-    headers['authorization'] = session['author']
-
-    r_id = request.args.getlist('r_id')
-    r_id=','.join(r_id) 
-    if not r_id:
-        return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!'})
-
-    kv = [(x, x) for x in ('id', 'username', 'name', 'email', 'mobile', 'role')] + [('is_lock', 'lock')]
-    data = dict([(k, request.args.get(v)) for k,v in kv])
-    data['r_id'] = r_id
-    url = "http://%s/api/user" % app.config['api_host']
-    r = requests.put(url, headers=headers,json=json.dumps(data))
-    result = json.loads(r.content)
-    return  json.dumps(result)
-
 #角色列表web页面，数据走cmdb.py中统一的JSONRPC, 后期需要整合
 @app.route("/role/list",methods=['GET','POST'])
 def role_list():
@@ -72,4 +52,34 @@ def power_list():
     headers['authorization'] = session['author']
     name = session['username']
     return render_template('power.html',name=name)
+
+#管理员修改用户密码
+@app.route("/user/changepasswd",methods=['GET','POST'])
+def changepasswd():
+    if session.get('username') == None :
+        return redirect('/login')
+    headers['authorization'] = session['author']
+    if request.method == 'POST':
+        user_id = int(request.form.get('passwdid'))
+        password = request.form.get('changepasswd')
+        data = {'user_id':user_id,'password':password}
+        url = "http://%s/api/password" % app.config['api_host']
+        r = requests.put(url, headers=headers,json=data)
+        result = json.loads(r.content)
+        return json.dumps(result)
+
+#用户修改个人密码
+@app.route("/user/chpwdoneself",methods=['GET','POST'])
+def chpwdoneself():
+    if session.get('username') == None:
+        return redirect('/login')
+    headers['authorization'] = session['author']
+    if request.method == 'POST':
+        oldpasswd = request.form.get('oldpasswd')
+        newpasswd = request.form.get('newpasswd')
+        data = {'oldpassword':oldpasswd,'password':newpasswd}
+        url = "http://%s/api/password" % app.config['api_host']
+        r = requests.put(url, headers=headers,json=data)
+        result = json.loads(r.content)
+        return json.dumps(result)
 

@@ -115,6 +115,25 @@ def userupdate(auth_info, **kwargs):
 
 
 #删除用户
+@jsonrpc.method('user.delete')
+@auth_login
+def userdelete(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'you are not admin!'})
+    try: 
+        data = request.get_json()['params']
+        result = app.config['cursor'].execute_delete_sql('user', data)
+        if result == '':
+            return json.dumps({'code':1,'errmsg':'you need give an id!'})
+        util.write_log(username, 'delete user successed')
+        return json.dumps({'code':0,'result':'delete user successed'})
+    except:
+        logging.getLogger().error('delete groups error: %s' %  traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'error: %s'  % trace back.format_exc()})
+
 
 #修改密码
 

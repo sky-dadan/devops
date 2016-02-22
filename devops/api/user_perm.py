@@ -75,7 +75,6 @@ def get_color(auth_info, **kwargs):
     username = auth_info['username']
     try:
         where = kwargs.get('where',None)
-        print where
         res = app.config['cursor'].get_one_result('user', ['r_id'], where)
         r_id = getid_list([res['r_id']])
 
@@ -107,6 +106,28 @@ def createuser(auth_info,**kwargs):
     except:
         logging.getLogger().error("Create user error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'Create user error'})
+#获取个人信息，用户中心个人信息展示和个人修改信息，以及用户列表中更新用户信息部分的获取数据
+@jsonrpc.method('user.get')
+@auth_login
+def userinfo(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return  json.dump(auth_info)
+    username = auth_info['username']
+    try:
+        output = ['id','username','name','email','mobile','role','is_lock','r_id']
+        fields = kwargs.get('output',output) #api可以指定输出字段，如果没有指定output，就按默认output输出
+        where = kwargs.get('where',None)     #前端传来的where条件，可能是uid或者username
+        result = app.config['cursor'].get_one_result('user', fields, where)
+        if result is None:
+            return json.dumps({'code':1, 'errmsg':'must need give a  where field'})
+        util.write_log(username, 'get_one_user info') 
+        return json.dumps({'code':0,'result':result})
+    except:
+        logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'Get  users error'})
+
+        
+
 #获取用户列表
 
 #通过id获取单条记录信息

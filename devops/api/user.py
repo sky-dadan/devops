@@ -125,7 +125,7 @@ def getbyid(auth_info,user_id):
         except:
             logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':'Get users error'})
-
+'''
 ## 管理员和用户都可以修改密码
 @app.route('/api/password',methods=['PUT'])
 @auth_login
@@ -203,4 +203,4 @@ def login():
             return json.dumps({'code': 1, 'errmsg': "login exception"})
     else:
         return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
-
+'''

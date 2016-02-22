@@ -132,12 +132,86 @@ def userdelete(auth_info, **kwargs):
         return json.dumps({'code':0,'result':'delete user successed'})
     except:
         logging.getLogger().error('delete groups error: %s' %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s'  % trace back.format_exc()})
+        return json.dumps({'code':1,'errmsg':'error: %s'  % traceback.format_exc()})
 
 
 #修改密码
+@app.route('/api/password',methods=['PUT'])
+@auth_login
+def passwd(auth_info):
+    if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    uid = int(auth_info['uid'])
+    role = int(auth_info['role'])
+    try:
+        data = request.get_json()
+        if  role==0:   # admin no need oldpassword  but need user_id
+            if  not data.has_key('user_id') :
+                if data.has_key('oldpassword') and data.has_key('password'):
+                    oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
+                    res = app.config['cursor'].get_one_result('user', ['password'], {'username': username})
+                    if res['password'] != oldpassword:
+                        return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
+                    else:
+                        password = hashlib.md5(data['password']).hexdigest()
+                        app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
+                        util.write_log(username,'update user password')
+                        return json.dumps({'code':0,'result':'update password success'  })
+                else:
+                    return json.dumps({'code':1,'errmsg':'admin must input user_id'})
+            else:
+                user_id = data['user_id']
+                if not app.config['cursor'].if_userid_exist(user_id): 
+                    return json.dumps({'code':1,'errmsg':'User is not exist'})
+                password = hashlib.md5(data['password']).hexdigest()
+                app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})
+        else:                  #user  need input oldpassword
+            if not data.has_key("oldpassword") :
+                return json.dumps({'code':1,'errmsg':'need input your old password' })
+            else:
+                oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
+                res = app.config['cursor'].get_one_result('user', ['password'], {'username': username})
+                if res['password'] != oldpassword:
+                    return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
+                else:
+                    password = hashlib.md5(data['password']).hexdigest()
+                    app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
+        util.write_log(username,'update user password')
+        return json.dumps({'code':0,'result':'update password success'  })
+    except:
+        logging.getLogger().error('update user password error : %s' % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'update user password error'})
+
 
 #用户登录
+@app.route('/api/auth', methods=['GET'])
+def login():
+    if request.method == 'GET':
+        try:
+            username = request.args.get('username', None)
+            passwd = request.args.get('passwd', None)
+            passwd = hashlib.md5(passwd).hexdigest()
+            if not (username and passwd):
+                return json.dumps({'code': 1, 'errmsg': "Please input username or password."})
+
+            result = app.config['cursor'].get_one_result('user', ['id', 'username', 'password', 'role', 'is_lock'], {'username': username})
+            if not result:
+                return json.dumps({'code': 1, 'errmsg': "No such user."})
+            if result['is_lock'] == 1:
+                return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % username})
+
+            if passwd == result['password']:
+                s = util.get_validate(result['username'], result['id'], result['role'], app.config['passport_key'])
+                return json.dumps({'code': 0, 'authorization': s})
+            else:
+                return json.dumps({'code': 1, 'errmsg': "Password is wrong."})
+        except:
+            logging.getLogger().error("user login error: %s" % traceback.format_exc())
+            return json.dumps({'code': 1, 'errmsg': "login exception"})
+    else:
+        return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
+
 
 
 #用户登录成功后通过用户username获取自己的权限信息，个人中心用户权限部分使用，点击权限名会连接到响应的url
@@ -207,106 +281,3 @@ def get_color(auth_info, **kwargs):
         logging.getLogger().error('groups_sel.get error!')
         return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
 
-'''
-#通过用户的id获取到某个用户的所有权限内容，不会根据个人对权限做更新，没什么用。且与上面代码冗余，需要整合
-@jsonrpc.method('user_perm.get')
-@auth_login
-def getlist_byid(auth_info,**kwargs):
-    if auth_info['code']==1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        output = ['name','name_cn','url','info']
-        fields = kwargs.get('output', output)
-        where = kwargs.get('where')
-        if not where.has_key('id'):
-            return json.dumps({'code':1,'errmsg':'need give an id!'})
-
-        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
-        r_id = getid_list([res['r_id']])
-
-        res = app.config['cursor'].get_results('groups', ['p_id'], {'id': r_id})
-        perm_result = getid_list([x['p_id'] for x in res])
-
-        result = app.config['cursor'].get_results('power', fields, {'id': perm_result})
-        util.write_log(username, "get permission success")
-        return json.dumps({'result':0,'result':result,'count':len(result)})
-    except:
-        logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
-        r eturn json.dumps({'code':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
-
-@jsonrpc.method('user_perm.update')
-@auth_login
-def update(auth_info, **kwargs):
-    if auth_info['code'] == 1: 
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'you are not admin'})
-    try:
-        data = request.get_json()['params']
-        app.config['cursor'].execute_update_sql('user', {'r_id': data['r_id']}, data['where'])
-        util.write_log(username, 'update permission success')
-        return json.dumps({'code':0,'result':'update permission success!'})
-    except:
-        logging.getLogger().error(username,'update user permission error: %s' %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s' %  traceback.format_exc()})
-@jsonrpc.method('user_groups.get')
-@auth_login
-def user_group_byid(auth_info, **kwargs):
-    if auth_ info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        output = ['name','name_cn','id','p_id','info']
-        fields = kwargs.get('output', output)
-        where = kwargs.get('where',None)
-        if not where.has_key('id'):
-            return json.dumps({'code':1,'errmsg':'need give an id!'})
-
-        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
-        r_id = getid_list([res['r_id']])
-
-        result = app.config['cursor'].get_reuslts('groups', fields, {'id': r_id})
-        util.write_log(username, "get user_groups success")
-        retur n json.dumps({'result':0, 'result':result,'count':len(result)})
-    except:
-        logging.getLogger().error('get list user_groups error: %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':"get list user_groups error  : %s" % traceback.format_exc()})
-
-
-
-@jsonrpc.method('user.getlist')
-@auth_login
-def user_getlist(auth_info,**kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        output = ['id','username','name','email','mobile','is_lock']
-        fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('user', fields)
-        util.write_log(username, 'user.getlist successed!')
-        re turn json.dumps({'code':0,'result':result,'count':len(result)})
-    except:
-        logging.getLogger().error('user.getlist error : %s')
-        r eturn json.dumps({'code':1,'errmsg':'user.getlist error:  %s'  %  traceback.format_exc()})
-
-@jsonrpc.method('user.get')
-@auth_login
-def user_get(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        output = ['id','username','name','email','mobile','is_lock']
-        fields = kwargs.get('output', output)
-        where = kwargs.get('where')
-        result = app.config['cursor'].get_one_result('user',fields, where)
-        util.write_log(username,'user.get successed!')
-        return json.dumps({'code':0,'result':result})
-    except:
-        logging.getLogger().error('user.get error: %s' %  traceback.format_exc())
-        ret urn json.dumps({'code':1,'errmsg':'user.get error: %s' %  traceback.format_exc()})
-
-'''        

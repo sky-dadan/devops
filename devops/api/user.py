@@ -31,7 +31,7 @@ def User(auth_info,offset=0,size=100):
 
                 result = app.config['cursor'].get_results('user', fields, limit=(offset, size))
                 for user in result: #查询user表中的r_id,与groups表生成的字典对比，一致的则将对应的id替换为name,如，"sa,php"
-                    user['r_id'] = ','.join([gids[x] for x in user['r_id'].split(',') if x in gids])
+                    user['r_id'] = ','.join([gids[x] for x in user['r_id'].split(',') if x in gids]) if user['r_id'] else ''
                     users.append(user)
                 util.write_log(username, 'get_all_users')
                 return json.dumps({'code': 0, 'users': users,'count':len(users)})

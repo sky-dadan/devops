@@ -36,7 +36,7 @@ def user_edit():
     if int(result['code']) == 0:
         return render_template('user_edit.html',name=name,user=result['user'])
     else:
-        return render_template('user_edit.html',name=name,errmsg=result['errmsg'])
+        return render_template('user_edit.html',errmsg=result['errmsg'])
 
 ##管理员添加用户
 @app.route("/user/add",methods=['GET','POST'])
@@ -44,27 +44,12 @@ def useradd():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    '''
-    if request.method == 'POST':
-        r_id = request.form.getlist('r_id')     #获取多一个属性r_id的多个值，保存为列表
-        r_id = ','.join(r_id)
-        if not r_id:
-            return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!'})
-        kv = [('username', 'username'), ('name', 'user_name'), ('email', 'user_mail'), ('mobile', 'user_phone'), ('role', 'role'), ('is_lock', 'lock'), ('password', 'user_pwd')]
-        data = dict([(k, request.form.get(v)) for k,v in kv])
-        if len(data['password']) < 6:
-            return json.dumps({'code':1, 'errmsg': '密码至少需要6位!'})
-        elif data['password'] != request.form.get('user_repwd'):
-            return json.dumps({'code':1, 'errmsg': '两次输入的密码不一致!'})
-        data['r_id'] = r_id
-        url = "http://%s/api/user" % app.config['api_host']
-
-        r = requests.post(url,headers=headers,json=data)
-        return r.content
+    if int(validate_result['code']) == 0:
+        return render_template('user_add.html',name=name)
     else:
-    '''    
-    return render_template('user_add.html',name=name)
+        return render_template('user_add.html',errmsg=validate_result['errmsg'])
  
 #管理员查看用户列表
 @app.route("/user/list",methods=['GET','POST'])
@@ -173,8 +158,12 @@ def role_list():
     if session.get('username') == None :
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('role_list.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('role_list.html',name=name)
+    else:
+        return render_template('role_list.html',errmsg=validate_result['errmsg'])
 
 #权限列表web页面，数据走cmdb.py统一的jsonrpc,冗余代码后期需要整合
 @app.route('/power/list')
@@ -182,6 +171,10 @@ def power_list():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('power.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('power.html',name=name)
+    else:
+        return render_template('power.html',errmsg=validate_result['errmsg'])
 

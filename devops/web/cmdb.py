@@ -38,8 +38,12 @@ def render(template):
     if session.get('username')  == None:
        return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template(template+'.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template(template+'.html',name=name)
+    else:
+        return render_template(template+'.html',errmsg=validate_result['errmsg'])
 
 @app.route('/listapi')
 def listapi():

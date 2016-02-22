@@ -45,6 +45,13 @@
        		 	<input id="upusername"  type="text"  name="username" >
       		</div> 
        	</div> <!--update username end-->
+		<div class="form-group">
+			<label class="control-label">用户组</label>
+			<div class="controls">
+				<select name='r_id' multiple='multiple' id='r_id'>
+				</select>
+			</div>
+		</div>
         <div class="form-group">
             <label class="control-label">E-mail</label>
       		<div class="controls">
@@ -75,13 +82,6 @@
 				</select> 
       		</div> 
 		</div><!--update lock  end -->
-		<div class="form-group">
-			<label class="control-label">用户组</label>
-			<div class="controls">
-				<select name='r_id' multiple='multiple' id='r_id'>
-				</select>
-			</div>
-		</div>
     	<div class="form-group">
      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
@@ -277,6 +277,8 @@ function user_groups(id){
 		})
 		console.log(str)
 		$("#r_id").html(str)
+		$('#r_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+		$('#r_id').multiselect('refresh')
 	})
 }
 </script>

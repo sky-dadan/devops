@@ -26,7 +26,9 @@
     </div>
 	<div class="control-group">
 		<label class="control-label">所属组</label>
-		<div id="r_id" class="controls">
+		<div class="controls">
+                <select id="r_id" name="r_id" class="multiselect" multiple="multiple">
+                </select>
 		</div>
 	</div>
     <div class="control-group">
@@ -141,11 +143,12 @@ function list(){
 		var str = ''
 		$.each(data.result, function(k,v){
 			//console.log(v)
-			str += '<label class="checkbox inline"><input type="checkbox"'+
- 				'name="r_id" value='+v['id']+'>'+v['name']+'</label>'
+			str += '<option value="'+v['id']+'">'+v['name']+'</option>'
 		})
   		$("#r_id").html(str)
-})
+		$('#r_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+		$("#r_id").multiselect('refresh')
+	})
 }
 list()
 

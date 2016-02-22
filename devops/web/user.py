@@ -11,7 +11,7 @@ headers = {'content-type': 'application/json'}
 @app.route("/user/info",methods=['GET'])
 def index():
     if session.get('username') == None:
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
     #url = "http://%s/api/user" % app.config['api_host']
@@ -25,17 +25,17 @@ def index():
 #获取个人信息，为后面的编辑获取数据,需要和管理员获取信息合并
 @app.route("/user/edit",methods=['GET','POST'])
 def user_edit():
-	if session.get('username') == None:
-	   return redirect('/login')
-	headers['authorization'] = session['author']
-	name = session['username']
-	url = "http://%s/api/user" % app.config['api_host']
-	r = requests.get(url, headers=headers)      
-	result = json.loads(r.content)
-	if int(result['code']) == 0:
-		return render_template('user_edit.html',name=name,user=result['user'])
-	else:
-		return render_template('user_edit.html',name=name,errmsg=result['errmsg'])
+    if session.get('username') == None:
+        return redirect('/login')
+    headers['authorization'] = session['author']
+    name = session['username']
+    url = "http://%s/api/user" % app.config['api_host']
+    r = requests.get(url, headers=headers)      
+    result = json.loads(r.content)
+    if int(result['code']) == 0:
+        return render_template('user_edit.html',name=name,user=result['user'])
+    else:
+        return render_template('user_edit.html',name=name,errmsg=result['errmsg'])
 
 ##管理员添加用户
 @app.route("/user/add",methods=['GET','POST'])
@@ -46,19 +46,17 @@ def useradd():
     name = session['username']
     '''
     if request.method == 'POST':
-        role = int(request.form.get('role'))
-        username = request.form.get('username')
-        name = request.form.get('user_name')
-        email = request.form.get('user_mail')
-        mobile = request.form.get('user_phone')
-        is_lock = int(request.form.get('lock'))
-        password = request.form.get('user_pwd')
-        user_repwd = request.form.get('user_repwd')
         r_id = request.form.getlist('r_id')     #获取多一个属性r_id的多个值，保存为列表
         r_id = ','.join(r_id)
-        if len(r_id) == 0:
-            return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!!!'})
-        data = {'role':role,'r_id':r_id,'username':username,'name':name,'email':email,'mobile':mobile,'is_lock':is_lock,'password':password}
+        if not r_id:
+            return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!'})
+        kv = [('username', 'username'), ('name', 'user_name'), ('email', 'user_mail'), ('mobile', 'user_phone'), ('role', 'role'), ('is_lock', 'lock'), ('password', 'user_pwd')]
+        data = dict([(k, request.form.get(v)) for k,v in kv])
+        if len(data['password']) < 6:
+            return json.dumps({'code':1, 'errmsg': '密码至少需要6位!'})
+        elif data['password'] != request.form.get('user_repwd'):
+            return json.dumps({'code':1, 'errmsg': '两次输入的密码不一致!'})
+        data['r_id'] = r_id
         url = "http://%s/api/user" % app.config['api_host']
 
         r = requests.post(url,headers=headers,json=data)
@@ -71,7 +69,7 @@ def useradd():
 @app.route("/user/list",methods=['GET','POST'])
 def user_list():
     if session.get('username') == None:
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
     url = "http://%s/api/user?list=true" % app.config['api_host']
@@ -85,33 +83,30 @@ def user_list():
 #获取更新单条记录的信息
 @app.route("/getbyid",methods=['GET','POST'])
 def getbyid():
-	if session.get('username') == None:
-		return redirect('/login')
-	id = int(request.args.get('id'))     
-	headers['authorization'] = session['author']
-	url = "http://%s/api/user/getbyid/%d" % (app.config['api_host'], id)
-	r = requests.get(url, headers=headers)      
-	result = json.loads(r.content)
-	return json.dumps(result)
+    if session.get('username') == None:
+        return redirect('/login')
+    id = int(request.args.get('id'))     
+    headers['authorization'] = session['author']
+    url = "http://%s/api/user/getbyid/%d" % (app.config['api_host'], id)
+    r = requests.get(url, headers=headers)      
+    result = json.loads(r.content)
+    return json.dumps(result)
 
 #管理员更新用户信息
 @app.route("/user/update",methods=['GET','POST'])
 def user_update():
     if session.get('username') == None:
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
 
-    user_id = int(request.args.get('id'))
-    name = request.args.get('name')
-    username = request.args.get('username')
-    email = request.args.get('email')
-    mobile = request.args.get('mobile')
-    role = int(request.args.get('role'))
-    is_lock = int(request.args.get('lock'))
     r_id = request.args.getlist('r_id')
     r_id=','.join(r_id) 
+    if not r_id:
+        return json.dumps({'code':1,'errmsg':'你必须选择一个所属组!'})
 
-    data = {'id':user_id,'username':username,'name':name,'email':email,'mobile':mobile,'role':role,'r_id':r_id,'is_lock':is_lock}
+    kv = [(x, x) for x in ('id', 'username', 'name', 'email', 'mobile', 'role')] + [('is_lock', 'lock')]
+    data = dict([(k, request.args.get(v)) for k,v in kv])
+    data['r_id'] = r_id
     url = "http://%s/api/user" % app.config['api_host']
     r = requests.put(url, headers=headers,json=json.dumps(data))
     result = json.loads(r.content)
@@ -121,12 +116,9 @@ def user_update():
 @app.route("/user/updateoneself",methods=['GET','POST'])
 def updateoneself():
     if session.get('username') == None :
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
-    name = request.args.get('user_name') 
-    email = request.args.get('user_email')
-    mobile = request.args.get('user_mobile')
-    data = {'name':name,'email':email,'mobile':mobile}
+    data = dict([(x, request.args.get('user_%s' % x)) for x in ('name', 'email', 'mobile')])
     url = "http://%s/api/user" % app.config['api_host']
     r = requests.put(url,headers=headers,json=json.dumps(data))
     return r.content
@@ -135,7 +127,7 @@ def updateoneself():
 @app.route("/user/changepasswd",methods=['GET','POST'])
 def changepasswd():
     if session.get('username') == None :
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     if request.method == 'POST':
         user_id = int(request.form.get('passwdid'))
@@ -150,7 +142,7 @@ def changepasswd():
 @app.route("/user/chpwdoneself",methods=['GET','POST'])
 def chpwdoneself():
     if session.get('username') == None:
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     if request.method == 'POST':
         oldpasswd = request.form.get('oldpasswd')
@@ -165,7 +157,7 @@ def chpwdoneself():
 @app.route("/user/delete",methods=['GET','POST'])
 def userdelete():
     if session.get('username') == None :
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     user_id = int(request.args.get('id'))
     url = "http://%s/api/user" % app.config['api_host']
@@ -178,7 +170,7 @@ def userdelete():
 @app.route("/role/list",methods=['GET','POST'])
 def role_list():
     if session.get('username') == None :
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
     return render_template('role_list.html',name=name)
@@ -187,7 +179,7 @@ def role_list():
 @app.route('/power/list')
 def power_list():
     if session.get('username') == None:
-       return redirect('/login')
+        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
     return render_template('power.html',name=name)

@@ -48,7 +48,7 @@ position:static;
              <div class="form-group">
             <label class="control-label">所拥有权限</label>
       		<div class="controls">
-                <select name="p_id" class="p_idinfo" multiple id="p_id">
+                <select id="p_id" name="p_id" class="p_idinfo multiselect" multiple="multiple">
                 </select>
       		</div> 
 		</div><!--add p_id end -->
@@ -97,9 +97,9 @@ position:static;
      	        <div class="form-group">
                     <label class="control-label">所拥有权限</label>
       		<div class="controls">
-                <select name="p_id" class="p_idinfo" multiple="multiple" id="upp_id">
+                <select id="upp_id" name="p_id" class="p_idinfo multiselect" multiple="multiple">
                 </select>
-      		</div> 
+                </div> 
 		</div><!--update p_id  end -->
             <div class="form-group">
                 <label class="control-label">备注</label>
@@ -205,6 +205,9 @@ function have_perm(){
             $('#errorMsg').html('Failed: '+data['errmsg']).show()
         }
         $("#p_id").html(power_select)
+        $('#p_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $('#p_id').multiselect('refresh');
+        $('#addModal').modal('show')
     })
 }
 
@@ -220,13 +223,15 @@ function uphave_perm(id){
 		})
 		console.log(str)
 		$("#upp_id").html(str)
+		$('#upp_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+		$('#upp_id').multiselect('refresh');
+		$('#updateModal').modal('show')  //show modal
 	})
 
 }
 /*click show modal*/
 $('#addBtn').on('click',function(){
         have_perm()
-		$('#addModal').modal('show')
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
@@ -267,7 +272,6 @@ $('tbody').on('click','.update-btn',function(){
           alert(data['errmsg'])
       }
 	})
-	$('#updateModal').modal('show')  //show modal
 })
 
 /*update data*/

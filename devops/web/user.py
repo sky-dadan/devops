@@ -14,13 +14,12 @@ def index():
        return redirect('/login')
     headers['authorization'] = session['author']
     name = session['username']
-    url = "http://%s/api/user" % app.config['api_host']
-    r = requests.get(url, headers=headers)      
-    result = json.loads(r.content)
-    if int(result['code']) == 0:
-        return render_template('index.html',name=name,result=result['user'])
-    else:
-        return redirect('/login')
+    #url = "http://%s/api/user" % app.config['api_host']
+    #r = requests.get(url, headers=headers)      
+    #result = json.loads(r.content)
+    #if int(result['code']) == 0:
+    #    return render_template('index.html',name=name,result=result['user'])
+    return render_template('index.html',name=name)
 
 
 #获取个人信息，为后面的编辑获取数据,需要和管理员获取信息合并

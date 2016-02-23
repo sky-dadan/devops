@@ -35,7 +35,7 @@ def user_list():
     return render_template('user_list.html',name=name)
 
 
-#角色列表web页面，数据走cmdb.py中统一的JSONRPC, 后期需要整合
+#角色列表web页面
 @app.route("/role/list",methods=['GET','POST'])
 def role_list():
     if session.get('username') == None :
@@ -44,7 +44,7 @@ def role_list():
     name = session['username']
     return render_template('role_list.html',name=name)
 
-#权限列表web页面，数据走cmdb.py统一的jsonrpc,冗余代码后期需要整合
+#权限列表web页面
 @app.route('/power/list')
 def power_list():
     if session.get('username') == None:

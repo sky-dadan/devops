@@ -11,7 +11,7 @@ jsonrpc = JSONRPC(app, '/api')
 
 #import  test
 import group
-import user
+#import user
 import cabinet
 import host
 import softassets

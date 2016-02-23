@@ -108,18 +108,18 @@
 					<table class="table table-bordered table-invoice" id = "detail">
 							<tr>
 							 	<td class="width30">E-mail地址：</td>
-                                <td class="width70" id="getemail"><strong>111@11</strong></td>
+                                <td class="width70" id="getemail"></td>
 							</tr>
 							<tr>
 								<td>所属管理组:</td>
-                                <td id='getrole' data='0'></td>
+                                 <td id='getrole' data='0'></td>
 							</tr>
                             <tr> <!--用户所属组，异步拼接-->
                                 <td>用户角色</td>
-					 			<td id="user_groups"></td>
+ 					 			<td id="user_groups"></td>
 							</tr>
                             <tr>                <!--用户的权限，异步拼接-->
-								<td>用户权限:</td>
+ 								<td>用户权限:</td>
 					 			<td id="user_power"></td>
   							</tr>
 					</table> 
@@ -178,7 +178,7 @@ $("#edit").on('click',function(){
 $("#upinfobtn").on('click',function(){
    var str = $("#updateForm").serialize()
    var data = {'method':name,'formdata':str}
-   $.post('updateapi',data,function(data){
+   $.post('/updateapi',data,function(data){
         data=JSON.parse(data)
         data = JSON.parse(data['result']) //object
         if(data['code'] == 0){   //recevie json object

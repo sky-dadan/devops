@@ -13,8 +13,12 @@ def index():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('index.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('index.html',name=name)
+    else:
+        return render_template('index.html',errmsg=validate_result['errmsg'])
 
 ##管理员添加用户web页面
 @app.route("/user/add",methods=['GET','POST'])
@@ -22,8 +26,12 @@ def useradd():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('user_add.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('user_add.html',name=name)
+    else:
+        return render_template('user_add.html',errmsg=validate_result['errmsg'])
  
 #管理员查看用户列表web页面，
 @app.route("/user/list",methods=['GET','POST'])
@@ -31,8 +39,12 @@ def user_list():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('user_list.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('user_list.html',name=name)
+    else:
+        return render_template('user_list.html',errmsg=validate_result['errmsg'])
 
 
 #角色列表web页面
@@ -41,8 +53,12 @@ def role_list():
     if session.get('username') == None :
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('role_list.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('role_list.html',name=name)
+    else:
+        return render_template('role_list.html',errmsg=validate_result['errmsg'])
 
 #权限列表web页面
 @app.route('/power/list')
@@ -50,8 +66,12 @@ def power_list():
     if session.get('username') == None:
         return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template('power.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template('power.html',name=name)
+    else:
+        return render_template('power.html',errmsg=validate_result['errmsg'])
 
 #管理员修改用户密码
 @app.route("/user/changepasswd",methods=['GET','POST'])

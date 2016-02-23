@@ -38,8 +38,12 @@ def render(template):
     if session.get('username')  == None:
        return redirect('/login')
     headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
-    return render_template(template+'.html',name=name)
+    if int(validate_result['code']) == 0:
+        return render_template(template+'.html',name=name)
+    else:
+        return render_template(template+'.html',errmsg=validate_result['errmsg'])
 
 @app.route('/listapi')
 def listapi():
@@ -72,7 +76,7 @@ def addapi():
 def getapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
-    username = session['username']
+    username = request.args.get('username')        #获取的是url传过来的username,不是当前session的username
     uid = request.args.get('id')
     if uid is not None:
         data['params'] = {"where":{'id':uid}}

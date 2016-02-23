@@ -299,7 +299,7 @@ function userlist(){
 	$.getJSON(url, function(data){
 		data = JSON.parse(data.result)
 		console.log(data)
-		$.each(data.result, function(k,v){
+		$.each(data.users, function(k,v){
 			str += '<option value="'+v['username']+'">'+v['username']+'</option>'
 		})
 		$(".user_list").html(str)

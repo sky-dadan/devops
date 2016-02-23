@@ -141,7 +141,7 @@
 		</tr>
 	</thead>
 	<tbody>
-	</ tbody >
+	</tbody >
    </table>
 
  </div> <!--widget-content  end -->
@@ -176,35 +176,39 @@ function list(){
     $.getJSON(url,function(data){
        data=JSON.parse(data['result']); //object 
        console.log(data)   //Object {count: 3, code: 0, users: Array[3]}
-       var str = ''
-       $.each(data.users,function(k,v){   
-           if (v['is_lock']==0){
-               v['is_lock']="正常"
-           }else{
-               v['is_lock']="锁定"
-           } 
-           if (v['role']==0){
-               v['role']="超级管理员"
-           }else{
-               v['role']="普通用户"
-           } 
-           str +='<tr class="odd gradeX">'+  
-           '<td>'+v['username']+'</td>'+  
-           '<td>'+v['name']+'</td>'+  
-           '<td>'+v['email']+'</td>'+  
-           '<td>'+v['mobile']+'</td>'+ 
-           '<td><span style="color:#5EDF47;">'+v['is_lock']+'</span></td>'+ 
-           '<td>'+v['role']+'</td>'+ 
-           '<td>'+v['r_id']+'</td>'+ 
-           '<td>'+
-           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-		   '<button class="btn btn-info btn-sm passwd-btn" data-id="'+v['id']+'">修改密码</button>'+
-           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
-           '</td>'+ '</tr>'          
-       })       
-         $("tbody").html(str)
-         datatable()
-    })
+       if (data['code']== 0){       
+           var str = ''
+           $.each(data.users,function(k,v){   
+               if (v['is_lock']==0){
+                   v['is_lock']="正常"
+               }else{
+                   v['is_lock']="锁定"
+               } 
+               if (v['role']==0){
+                   v['role']="超级管理员"
+               }else{
+                   v['role']="普通用户"
+               } 
+               str +='<tr class="odd gradeX">'+  
+               '<td>'+v['username']+'</td>'+  
+               '<td>'+v['name']+'</td>'+  
+               '<td>'+v['email']+'</td>'+  
+               '<td>'+v['mobile']+'</td>'+ 
+               '<td><span style="color:#5EDF47;">'+v['is_lock']+'</span></td>'+ 
+               '<td>'+v['role']+'</td>'+ 
+               '<td>'+v['r_id']+'</td>'+ 
+               '<td>'+
+               '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+               '<button class="btn btn-info btn-sm passwd-btn" data-id="'+v['id']+'">修改密码</button>'+
+               '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+               '</td>'+ '</tr>'          
+           })       
+                $("tbody").html(str)
+                 datatable()
+            }else{
+                swal("error", data['errmsg'],"error")
+            }
+         })
 }
 
 list()

@@ -76,12 +76,12 @@
         <div class="form-group">
 			<label class="control-label">状态</label>
       		<div class="controls">
-       			<select name="lock" id="uplock">
+       			<select name="is_lock" id="uplock">
 					<option value="0">正常</option> 
 					<option value="1">锁定</option> 
 				</select> 
       		</div> 
-		</div><!--update lock  end -->
+		</div><!--update is_lock  end -->
     	<div class="form-group">
      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
@@ -141,24 +141,21 @@
 		</tr>
 	</thead>
 	<tbody>
-        {% for user in users %}
-		<tr  class="odd gradeX">
-            <td>{{user['username']}}</td>
-            <td>{{user['name']}}</td>
-            <td>{{user['email']}}</td>
-            <td>{{user['mobile']}}</td>
-            <td><span style="color:#5EDF47;">{%if user['is_lock']==1%}锁定{%else%}正常{%endif%}</span></td>
-            <td>{%if user['role']==0 %}超级管理员{%else%}普通用户{% endif %}</td>
-			<td id="user_role">{{user['r_id']}}</td>
+	 	<tr class="odd gradeX" >
+             <td>username</td>
+            <td>name</td>
+            <td>email</td>
+            <td>mobile</td>
+            <td><span style="color:#5EDF47;">正常</span></td>
+            <td>超级管理员</td>
+            <td>php,sa</td>
 			<td>
-<!--				<a class='btn btn-info btn-sm' href="/power/user?id={{user['id']}}">查看权限</a>   --!>
-                <button  class='btn btn-info btn-sm update-btn' data-id='{{user['id']}}'>更新</button>
-                <button  class='btn btn-primary btn-sm passwd-btn' data-id='{{user['id']}}'>修改密码</button>
-                <button  class='btn btn-danger btn-sm delete-btn' data-id='{{user['id']}}'>删除</button>
-			</td>
+                <button  class='btn btn-info btn-sm update-btn' data-id='27'>更新</button>
+                <button  class='btn btn-primary btn-sm passwd-btn' data-id='27'>修改密码</button>
+                <button  class='btn btn-danger btn-sm delete-btn' data-id='27'>删除</button>
+		 	</td>
 		</tr>
-        {% endfor %}										
-	</tbody>
+	</ tbody >
    </table>
 
  </div> <!--widget-content  end -->
@@ -168,7 +165,8 @@
 {% block js %}
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
-$(document).ready(function(){
+name='user'
+function datatable(){
     $('#datatable').DataTable({
         "language": {
             "lengthMenu": "每页 _MENU_ 条记录",
@@ -185,45 +183,86 @@ $(document).ready(function(){
             }
         }
     });
-});
+};
+/* list all data*/
+function list(){
+    url = "/listapi?method="+name
+    $.getJSON(url,function(data){
+       data=JSON.parse(data['result']); //object 
+       console.log(data)   //Object {count: 3, code: 0, users: Array[3]}
+       var str = ''
+       $.each(data.users,function(k,v){   
+           if (v['is_lock']==0){
+               v['is_lock']="正常"
+           }else{
+               v['is_lock']="锁定"
+           } 
+           if (v['role']==0){
+               v['role']="超级管理员"
+           }else{
+               v['role']="普通用户"
+           } 
+           str +='<tr class="odd gradeX">'+  
+           '<td>'+v['username']+'</td>'+  
+           '<td>'+v['name']+'</td>'+  
+           '<td>'+v['email']+'</td>'+  
+           '<td>'+v['mobile']+'</td>'+ 
+           '<td><span style="color:#5EDF47;">'+v['is_lock']+'</span></td>'+ 
+           '<td>'+v['role']+'</td>'+ 
+           '<td>'+v['r_id']+'</td>'+ 
+           '<td>'+
+           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
+		   '<button class="btn btn-info btn-sm passwd-btn" data-id="'+v['id']+'">修改密码</button>'+
+           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '</td>'+ '</tr>'          
+       })       
+         $("tbody").html(str)
+         datatable()
+    })
+}
+
+list()
+
+
 /*get data for update */
 $("tbody").on('click','.update-btn',function(){
     var id = $(this).attr('data-id')
-    var getbyid = "/getbyid?id="+id
-    $('#updateModal').modal('show')  //show modal
-    $.getJSON(getbyid,function(result){
-//      console.log(result)//for test
-      if (result['code']==0){
-          $('#id').val(result['user']['id']) 
-          $('#upname').val(result['user']['name']) 
-          $('#upusername').val(result['user']['username']) 
-          $('#upemail').val(result['user']['email']) 
-          $('#upmobile').val(result['user']['mobile']) 
-          $('#uprole').val(result['user']['role']) 
-          $('#uplock').val(result['user']['is_lock']) 
+    var url = "/getapi?method="+name+"&id="+id
+    $.getJSON(url,function(data){
+    data = JSON.parse(data['result'])
+    if (data['code']==0){
+          $('#id').val(data['result']['id']) 
+          $('#upname').val(data['result']['name']) 
+          $('#upusername').val(data['result']['username']) 
+          $('#upemail').val(data['result']['email']) 
+          $('#upmobile').val(data['result']['mobile']) 
+          $('#uprole').val(data['result']['role']) 
+          $('#uplock').val(data['result']['is_lock']) 
 		  user_groups(id)
+          $('#updateModal').modal('show')  //show modal
       }else{
          $('#errorMsg').html('failed '+result['errmsg']).show()
       }
     })
     
 })
-/*update */
+
+/*update data*/
 $('#updateForm').on('submit',function(){
-       var str = $('#updateForm').serialize()
-       var url = '/user/update?'+str
-       $.getJSON(url,function(result){
-//			 console.log(result)
-			 if (result['code']==0){   //recevie json object
-                alert("更新成功")
-				$('#updateModal').modal('hide')
-                location.reload()
-			 }else{
-				//alert('failed  '+result['msg'])
-				 $('#errorMsg').html('failed '+result['errmsg']).show()
-			}
-       })
-       return false   //update data and end
+    var str = $('#updateForm').serialize()
+    var data = {'method':name,'formdata':str}    
+    $.post('/updateapi',data,function(data){
+        data = JSON.parse(data)    //object
+        data = JSON.parse(data['result']) //object
+        if (data['code']==0){   
+            swal("更新成功")
+            $('#updateModal').modal('hide')
+            location.reload()
+        }else{
+             $('#errorMsg').html('failed '+data['errmsg']).show()
+        }
+   })
+   return false   //update data and end
 })    
 /*update passwd*/
 $("tbody").on('click','.passwd-btn',function(){
@@ -251,13 +290,14 @@ $("tbody").on('click','.delete-btn',function(){
 	if(confirm("Are you sure delete")){
         var that = this;
 		var id = $(this).attr('data-id')
-		var delete_url = '/user/delete?id='+id
-		$.getJSON(delete_url,function(result){
-			if (result['code']== 0 ){
-				alert('success')
+		var url =  "/deleteapi?method="+name+"&id="+id
+		$.getJSON(url,function(data){
+            data = JSON.parse(data['result'])
+			if (data['code']== 0 ){
+ 				swal('删除成功')
 				location.reload()
 			}else{
-				alert(result['errmsg'])
+				swal(data['errmsg'])
 			}
     	})
     }  // end confirm

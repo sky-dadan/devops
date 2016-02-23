@@ -10,19 +10,19 @@
        <div class="widget-title"> 
           <span class="icon"> <i class="icon-briefcase"></i> </span>
 	      <h5>您的个人资料</h5>
-          <h5 style="float:right;">
-         （<a href="/user/edit"><i class="icon-edit"></i>编辑个人资料</a>）</h5>
+          <h5 style="float:right;" id = "edit">
+         （<i class="icon-edit"></i>编辑个人资料）</h5>
           <h5 style="float:right;" id = "passwd">
               (<i class="icon-edit"></i><strong>修改密码</strong>)</h5>
 	   </div> <!--end widget-title-->
 <!--更新密码模态窗-->
-<div id="updateModal"  class="modal hide fade">
+<div id="updatepasswd"  class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h3>修改个人密码</h3>
+	<h3>修改个人密码< /h3>
   </div> <!--modal-header end-->
   <div class="modal-body">
-    <form class="form-horizontal" id="updateForm" method="POST">
+    <form class="form-horizontal" id="updatepw" method="POST">
      	<div class="form-group">
 			<label class="control-label">旧密码</label>
      		 <div class="controls">
@@ -37,9 +37,54 @@
        	</div> <!--newpasswd  end-->
     	<div class="form-group">
      		<div class="modal-footer">
-				<button class="btn btn-primary update-btn" >更新</button>
+				<button class="btn btn-primary" id = "uppwbtn" >更新</button>
+			 	<button class="btn btn-warning exit-btn" data-dismiss="modal">退出</button>
+            </div> 
+      </div><!--button end-->
+
+    </form><!--form end-->
+  </div> <!--modal-body end -->
+</div> <!--modal end-->
+<!--模态窗结束-->
+
+<!--更新个人信息模态窗-->
+<div id="editModal"  class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+ 	<h3>修改个人资料</h3>
+  </div> <!--modal-header end-->
+  <div class="modal-body">
+     <form class="form-horizontal" id="updateForm" method="POST">
+       	<input type="hidden" id="upid" name="id" >
+     	<div class="form-group">
+            <label class="control-label">用户名</label>
+     		 <div class="controls">
+       		 	<input id="upusername" name="username" >
+      		</div> 
+       	</div> <!-- username  end-->
+     	<div class="form-group">
+			 <label class="control-label">姓名</label>
+     		 <div class="controls">
+       		 	<input id="upname" name="name" >
+      		</div> 
+       	</div> <!--name  end-->
+     	<div class="form-group">
+            <label class="control-label">E-mail</label>
+     		 <div class="controls">
+       		 	<input id="upemail" name="email" >
+      		</div> 
+       	</div> <!--email  end-->
+     	<div class="form-group">
+            <label class="control-label">联系电话</label>
+     		 <div class="controls">
+       		 	<input id="upmobile" name="mobile" >
+      		</div>  
+       	</div> <!--mobile  end-->
+    	<div class="form-group">
+     		<div class="modal-footer">
+			 	<button class="btn btn-primary"  id = "upinfobtn">更新</button>
 				<button class="btn btn-warning exit-btn" data-dismiss="modal">退出</button>
-         	</div>
+            </div> 
       </div><!--button end-->
 
     </form><!--form end-->
@@ -52,33 +97,31 @@
                <div class="span6">
 					<table class="" id = "info">
 							<tr>
-                                <td><h4>{{result.name}}</h4></td>
+                                <td><span><h4></h4></td>
 							</tr>
 							<tr>
-                                <td>Tel:{{result.mobile}}</td>
+                                <td><h6></h6></td>
 							</tr>
 					</table>
 			    </div> <!--info end-->
 				<div class="span6">
 					<table class="table table-bordered table-invoice" id = "detail">
 							<tr>
-								<td class="width30">E-mail地址：</td>
-                                 <td class="width70"><strong>{{result.email}}</strong></td>
-							</tr>
-							<tr>
-					 			<td>加入时间:</td>
-								<td><strong>2015-10-13 15:19:52</strong></td>
+							 	<td class="width30">E-mail地址：</td>
+                                <td class="width70" id="getemail"><strong>111@11</strong></td>
 							</tr>
 							<tr>
 								<td>所属管理组:</td>
-                                <td id='role' data={{result.role}}><strong>{% if result.role==0 %}超级管理员{% else %}普通用户 {% endif %}</strong></td>
+                                <td id='getrole' data='0'></td>
 							</tr>
-                            <tr id="user_groups">
+                            <tr> <!--用户所属组，异步拼接-->
+                                <td>用户角色</td>
+					 			<td id="user_groups"></td>
 							</tr>
-							<tr>
+                            <tr>                <!--用户的权限，异步拼接-->
 								<td>用户权限:</td>
 					 			<td id="user_power"></td>
- 							</tr>
+  							</tr>
 					</table> 
                 </div><!--detail end-->
            </div> <!--row-fluid end-->
@@ -90,23 +133,84 @@
 {% endblock %}
 {% block js %}
 <script>
-/*点击按钮，显示修改密码的模态窗 */
-$("#passwd").on('click',function(){
-    $('#updateModal').modal('show')  
+name='user'
+/*获取个人信息，渲染个人中心页面，同时渲染个人信息修改模态窗，实现代码复用*/
+function userinfo(){
+ 	var url = "/getapi?method="+name
+    console.log(url)
+	$.getJSON(url,function(data){
+      console.log(data) /*Object {id: 1, jsonrpc: "2.0", result: "{"code": 0, "result": {"username": "liuziping", "i…"}}"}*/
+      data = JSON.parse(data['result'])  /*data['result'] 是字符串，必须转为json对象，才能按照k取值*/
+      console.log(data)      /*Object {code: 0, result: Object{username: "liuziping", is_lock: 0,.}}*/
+      console.log(data['result']) /*Object {username: "liuziping", is_lock: 0,.....*/
+      if (data['code']==0){
+          $('h4').html(data['result']['name'])
+          $('h6').html("Tel:"+data['result']['mobile'])
+          $('#getemail').html(data['result']['email'])
+          if (data['result']['role'] ==0){
+              data['result']['role']="超级管理员"
+          }else{
+              data['result']['role']="普通管理员"
+          }
+          $('#getrole').html(data['result']['role'])
+          /*更新个人信息的模态窗渲染数据*/
+          $('#upid').val(data['result']['id'])
+          $('#upusername').val(data['result']['username'])
+          $('#upname').val(data['result']['name'])
+          $('#upemail').val(data['result']['email'])
+          $('#upmobile').val(data['result']['mobile'])
+
+      }else{
+          swal(data['result']['errmsg'])
+      }
+	})
+}
+userinfo()
+
+
+/*修改个人信息模态窗 */
+$("#edit").on('click',function(){
+    $('#editModal').modal('show')  
 })
 
-/*用户自己修改密码*/
-$(".update-btn").on('click',function(){
+
+/*用户自己个人信息修改*/
+$("#upinfobtn").on('click',function(){
    var str = $("#updateForm").serialize()
+   var data = {'method':name,'formdata':str}
+   $.post('updateapi',data,function(data){
+        data=JSON.parse(data)
+        data = JSON.parse(data['result']) //object
+        if(data['code'] == 0){   //recevie json object
+             swal("更新信息成功")
+             $('#editModal').modal('hide')
+             window.location.reload();
+             
+        }else{
+             swal("更新信息失败")
+        }
+   })
+        return false
+})
+
+/*修改密码的模态窗显示 */
+$("#passwd").on('click',function(){
+    $('#updatepasswd').modal('show')  
+})
+
+
+/*用户自己修改密码*/
+$("#uppwbtn").on('click',function(){
+   var str = $("#updatepw").serialize()
    var url = '/user/chpwdoneself'
    $.post(url,str,function(data){
        data=JSON.parse(data)
         if (data['code']==0){   //recevie json object
-             alert("更新成功")
-             $('#updateModal').modal('hide')
+             swal("更新成功")
+             $('#updatepasswd').modal('hide')
         }else{
-             alert("更新失败")
-            }
+             swal("更新失败")
+             }
    })
         return false
 })
@@ -114,7 +218,7 @@ $(".update-btn").on('click',function(){
 /*获取用户组信息*/
 var groups_name=''
 var url = "/listapi?method=user_groups"
-var str = '<td>用户组:</td>'
+var str = ''
 $.ajaxSettings.async=false;
 $.getJSON(url, function(data){
 	data=JSON.parse(data['result'])
@@ -124,13 +228,13 @@ $.getJSON(url, function(data){
         groups_name+=v['name']+','
 	})
         groups_name=groups_name.substring(0,groups_name.length-1)
-        str += '<td><strong>'+groups_name+'</strong></td>'
+        str += '<strong>'+groups_name+'</strong>'
 		$("#user_groups").html(str)
 	})
 
 /*获取用户权限*/
 function user_power(){
-	var url = "/listapi?method=user_perm"
+ 	var url = "/listapi?method=user_perm"
 	var str = ''
 	$.getJSON(url, function(data){
  		data = JSON.parse(data['result'])
@@ -144,7 +248,7 @@ function user_power(){
 user_power()
 
 /*通过用户组信息，判断是否显示列表*/
-role = $('#role').attr("data")
+role = $('#getrole').attr("data")
 if (role != 0){
     $('.sa').hide();
 }

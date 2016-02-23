@@ -78,7 +78,7 @@
     <div class="control-group">
         <label class="control-label">重复输入密码：</label>
         <div class="controls">
-            <input  type="password" name="repwd" id="repwd" />
+             <input  type="password" name="repwd" id="repwd" />
              <span for="required" generated="true" class="help-inline"></span>
         </div>
     </div>
@@ -94,45 +94,51 @@
 
 {% block js %}
 <script>
-/* 原理通过restfulapi 方式提交的请求
-$("#submit_data_btn").on('click',function(){
-    var str = $('#user_signup_form').serialize()
-	console.log(str)
-    var url = '/user/add'
-    $.post(url,str,function(data){ 
-        data=JSON.parse(data);   //将json串转换为对象，然后取值
-        if (data['code']==0){
-            alert("创建用户成功")
-			window.location='/user/list'
-        }else{
-            alert("创建用户失败," + data['errmsg'])
-        }
-     })
+
+/*检查表单数据是否合法*/
+
+$('#repwd').hover(function(){
+    password=$('#password').val()
+},function(){
+    repwd=$('#repwd').val()
+    if (password != repwd){
+        swal("OMG!", "两次输入密码不一致", "error")
+    }
 })
-*/
+
+$("#submit_data_btn").on('click',function(){
+    if ($('#r_id').val() == null || $('#r_id').val() == ""){
+        swal("OMG!", "你必须选择一个组", "error")
+    }else{
+        add()
+    }
+ })
+
 name="user"
 /*通过jsonrpc接口统一处理*/
-$("#submit_data_btn").on('click',function(){
-    var str = $('#user_signup_form').serialize()
-	console.log(str)
-    var data={'method':name,'formdata':str}
-    $.post('/addapi',data,function(data){ 
-        data=JSON.parse(data);   //将json串转换为对象，然后取值
-        data = JSON.parse(data['result']) //object
-        if (data['code']==0){
-            alert("创建用户成功")
-			window.location='/user/list'
-        }else{
-            alert("创建用户失败," + data['errmsg'])
-        }
-     })
-})
+function add(){
+        var str = $('#user_signup_form').serialize()
+        console.log(str)
+        var data={'method':name,'formdata':str}
+        $.post('/addapi',data,function(data){ 
+            data=JSON.parse(data);   //将json串转换为对象，然后取值
+            data = JSON.parse(data['result']) //object
+            if (data['code']==0){
+                swal("Good!", "创建用户成功", "success"); 
+                window.location='/user/list'
+            }else{
+                swal("error","创建用户失败," + data['errmsg'],"error")
+            }
+         })
+}
+
 
 /*检查输入的表单内容是否合法*/
 $("form :input.required").each(function(){
-    var $required = $("<strong class='high'> *</strong>"); //创建元素
+     var $required = $("<strong class='high'> *</strong>"); //创建元素
     $(this).parent().append($required); //然后将它追加到文档中
 });
+
 
 /*列出所有组的信息，并拼接成复选框,API调用的是cmdb.py中统一的jsonrpc格式，与上面/user/add的restfulapi 风格不搭配，后期需要优化统一*/
 function list(){
@@ -140,15 +146,26 @@ function list(){
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		console.log(data)	
-		var str = ''
-		$.each(data.result, function(k,v){
-			//console.log(v)
-			str += '<option value="'+v['id']+'">'+v['name']+'</option>'
-		})
-  		$("#r_id").html(str)
-		$('#r_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
-		$("#r_id").multiselect('refresh')
+        if (data['code']== 0){
+            var str = ''
+            $.each(data.result, function(k,v){
+                //console.log(v)
+                str += '<option value="'+v['id']+'">'+v['name']+'</option>'
+            })
+            $("#r_id").html(str)
+            $('#r_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+            $("#r_id").multiselect('refresh')
+        }else{
+            swal({
+                title:"error", 
+                text:data['errmsg'],
+                type:"error"
+                },function(){
+                    location.href="/login"
+                });
+        } //if end
 	})
+
 }
 list()
 

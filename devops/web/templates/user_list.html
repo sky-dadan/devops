@@ -255,9 +255,16 @@ $('#updateForm').on('submit',function(){
         data = JSON.parse(data)    //object
         data = JSON.parse(data['result']) //object
         if (data['code']==0){   
-            swal("更新成功")
-            $('#updateModal').modal('hide')
-            location.reload()
+            swal({
+                title:"success",
+                text:"更新成功",
+                type:"success",
+                confirmButtonText:'确定更新'
+                },function(){
+                    $('#updateModal').modal('hide')
+                    location.reload()
+                })
+
         }else{
              $('#errorMsg').html('failed '+data['errmsg']).show()
         }
@@ -277,8 +284,14 @@ $('#ChangePasswdForm').on('submit',function(){
     $.post(url,str,function(result){
         result = JSON.parse(result)
         if (result['code']==0){
-            alert("密码更新成功")
-            $('#ChangePasswdModal').modal('hide')
+            swal({
+                title:"success",
+                text:"密码更新成功",
+                type:"success",
+                confirmButtonText:'确定'
+                },function(){
+                    $('#ChangePasswdModal').modal('hide')
+                })
         }else{
             $('#errorMsg').html('failed '+result['errmsg']).show()
         }
@@ -294,8 +307,15 @@ $("tbody").on('click','.delete-btn',function(){
 		$.getJSON(url,function(data){
             data = JSON.parse(data['result'])
 			if (data['code']== 0 ){
- 				swal('删除成功')
-				location.reload()
+                swal({
+                    title:"success",
+                    text:"删除成功",
+                    type:"success",
+                    confirmButtonText:'删除成功'
+                    },function(){
+                        location.reload()
+                    })
+ 				
 			}else{
 				swal(data['errmsg'])
 			}

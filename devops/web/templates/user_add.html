@@ -97,6 +97,11 @@
 
 /*检查表单数据是否合法*/
 
+$("form :input.required").each(function(){
+     var $required = $("<strong class='high'> *</strong>"); //创建元素
+    $(this).parent().append($required); //然后将它追加到文档中
+});
+
 $('#repwd').hover(function(){
     password=$('#password').val()
 },function(){
@@ -133,14 +138,8 @@ function add(){
 }
 
 
-/*检查输入的表单内容是否合法*/
-$("form :input.required").each(function(){
-     var $required = $("<strong class='high'> *</strong>"); //创建元素
-    $(this).parent().append($required); //然后将它追加到文档中
-});
 
-
-/*列出所有组的信息，并拼接成复选框,API调用的是cmdb.py中统一的jsonrpc格式，与上面/user/add的restfulapi 风格不搭配，后期需要优化统一*/
+/*列出所有组的信息，并拼接成复选框*/
 function list(){
 	var url = "/listapi?method=groups"
 	$.getJSON(url, function(data){

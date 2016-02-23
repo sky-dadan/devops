@@ -76,7 +76,7 @@ def addapi():
 def getapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
-    username = session['username']
+    username = request.args.get('username')        #获取的是url传过来的username,不是当前session的username
     uid = request.args.get('id')
     if uid is not None:
         data['params'] = {"where":{'id':uid}}

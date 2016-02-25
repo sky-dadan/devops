@@ -39,9 +39,8 @@ def render(template):
        return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template(template+'.html',name=name)
+        return render_template(template+'.html',info=session)
     else:
         return render_template(template+'.html',errmsg=validate_result['errmsg'])
 

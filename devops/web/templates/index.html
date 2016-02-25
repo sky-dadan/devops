@@ -55,29 +55,29 @@
   </div> <!--modal-header end-->
   <div class="modal-body">
      <form class="form-horizontal" id="updateForm" method="POST">
-       	<input type="hidden" id="upid" name="id" >
+       	<input type="hidden" id="upid" name="id" value="{{ user.id }}">
      	<div class="form-group">
             <label class="control-label">用户名</label>
      		 <div class="controls">
-       		 	<input id="upusername" name="username" >
+       		 	<input id="upusername" name="username" value="{{ user.username }}">
       		</div> 
        	</div> <!-- username  end-->
      	<div class="form-group">
 			 <label class="control-label">姓名</label>
      		 <div class="controls">
-       		 	<input id="upname" name="name" >
+       		 	<input id="upname" name="name" value="{{ user.name }}">
       		</div> 
        	</div> <!--name  end-->
      	<div class="form-group">
             <label class="control-label">E-mail</label>
      		 <div class="controls">
-       		 	<input id="upemail" name="email" >
+       		 	<input id="upemail" name="email" value="{{ user.email }}">
       		</div> 
        	</div> <!--email  end-->
      	<div class="form-group">
             <label class="control-label">联系电话</label>
      		 <div class="controls">
-       		 	<input id="upmobile" name="mobile" >
+       		 	<input id="upmobile" name="mobile" value="{{ user.mobile }}">
       		</div>  
        	</div> <!--mobile  end-->
     	<div class="form-group">
@@ -97,10 +97,10 @@
                <div class="span6">
 					<table class="" id = "info">
 							<tr>
-                                <td><span><h4></h4></td>
+                                <td><span><h4>{{ user.name }}</h4></td>
 							</tr>
 							<tr>
-                                <td><h6></h6></td>
+                                <td><h6>{{ user.mobile }}</h6></td>
 							</tr>
 					</table>
 			    </div> <!--info end-->
@@ -108,19 +108,19 @@
 					<table class="table table-bordered table-invoice" id = "detail">
 							<tr>
 							 	<td class="width30">E-mail地址：</td>
-                                <td class="width70" id="getemail"></td>
+                                <td class="width70" id="getemail">{{ user.email }}</td>
 							</tr>
 							<tr>
-								<td>所属管理组:</td>
-                                 <td id='getrole' data='0'></td>
+								<td>用户角色</td>
+								<td id='getrole' data='0'>{% if user.role == 0 %}超级管理员{% else %}普通用户{% endif %}</td>
 							</tr>
                             <tr> <!--用户所属组，异步拼接-->
-                                <td>用户角色</td>
- 					 			<td id="user_groups"></td>
+								<td>所属管理组:</td>
+					 			<td id="user_groups"><strong>{{ user.groups }}</strong></td>
 							</tr>
                             <tr>                <!--用户的权限，异步拼接-->
- 								<td>用户权限:</td>
-					 			<td id="user_power"></td>
+								<td>用户权限:</td>
+					 			<td id="user_power">{{ user.perm|safe() }}</td>
   							</tr>
 					</table> 
                 </div><!--detail end-->
@@ -134,39 +134,6 @@
 {% block js %}
 <script>
 name='user'
-/*获取个人信息，渲染个人中心页面，同时渲染个人信息修改模态窗，实现代码复用*/
-function userinfo(){
- 	var url = "/getapi?method="+name
-    console.log(url)
-	$.getJSON(url,function(data){
-      console.log(data) /*Object {id: 1, jsonrpc: "2.0", result: "{"code": 0, "result": {"username": "liuziping", "i…"}}"}*/
-      data = JSON.parse(data['result'])  /*data['result'] 是字符串，必须转为json对象，才能按照k取值*/
-      console.log(data)      /*Object {code: 0, result: Object{username: "liuziping", is_lock: 0,.}}*/
-      console.log(data['result']) /*Object {username: "liuziping", is_lock: 0,.....*/
-      if (data['code']==0){
-          $('h4').html(data['result']['name'])
-          $('h6').html("Tel:"+data['result']['mobile'])
-          $('#getemail').html(data['result']['email'])
-          if (data['result']['role'] ==0){
-              data['result']['role']="超级管理员"
-          }else{
-              data['result']['role']="普通管理员"
-          }
-          $('#getrole').html(data['result']['role'])
-          /*更新个人信息的模态窗渲染数据*/
-          $('#upid').val(data['result']['id'])
-          $('#upusername').val(data['result']['username'])
-          $('#upname').val(data['result']['name'])
-          $('#upemail').val(data['result']['email'])
-          $('#upmobile').val(data['result']['mobile'])
-
-      }else{
-          swal(data['errmsg'])
-      }
-	})
-}
-userinfo()
-
 
 /*修改个人信息模态窗 */
 $("#edit").on('click',function(){
@@ -215,42 +182,5 @@ $("#uppwbtn").on('click',function(){
         return false
 })
 
-/*获取用户组信息*/
-var groups_name=''
-var url = "/listapi?method=user_groups"
-var str = ''
-$.ajaxSettings.async=false;
-$.getJSON(url, function(data){
-	data=JSON.parse(data['result'])
-	var count = data['count']
-	$.each(data.result, function(k,v){
-        //console.log(v)
-        groups_name+=v['name']+','
-	})
-        groups_name=groups_name.substring(0,groups_name.length-1)
-        str += '<strong>'+groups_name+'</strong>'
-		$("#user_groups").html(str)
-	})
-
-/*获取用户权限*/
-function user_power(){
- 	var url = "/listapi?method=user_perm"
-	var str = ''
-	$.getJSON(url, function(data){
- 		data = JSON.parse(data['result'])
-		$.each(data.result, function(k,v){
-			console.log(k,v)
- 			str+='<a href="'+v['url']+'" style="color:blue">'+v['name_cn']+'</a>'+','
-	})
-    		$("#user_power").html(str)
-})
-}
-user_power()
-
-/*通过用户组信息，判断是否显示列表*/
-role = $('#getrole').attr("data")
-if (role != 0){
-    $('.sa').hide();
-}
 </script>
 {% endblock %}

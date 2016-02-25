@@ -32,7 +32,7 @@
     <ul class="nav">
         <li  class="dropdown" id="profile-messages" >
             <a title="" href="#" data-toggle="dropdown" data-target="#profile-messages" class="dropdown-toggle"><i class="icon icon-user"></i> 
-                <span class="text">{% if not name%}<span style="color: red;">{{errmsg}}</span>{%else%}{{name}}{%endif%}</span>
+                <span class="text">{% if not info.username%}<span style="color: red;">{{errmsg}}</span>{%else%}{{info.username}}{%endif%}</span>
             <b class="caret"></b></a>
             <ul class="dropdown-menu">
                 <li><a href="/user/info"><i class="icon-user"></i>个人中心</a></li>
@@ -54,26 +54,31 @@
                 <i class="icon icon-user-md"></i><span>账号中心</span>
                 <span class="arrow icon-chevron-down"></span>
             </a>
+            {% if info.role == 0 %}
             <ul>
                 <li class="sa"><a href="/user/add">添加用户</a></li>
                 <li class="sa"><a href="/user/list">用户列表</a></li>
                 <li class="sa"><a href="/role/list">角色管理</a></li>
             </ul>
+            {% endif %}
         </li>  <!--end user-->
         <li class="submenu open">
         <a href="javascript:;">
             <i class="icon icon-bell"></i><span>权限管理</span>
             <span class="arrow icon-chevron-down"></span>
         </a>
+        {% if info.role == 0 %}
         <ul>
             <li class="sa"><a href="/power/list">权限列表</a></li>
         </ul>
+        {% endif %}
         </li> <!--end priviage-->
         <li class="submenu">
         <a href="javascript:;">
             <i class="icon icon-bell"></i><span>CMDB系统</span>
             <span class="arrow icon-chevron-down"></span>
         </a>
+        {% if info.role == 0 %}
         <ul>
             <li class="sa"><a href="/cmdb/host">主机管理</a></li>
             <li class="sa"><a href="/cmdb/switch">网络设备管理</a></li>
@@ -83,6 +88,7 @@
             <li class="sa"><a href="/cmdb/services">服务管理</a></li>
             <li class="sa"><a href="/cmdb/softassets">软资产管理</a></li>
         </ul>
+        {% endif %}
         </li> <!--end cmdb-->
         <li class="submenu">
         <a href="javascript:;">

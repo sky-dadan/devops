@@ -10,15 +10,24 @@ headers = {'content-type': 'application/json'}
 @app.route("/",methods=['GET'])
 @app.route("/user/info",methods=['GET'])
 def index():
-    if session.get('username') == None:
-        return redirect('/login')
     headers['authorization'] = session['author']
-    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
-    if int(validate_result['code']) == 0:
-        return render_template('index.html',name=name)
+    url = "http://%s/api" % app.config['api_host']
+    data = {'jsonrpc': '2.0', 'id': 1, 'method': 'user.getinfo'}
+    req = requests.post(url, headers=headers, json=data)
+    result = json.loads(json.loads(req.content).get('result', '{}'))
+    if result['code'] == 0:
+        user = result['user']
+        session['role'] = user['role']
+        session['group'] = user['r_id']
+        session['perm'] = user['p_id'].keys()
+        session['username'] = user['name'] if user['name'] else user['username']
+
+        user['groups'] = ','.join(user['r_id'])
+        user['perm'] = ','.join(['<a href="%s" style="color:blue">%s</a>' % (x['url'], x['name_cn']) for x in user['p_id'].values()])
+
+        return render_template('index.html',info=session,user=user)
     else:
-        return render_template('index.html',errmsg=validate_result['errmsg'])
+        return redirect('/login')
 
 ##管理员添加用户web页面
 @app.route("/user/add",methods=['GET','POST'])
@@ -27,9 +36,8 @@ def useradd():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('user_add.html',name=name)
+        return render_template('user_add.html',info=session)
     else:
         return render_template('user_add.html',errmsg=validate_result['errmsg'])
  
@@ -40,9 +48,8 @@ def user_list():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('user_list.html',name=name)
+        return render_template('user_list.html',info=session)
     else:
         return render_template('user_list.html',errmsg=validate_result['errmsg'])
 
@@ -54,9 +61,8 @@ def role_list():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('role_list.html',name=name)
+        return render_template('role_list.html',info=session)
     else:
         return render_template('role_list.html',errmsg=validate_result['errmsg'])
 
@@ -67,9 +73,8 @@ def power_list():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('power.html',name=name)
+        return render_template('power.html',info=session)
     else:
         return render_template('power.html',errmsg=validate_result['errmsg'])
 

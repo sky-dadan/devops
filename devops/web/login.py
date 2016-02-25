@@ -24,7 +24,6 @@ def login():
             #else:
             #    print "%s is user" % res['username']
             session['author'] = token
-            session['username'] = res['username']
            # return redirect('/')
     	    return json.dumps({'code':0})
         else:

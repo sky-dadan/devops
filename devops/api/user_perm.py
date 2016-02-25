@@ -30,15 +30,21 @@ def createuser(auth_info,**kwargs):
     username = auth_info['username']
     try:
         data = request.get_json()['params']
-        print data 
-        data.pop('repwd')    #因为表单是整体打包过来的，第二次输入的密码字段不存在，需要删除
+        if 'r_id' not in data:
+            return json.dumps({'code': 1, 'errmsg': "必须选择一个所属组!"})
+        if data['password'] != data['repwd']:
+            return json.dumps({'code': 1, 'errmsg': "两次输入的密码不一致!"})
+        elif len(data['password']) < 6:
+            return json.dumps({'code': 1, 'errmsg': '密码至少需要6位!'})
+        else:
+            data.pop('repwd')    #因为表单是整体打包过来的，第二次输入的密码字段不存在，需要删除
         data['password'] = hashlib.md5(data['password']).hexdigest()
         app.config['cursor'].execute_insert_sql('user', data)
         util.write_log(username, "create_user %s" % data['username'])
         return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
     except:
         logging.getLogger().error("Create user error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'Create user error'})
+        return json.dumps({'code': 1, 'errmsg': '创建用户失败，有异常情况'})
 
 #获取(uid or username)个人信息，个人信息展示和个人修改信息，以及用户列表中更新用户信息部分的获取数据
 @jsonrpc.method('user.get')
@@ -59,6 +65,34 @@ def userinfo(auth_info,**kwargs):
     except:
         logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'Get  users error'})
+
+#获取用户信息
+@jsonrpc.method('user.getinfo')
+@auth_login
+def userselfinfo(auth_info,**kwargs):
+    if auth_info['code'] ==  1:
+        return  json.dump(auth_info)
+    username = auth_info['username']
+    fields = ['id','username','name','email','mobile','role','is_lock','r_id']
+    try:
+        #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
+        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'])
+        own_pids = set([])
+        for x in gids:
+            own_pids |= set(x['p_id'].split(','))
+        gids = dict([(str(x['id']), x['name']) for x in gids])
+
+        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'])
+        pids = dict([(str(x['id']), dict([(k, x[k]) for k in ('name', 'name_cn', 'url')])) for x in pids])
+
+        user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
+        user['r_id'] = [gids[x] for x in user['r_id'].split(',') if x in gids]
+        user['p_id'] = dict([(pids[x]['name'], pids[x]) for x in own_pids if x in pids])
+        util.write_log(username, 'get_user_info')
+        return  json.dumps({'code': 0, 'user': user})
+    except:
+        logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'Get users error'})
 
 #获取用户列表
 @jsonrpc.method('user.getlist')
@@ -95,7 +129,7 @@ def userupdate(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'you are not admin!'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才可操作!'})
     try:
         data = request.get_json()['params']
         where = data.get('where',None)

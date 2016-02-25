@@ -6,6 +6,7 @@ from . import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json, traceback,hashlib
+import htpasswd
 
 #本模块提供用户信息的增删改查，以及 用户所在组，所有权限的查询
 
@@ -20,6 +21,18 @@ def getid_list(ids):
     id_list.sort()
     print id_list
     return  id_list
+
+def git_passwd(user, password):
+    try:
+        with htpasswd.Basic(app.config['git_passwd_file']) as user_pwd:
+            if user in user_pwd:
+                user_pwd.change_password(user, password)
+            else:
+                user_pwd.add(user.password)
+        return True
+    except:
+        logging.getLogger().error("Set '%s' password error: %s" % (user, traceback.format_exc()))
+        return False
 
 #创建用户
 @jsonrpc.method('user.create')
@@ -40,6 +53,9 @@ def createuser(auth_info,**kwargs):
             data.pop('repwd')    #因为表单是整体打包过来的，第二次输入的密码字段不存在，需要删除
         data['password'] = hashlib.md5(data['password']).hexdigest()
         app.config['cursor'].execute_insert_sql('user', data)
+
+        if not git_passwd(username, data['password']):
+            return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
         util.write_log(username, "create_user %s" % data['username'])
         return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
     except:
@@ -180,42 +196,29 @@ def passwd(auth_info):
     role = int(auth_info['role'])
     try:
         data = request.get_json()
-        if  role==0:   # admin no need oldpassword  but need user_id
-            if  not data.has_key('user_id') :
-                if data.has_key('oldpassword') and data.has_key('password'):
-                    oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
-                    res = app.config['cursor'].get_one_result('user', ['password'], {'username': username})
-                    if res['password'] != oldpassword:
-                        return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
-                    else:
-                        password = hashlib.md5(data['password']).hexdigest()
-                        app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
-                        util.write_log(username,'update user password')
-                        return json.dumps({'code':0,'result':'update password success'  })
-                else:
-                    return json.dumps({'code':1,'errmsg':'admin must input user_id'})
-            else:
-                user_id = data['user_id']
-                if not app.config['cursor'].if_userid_exist(user_id): 
-                    return json.dumps({'code':1,'errmsg':'User is not exist'})
-                password = hashlib.md5(data['password']).hexdigest()
-                app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})
+        if role==0 and 'user_id' in data:   # admin no need oldpassword  but need user_id
+            user_id = data['user_id']
+            if not app.config['cursor'].if_userid_exist(user_id): 
+                return json.dumps({'code':1,'errmsg':'需要更改密码的用户不存在'})
+            password = hashlib.md5(data['password']).hexdigest()
+            app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})
         else:                  #user  need input oldpassword
             if not data.has_key("oldpassword") :
-                return json.dumps({'code':1,'errmsg':'need input your old password' })
-            else:
-                oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
-                res = app.config['cursor'].get_one_result('user', ['password'], {'username': username})
-                if res['password'] != oldpassword:
-                    return json.dumps({'code':1,'errmsg':'input  old password is wrong'})
-                else:
-                    password = hashlib.md5(data['password']).hexdigest()
-                    app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
+                return json.dumps({'code':1,'errmsg':'需要提供原密码'})
+            oldpassword = hashlib.md5(data['oldpassword']).hexdigest()
+            res = app.config['cursor'].get_one_result('user', ['password'], {'username': username})
+            if res['password'] != oldpassword:
+                return json.dumps({'code':1,'errmsg':'原密码输入有误'})
+            password = hashlib.md5(data['password']).hexdigest()
+            app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
+
+        if not git_passwd(username, data['password']):
+            return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
         util.write_log(username,'update user password')
         return json.dumps({'code':0,'result':'update password success'  })
     except:
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'update user password error'})
+        return json.dumps({'code':1,'errmsg':'更新密码有异常'})
 
 
 #用户登录

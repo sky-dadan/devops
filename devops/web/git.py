@@ -22,7 +22,7 @@ def git():
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('git.html',name=name)
+        return render_template('git.html',info=session)
     else:
         return render_template('git.html',errmsg=validate_result['errmsg'])
 

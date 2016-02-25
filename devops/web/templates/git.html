@@ -10,8 +10,8 @@ position:static;
 }
 </style>
 {% endblock %}
-{% block title %}Git管理{% endblock %}
-{% block breadcrumb %}<a href="/cmdb/idc">Git管理</a>{% endblock %}
+{% block title %}Git项目管理{% endblock %}
+{% block breadcrumb %}<a href="/cmdb/idc">Git项目管理</a>{% endblock %}
 
 <!--主体内容-->
 {% block row %}
@@ -19,15 +19,15 @@ position:static;
 <div class="widget-box">
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
-      <h5>Git管理</h5>
-      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加Git</button>
+      <h5>Git项目管理</h5>
+      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加项目</button>
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
 <div id="addModal" class="modal hide fade">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">添加Git</h4>
+        <h4 class="modal-title">添加项目</h4>
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
@@ -200,10 +200,13 @@ position:static;
    <table id ="datatable"  class="table table-bordered table-striped">
 	<thead>
 		<tr>
-            <th scope="col">Git名</th>
-			<th scope="col">Git接口人</th>
-            <th scope="col">接口人电话</th>
-            <th scope="col">Git地址</th>
+            <th scope="col">项目名称</th>
+            <th scope="col">项目路径</th>
+            <th scope="col">项目负责人</th>
+            <th scope="col">用户RW+</th>
+            <th scope="col">用户RW</th>
+            <th scope="col">组RW+</th>
+            <th scope="col">组RW</th>
             <th  scope="col">操作</th>
         </tr>
     </thead> 
@@ -219,11 +222,10 @@ position:static;
 
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
-var name=window.location.pathname.split('/').pop()
+var name='git'
 /* list all data */
 function list(){
-    var name=window.location.pathname.split('/').pop()
-    var url = "/listapi?method="+name
+    var url = "/git/listapi?method="+name
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
@@ -234,9 +236,12 @@ function list(){
            console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
-           '<td>'+v['interface_user']+'</td>'+  
-           '<td>'+v['user_phone']+'</td>'+  
-           '<td>'+v['address']+'</td>'+ 
+           '<td>'+v['path']+'</td>'+  
+           '<td>'+v['principal']+'</td>'+  
+           '<td>'+v['user_all_perm']+'</td>'+ 
+           '<td>'+v['user_rw_perm']+'</td>'+ 
+           '<td>'+v['group_all_perm']+'</td>'+ 
+           '<td>'+v['group_rw_perm']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
            '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+

@@ -21,5 +21,4 @@ import services
 import manufact
 import user_perm
 import power
-import pro_git
 import git

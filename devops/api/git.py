@@ -9,6 +9,24 @@ from auth import auth_login
 import time
 from jsondate import MyEncoder
 
+
+#获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
+def getinfo(table_name,fields):
+    result = app.config['cursor'].get_results(table_name,fields)
+    result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
+    return result
+
+#将用户id替换为username,组id替换为name
+def id2name(pro_perm_result,fields,users,groups):
+    for res in pro_perm_result:
+        for key in fields:
+            if not key.find('user'):
+                res[key] = ','.join([users[x] for x in res[key].split(',') if x in users]) if res[key] else ''
+            elif not key.find('group'):
+                res[key] = ','.join([groups[x] for x in res[key].split(',') if x in groups]) if res[key] else ''
+            else:
+                continue
+
 @jsonrpc.method('git.get')
 @auth_login
 def create(auth_info, **kwargs):
@@ -23,11 +41,23 @@ def create(auth_info, **kwargs):
         pro_perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         data = request.get_json()
         data = data['params']
+        users = getinfo('user',['id','username'])
+        groups = getinfo('groups',['id','name'])
+        # 条件,项目ID 例如：{'id':1}
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('project', pro_fields,where)
-        where = {'id':int(result['id'])}
-        pro_perm_result = app.config['cursor'].get_one_result('project_perm',pro_perm_fields,where)
-        result.update(pro_perm_result)
+        #得到项目id为where条件的结果
+        result = app.config['cursor'].get_one_result('project', pro_fields,where) 
+        #更新result['principal']的值，将id替换成负责人的用户名
+        result['principal'] = users[str(result['principal'])]
+        #将项目的id做为条件
+        where = {'id':int(result['id'])} 
+        #查出项目id对应的权限
+        pro_perm_result = app.config['cursor'].get_one_result('project_perm',pro_perm_fields,where) 
+        #将用户id替换为用户名,组id替换为组名
+        id2name([pro_perm_result],pro_perm_fields,users,groups)
+        #将更新后的结果追加到result字典里
+        result.update(pro_perm_result) 
+
         util.write_log(username, 'select project sucess') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
@@ -48,13 +78,24 @@ def create(auth_info, **kwargs):
         pro_perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         data = request.get_json()
         data = data['params']
+        #user表里查出id,username,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
+        users = getinfo('user',['id','username'])
+        #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
+        groups = getinfo('groups',['id','name']) 
+        #查出项目列表
         result = app.config['cursor'].get_results('project', pro_fields)
+        #将负责人id替换成name
+        for res in result:
+            res['principal'] = users[str(res['principal'])]
+        #查出项目权限列表
         pro_perm_result = app.config['cursor'].get_results('project_perm',pro_perm_fields)
+        # 将权限表里的用户id,组id，替换成用户名，组名
+        id2name(pro_perm_result,pro_perm_fields,users,groups)
+        #将权限信息追加到result字典里
         for project in result:
             for pro_perm in pro_perm_result:
                 if project['id'] == pro_perm['id']:
                     project.update(pro_perm)
-        print "final_result =",result
         util.write_log(username, 'select project list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:

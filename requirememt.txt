@@ -7,4 +7,3 @@ Flask-SQLAlchemy
 Flask-JSONRPC
 Flask-WTF 
 ipython 
-htpasswd

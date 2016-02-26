@@ -48,7 +48,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>负责人</label>
 			<div class='controls'>
-				<select name='principal' id='add_principal' class='user_list'  multiple='multiple'>
+				<select name='principal' id='add_principal' class='user_list'>
 						<option value='test'>test</option>
 				</select>
 			</div>
@@ -288,7 +288,7 @@ $('#addBtn').on('click',function(){
 })
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
-	if($('#up_principal').val() == null || $('#up_principal').val() ==""){
+	if($('#add_principal').val() == null || $('#add_principal').val() ==""){
 			swal("OMG!", "你必须选择一个负责人", "error")
 	}else{
 	   var str = $('#addForm').serialize()

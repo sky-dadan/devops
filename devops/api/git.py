@@ -55,7 +55,7 @@ def create(auth_info, **kwargs):
 		return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})	
 	except:
 		logging.getLogger().error('create project error: %s' % traceback.format_exc())
-		return json.dumps({'code':1,'errmsg':'git project create error'})
+		return json.dumps({'code':1,'errmsg':'git project create error: %s' % traceback.format_exc()})
 
 
 @jsonrpc.method('git.update')

@@ -48,7 +48,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>负责人</label>
 			<div class='controls'>
-				<select name='principal' class="user_list"  multiple='multiple'>
+				<select name='principal' class='user_list'  multiple='multiple'>
 						<option value='test'>test</option>
 				</select>
 			</div>
@@ -73,7 +73,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>RW+_组权限</label>
 			<div class='controls'>
-				<select name='user_all_perm' class='groups_list'  multiple='multiple'>
+				<select name='group_all_perm' class='groups_list'  multiple='multiple'>
 				</select>
 			</div>
 		</div> <!--add group_all_perm-->
@@ -125,65 +125,72 @@ position:static;
      <form class="form-horizontal" id="updateForm">
         <input type="hidden" id='upid' name="id">  <!--update need id-->
      	<div class="form-group">
-            <label class="control-label">Git名简称</label>
+            <label class="control-label">Git项目名称</label>
      		 <div class="controls">
-       		 	<input id="up_idc_name"  type="text"  name="idc_name" >
+				<input id='up_project_name' type='text' name='name'>
       		</div> 
-       	</div> <!--update name end-->
+       	</div> <!--update project name -->
+		<div class='form-group'>
+			<label class='control-label'>仓库路径</label>
+			<div class='controls'>
+				<input id='up_project_path' type='text' name='path'>
+			</div>
+		</div><!--update project path-->
+		<div class='form-group'>
+			<label class='control-label'>负责人</label>
+			<div class='controls'>
+				<select name='principal' id='up_principal_sel'  multiple='multiple'>
+						<option value='test'>test</option>
+				</select>
+			</div>
+		</div><!--update principal -->
+		<div class='form-group'>
+			<label class='control-label'>状态</label>
+			<div class='controls'>
+			<select name='is_lock'>
+				<option value=0>正常</option>
+				<option value=1>锁定</option>
+			</select>
+			</div>
+		</div> <!--update status-->
+		<div class='form-group'>
+			<label class='control-label'>RW+_用户权限</label>
+			<div class='controls'>
+				<select name='user_all_perm' id='up_u_all_sel'   multiple='multiple'>
+				</select>
+			</div>
+		</div> <!--update user_all_perm-->
 		
 		<div class='form-group'>
-			<label class="control-label">Git名全称</label>
+			<label class='control-label'>RW+_组权限</label>
 			<div class='controls'>
-				<input id='up_name' type='text' name='name'>
+				<select name='group_all_perm' id='up_g_all_sel'  multiple='multiple'>
+				</select>
 			</div>
-		</div>
-		
-		<div class='form-group'>
-			<label class='control-label'>Git地址</label>
-			<div class='controls'>
-				<input id='up_address'  type='text' name='address'>
-			</div>
-		</div>
+		</div> <!--update group_all_perm-->
 
 		<div class='form-group'>
-			<label class='control-label'>Git邮件</label>
+			<label class='control-label'>RW_用户权限</label>
 			<div class='controls'>
-				<input id='up_email' type='text' name='email'>
+				<select name='user_rw_perm' id='up_u_rw_sel'  multiple='multiple'>
+				</select>
 			</div>
-		</div>
+		</div> <!--update user_rw_perm-->
 
 		<div class='form-group'>
-			<label class='control-label'>Git接口人</label>
+			<label class='control-label'>RW_组权限</label>
 			<div class='controls'>
-				<input id='up_interface_user' type='text' name='interface_user'>
+				<select name='group_rw_perm' id='up_g_rw_sel'  multiple='multiple'>
+				</select>
 			</div>
-		</div>
-		<div class='form-group'>
-			<label class='control-label'>接口人电话</label>
-			<div class='controls'>
-				<input id='up_user_phone' type='text' name='user_phone'>
-			</div>
-		</div>
+		</div> <!--update group_rw_perm-->
 
-		<div class='form-group'>
-			<label class='control-label'>合约机柜数</label>
+		<div class='from-group'>
+			<label class='control-label'>comment</label>
 			<div class='controls'>
-				<input id='up_pact_cabinet_num' type='text' name='pact_cabinet_num'>
+				<textarea  id='up_comment' rows='3' name='comment'></textarea>
 			</div>
 		</div>
-		<div class='form-group'>
-			<label class='control-label'>实际分配机柜数</label>
-			<div class='controls'>
-				<input id='up_rel_cabinet_num' type='text' name='rel_cabinet_num'>
-			</div>
-		</div>
-		<div class='form-group'>
-			<label class='control-label'>备注信息</label>
-			<div class='controls'>
-				<textarea id='up_remark' rows='3' name='remark'></textarea>
-			</div>
-		</div>
-
 
     	<div class="form-group">
      		<div class="modal-footer">
@@ -229,11 +236,11 @@ function list(){
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
+//       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
+//           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['name']+'</td>'+  
            '<td>'+v['path']+'</td>'+  
@@ -302,20 +309,19 @@ $('#addForm').on('submit',function(){
 $('tbody').on('click','.update-btn',function(){
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
+	selected('g_all_sel',id)
+	selected('g_rw_sel',id)
+	selected('u_all_sel',id)
+	selected('u_rw_sel',id)
+	selected('principal_sel',id)
 	$.getJSON(url,function(data){
-	  console.log(data)  
+//	  console.log(data)  
       data = JSON.parse(data['result'])
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
-          $('#up_idc_name').val(data['result']['idc_name'])
-		  $('#up_name').val(data['result']['name'])
-		  $('#up_address').val(data['result']['address'])
-		  $('#up_email').val(data['result']['email'])
-		  $('#up_interface_user').val(data['result']['interface_user'])
-		  $('#up_user_phone').val(data['result']['user_phone'])
-		  $('#up_pact_cabinet_num').val(data['result']['pact_cabinet_num'])
-		  $('#up_rel_cabinet_num').val(data['result']['rel_cabinet_num'])
-		  $('#up_remark').val(data['result']['remark'])
+          $('#up_project_name').val(data['result']['name'])
+		  $('#up_project_path').val(data['result']['path'])
+		  $('#up_comment').val(data['result']['comment'])
 		$('#updateModal').modal('show')  //show modal
       }else{
           alert(data['errmsg'])
@@ -394,5 +400,24 @@ function grouplist(){
     })
 }
 
+//获取列表  已选上的标记
+function selected(api,id){
+	var url = "/getapi?method="+api+"&id="+id
+	var up_id = "#up_"+api
+	alert(url)
+	alert(up_id)
+	console.log(url,up_id)
+	$.getJSON(url,function(data){
+		var str=''
+		data = JSON.parse(data.result)
+        $.each(data.result,function(k,v){
+            str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
+            '</option>'
+        })
+        $(up_id).html(str)
+        $(up_id).multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $(up_id).multiselect('refresh');
+    })	
+}
 </script>
 {% endblock %}

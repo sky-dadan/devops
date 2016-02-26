@@ -8,6 +8,7 @@ import json, traceback
 from auth import auth_login
 import time
 from jsondate import MyEncoder
+from user_perm import getid_list
 
 
 #获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
@@ -85,6 +86,8 @@ def update(auth_info,**kwargs):
 	except:
 		logging.getLogger().error("update project error : %s" % traceback.format_exc())
 		return json.dumps({'code':1,'errmsg':'update project error'})
+
+
 @jsonrpc.method('git.get')
 @auth_login
 def create(auth_info, **kwargs):
@@ -160,3 +163,114 @@ def create(auth_info, **kwargs):
         logging.getLogger().error("select project list error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'select project list error'})
 
+
+@jsonrpc.method('g_all_sel.get')
+@auth_login
+def g_all_sel(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		where = kwargs.get('where',None)
+		res = app.config['cursor'].get_one_result('project_perm',['group_all_perm'],where)
+		g_all_perm = getid_list([res['group_all_perm']])
+
+		result = app.config['cursor'].get_results('groups',['id','name'])
+		ids = set([str(x['id']) for x in result])  & set(g_all_perm)
+		for x in result:
+			x['selected'] = 'selected="selected"'  if str(x['id'])  in ids else ''
+		util.write_log(username, 'project_perm group_all_perm sucessfully')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('project_perm group_all_perm error %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error:%s'  % traceback.format_exc})
+
+
+
+@jsonrpc.method('g_rw_sel.get')
+@auth_login
+def g_rw_sel(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		where = kwargs.get('where',None)
+		res = app.config['cursor'].get_one_result('project_perm',['group_rw_perm'],where)
+		g_rw_perm = getid_list([res['group_rw_perm']])
+
+		result = app.config['cursor'].get_results('groups',['id','name'])
+		ids = set([str(x['id']) for x in result])  & set(g_rw_perm)
+		for x in result:
+			x['selected'] = 'selected="selected"'  if str(x['id'])  in ids else ''
+		util.write_log(username, 'project_perm group_rw_perm sucessfully')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('project_perm group_rw_perm error %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error:%s'  % traceback.format_exc})
+
+
+
+@jsonrpc.method('u_all_sel.get')
+@auth_login
+def g_all_sel(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		where = kwargs.get('where',None)
+		res = app.config['cursor'].get_one_result('project_perm',['user_all_perm'],where)
+		u_all_perm = getid_list([res['user_all_perm']])
+
+		result = app.config['cursor'].get_results('user',['id','name'])
+		ids = set([str(x['id']) for x in result])  & set(u_all_perm)
+		for x in result:
+			x['selected'] = 'selected="selected"'  if str(x['id'])  in ids else ''
+		util.write_log(username, 'project_perm user_all_perm sucessfully')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('project_perm user_all_perm error %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error:%s'  % traceback.format_exc})
+
+
+@jsonrpc.method('u_rw_sel.get')
+@auth_login
+def g_all_sel(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		where = kwargs.get('where',None)
+		res = app.config['cursor'].get_one_result('project_perm',['user_rw_perm'],where)
+		u_rw_perm = getid_list([res['user_rw_perm']])
+
+		result = app.config['cursor'].get_results('user',['id','name'])
+		ids = set([str(x['id']) for x in result])  & set(u_rw_perm)
+		for x in result:
+			x['selected'] = 'selected="selected"'  if str(x['id'])  in ids else ''
+		util.write_log(username, 'project_perm user_rw_perm sucessfully')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('project_perm user_rw_perm error %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error:%s'  % traceback.format_exc})
+
+
+
+@jsonrpc.method('principal_sel.get')
+@auth_login
+def g_all_sel(auth_info, **kwargs):
+	if auth_info['code'] == 1:
+		return json.dumps(auth_info)
+	username = auth_info['username']
+	try:
+		where = kwargs.get('where',None)
+		res = app.config['cursor'].get_one_result('project',['principal'],where)
+		principal = getid_list([str(res['principal'])])
+		result = app.config['cursor'].get_results('user',['id','name'])
+		ids = set([str(x['id']) for x in result])  & set(principal)
+		for x in result:
+			x['selected'] = 'selected="selected"'  if str(x['id'])  in ids else ''
+		util.write_log(username, 'project  principal  sucessfully')
+		return json.dumps({'code':0,'result':result})
+	except:
+		logging.getLogger().error('project_perm user_rw_perm error %s' % traceback.format_exc())
+		return json.dumps({'code':1,'errmsg':'error:%s'  % traceback.format_exc})

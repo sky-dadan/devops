@@ -139,7 +139,7 @@ def create(auth_info, **kwargs):
         pro_perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         data = request.get_json()
         data = data['params']
-        #user表里查出id,username,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
+        #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
         users = getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
         groups = getinfo('groups',['id','name']) 

@@ -251,7 +251,6 @@ function list(){
            '<td>'+v['group_rw_perm']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
            '</td>'+ 
            '</tr>'          
        })       
@@ -348,26 +347,6 @@ $.post('/updateapi',data, function(data){  // data is string
     return false   //get data and end
 })  //submit form
 
-/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
-$("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
-        var that = this;
-		var id = $(this).attr('data-id')
-        var url = "/deleteapi?method="+name+"&id="+id
-		$.getJSON(url,function(data){
-      		data = JSON.parse(data['result'])
-			if (data['code']== 0 ){
-				alert(data['result'])
-				window.location.reload();
-                $(that).parents('tr').remove();
-                list()
-			}else{
-				alert(data['errmsg'])
-			}
-    	})
-    }  // end confirm
-    return false   //get data and end
-})   
 
 
 //获得所有用户列表信息
@@ -404,9 +383,6 @@ function grouplist(){
 function selected(api,id){
 	var url = "/getapi?method="+api+"&id="+id
 	var up_id = "#up_"+api
-	alert(url)
-	alert(up_id)
-	console.log(url,up_id)
 	$.getJSON(url,function(data){
 		var str=''
 		data = JSON.parse(data.result)

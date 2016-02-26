@@ -75,3 +75,8 @@ def validate(key, fix_pwd):
         logging.getLogger().warning("密码不正确")
         return json.dumps({'code':1,'errmsg':'密码不正确'})
 
+def check_name(name):
+    if isinstance(name, str) or isinstance(name, unicode):
+        return name.isalnum() and len(name) > 2
+    else:
+        return False

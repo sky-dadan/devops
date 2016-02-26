@@ -20,7 +20,8 @@ def create(auth_info,**kwargs):
         return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
         data = request.get_json()['params']
-        print data
+        if not util.check_name(data['name']):
+            return json.dumps({'code': 1, 'errmsg': '权限名必须为字母和数字'})
         app.config['cursor'].execute_insert_sql('power', data)
         util.write_log(username, "create power %s success"  %  data['name'])
         return json.dumps({'code':0,'result':'create %s scucess' %  data['name']})
@@ -101,6 +102,8 @@ def update(auth_info, **kwargs):
         data = request.get_json()['params']
         where = data.get('where',None)
         data = data.get('data',None)
+        if not util.check_name(data['name']):
+            return json.dumps({'code': 1, 'errmsg': '权限名必须为字母和数字'})
         result=app.config['cursor'].execute_update_sql('power', data, where, ['name', 'name_cn', 'url', 'info'])
         if result == '': 
             return json.dumps({'code':1, 'errmsg':'you need give an id!'})

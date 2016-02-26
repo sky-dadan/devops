@@ -57,6 +57,8 @@ def createuser(auth_info,**kwargs):
         data = request.get_json()['params']
         if 'r_id' not in data:
             return json.dumps({'code': 1, 'errmsg': "必须选择一个所属组!"})
+        if not util.check_name(data['username']):
+            return json.dumps({'code': 1, 'errmsg': "用户名必须为字母和数字!"})
         if data['password'] != data['repwd']:
             return json.dumps({'code': 1, 'errmsg': "两次输入的密码不一致!"})
         elif len(data['password']) < 6:
@@ -103,19 +105,19 @@ def userselfinfo(auth_info,**kwargs):
     username = auth_info['username']
     fields = ['id','username','name','email','mobile','role','is_lock','r_id']
     try:
+        user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
+        r_id = user['r_id'].split(',') if user['r_id'] else 0
+
         #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
-        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'])
+        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'], where={'id': r_id})
         own_pids = set([])
         for x in gids:
-            own_pids |= set(x['p_id'].split(','))
-        gids = dict([(str(x['id']), x['name']) for x in gids])
+                own_pids |= set(x['p_id'].split(','))
+        user['r_id'] = [x['name'] for x in gids]
 
-        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'])
-        pids = dict([(str(x['id']), dict([(k, x[k]) for k in ('name', 'name_cn', 'url')])) for x in pids])
+        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'], where={'id': list(own_pids) if own_pids else 0})
+        user['p_id'] = dict([(str(x['name']), dict([(k, x[k]) for k in ('name_cn', 'url')])) for x in pids])
 
-        user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
-        user['r_id'] = [gids[x] for x in user['r_id'].split(',') if x in gids]
-        user['p_id'] = dict([(pids[x]['name'], pids[x]) for x in own_pids if x in pids])
         util.write_log(username, 'get_user_info')
         return  json.dumps({'code': 0, 'user': user})
     except:

@@ -140,7 +140,7 @@ def create(auth_info, **kwargs):
         data = request.get_json()
         data = data['params']
         #user表里查出id,username,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
-        users = getinfo('user',['id','username'])
+        users = getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
         groups = getinfo('groups',['id','name']) 
         #查出项目列表

@@ -176,7 +176,7 @@ $("#uppwbtn").on('click',function(){
              swal("更新成功")
              $('#updatepasswd').modal('hide')
         }else{
-             swal("更新失败")
+             swal(data['errmsg'])
              }
    })
         return false

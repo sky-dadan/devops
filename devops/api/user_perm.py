@@ -6,6 +6,12 @@ from . import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json, traceback,hashlib
+import crypt, random
+import string
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 #本模块提供用户信息的增删改查，以及 用户所在组，所有权限的查询
 
@@ -21,17 +27,24 @@ def getid_list(ids):
     print id_list
     return  id_list
 
-#def git_passwd(user, password):
-#    try:
-#        with htpasswd.Basic(app.config['git_passwd_file']) as user_pwd:
-#            if user in user_pwd:
-#                user_pwd.change_password(user, password)
-#            else:
-#                user_pwd.add(user.password)
-#        return True
-#    except:
-#        logging.getLogger().error("Set '%s' password error: %s" % (user, traceback.format_exc()))
-#        return False
+#设置或者更改用户的Git密码
+def git_passwd(user, password):
+    try:
+        symbols = string.ascii_letters + string.digits
+        salt = random.choice(symbols) + random.choice(symbols)
+        pwd = crypt.crypt(password, salt)
+
+        user_pwd = OrderedDict([x.strip().split(':', 1) for x in file(app.config['git_passwd_file']) if x.find(':') > 0])
+        user_pwd[user] = pwd
+
+        f = file(app.config['git_passwd_file'], 'w')
+        for k, v in user_pwd.items():
+            print >>f, "%s:%s" % (k, v)
+        f.close()
+        return True
+    except:
+        logging.getLogger().error("Set '%s' password error: %s" % (user, traceback.format_exc()))
+        return False
 
 #创建用户
 @jsonrpc.method('user.create')
@@ -44,6 +57,8 @@ def createuser(auth_info,**kwargs):
         data = request.get_json()['params']
         if 'r_id' not in data:
             return json.dumps({'code': 1, 'errmsg': "必须选择一个所属组!"})
+        if not util.check_name(data['username']):
+            return json.dumps({'code': 1, 'errmsg': "用户名必须为字母和数字!"})
         if data['password'] != data['repwd']:
             return json.dumps({'code': 1, 'errmsg': "两次输入的密码不一致!"})
         elif len(data['password']) < 6:
@@ -53,8 +68,8 @@ def createuser(auth_info,**kwargs):
         data['password'] = hashlib.md5(data['password']).hexdigest()
         app.config['cursor'].execute_insert_sql('user', data)
 
-        #if not git_passwd(username, data['password']):
-        #    return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
+        if not git_passwd(username, data['password']):
+            return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
         util.write_log(username, "create_user %s" % data['username'])
         return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
     except:
@@ -90,19 +105,19 @@ def userselfinfo(auth_info,**kwargs):
     username = auth_info['username']
     fields = ['id','username','name','email','mobile','role','is_lock','r_id']
     try:
+        user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
+        r_id = user['r_id'].split(',') if user['r_id'] else 0
+
         #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
-        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'])
+        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'], where={'id': r_id})
         own_pids = set([])
         for x in gids:
-            own_pids |= set(x['p_id'].split(','))
-        gids = dict([(str(x['id']), x['name']) for x in gids])
+                own_pids |= set(x['p_id'].split(','))
+        user['r_id'] = [x['name'] for x in gids]
 
-        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'])
-        pids = dict([(str(x['id']), dict([(k, x[k]) for k in ('name', 'name_cn', 'url')])) for x in pids])
+        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'], where={'id': list(own_pids) if own_pids else 0})
+        user['p_id'] = dict([(str(x['name']), dict([(k, x[k]) for k in ('name_cn', 'url')])) for x in pids])
 
-        user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
-        user['r_id'] = [gids[x] for x in user['r_id'].split(',') if x in gids]
-        user['p_id'] = dict([(pids[x]['name'], pids[x]) for x in own_pids if x in pids])
         util.write_log(username, 'get_user_info')
         return  json.dumps({'code': 0, 'user': user})
     except:
@@ -211,8 +226,8 @@ def passwd(auth_info):
             password = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
 
-        #if not git_passwd(username, data['password']):
-        #    return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
+        if not git_passwd(username, data['password']):
+            return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
         util.write_log(username,'update user password')
         return json.dumps({'code':0,'result':'update password success'  })
     except:

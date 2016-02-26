@@ -19,9 +19,10 @@ def role_create(auth_info, **kwargs):
         return json.dumps({'code':1,'errmsg':'you are not admin!'})
     try:
 	data = request.get_json()['params']
-	print data
         if not data.has_key('p_id'):
             return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
+        if not util.check_name(data['name']):
+            return json.dumps({'code': 1, 'errmsg': '组名必须为字母和数字!'})
         app.config['cursor'].execute_insert_sql('groups', data)
 	util.write_log(username, "create groups %s scucess" %  data['name'])
 	return json.dumps({'code':0,'result':'create groups %s successed' % data['name']})
@@ -92,6 +93,8 @@ def role_update(auth_info, **kwargs):
         data = request.get_json()['params']
 	where = data.get('where',None)
 	data = data.get('data',None)
+        if not util.check_name(data['name']):
+            return json.dumps({'code': 1, 'errmsg': '组名必须为字母和数字!'})
         result = app.config['cursor'].execute_update_sql('groups', data, where, ['name', 'name_cn', 'p_id', 'info'])
         if result == '':
             return json.dumps({'code':1, 'errmsg':'you need give an id!'})

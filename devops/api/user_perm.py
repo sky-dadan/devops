@@ -6,7 +6,6 @@ from . import app , jsonrpc
 import logging, util
 from auth import auth_login
 import json, traceback,hashlib
-import htpasswd
 
 #本模块提供用户信息的增删改查，以及 用户所在组，所有权限的查询
 
@@ -22,17 +21,17 @@ def getid_list(ids):
     print id_list
     return  id_list
 
-def git_passwd(user, password):
-    try:
-        with htpasswd.Basic(app.config['git_passwd_file']) as user_pwd:
-            if user in user_pwd:
-                user_pwd.change_password(user, password)
-            else:
-                user_pwd.add(user.password)
-        return True
-    except:
-        logging.getLogger().error("Set '%s' password error: %s" % (user, traceback.format_exc()))
-        return False
+#def git_passwd(user, password):
+#    try:
+#        with htpasswd.Basic(app.config['git_passwd_file']) as user_pwd:
+#            if user in user_pwd:
+#                user_pwd.change_password(user, password)
+#            else:
+#                user_pwd.add(user.password)
+#        return True
+#    except:
+#        logging.getLogger().error("Set '%s' password error: %s" % (user, traceback.format_exc()))
+#        return False
 
 #创建用户
 @jsonrpc.method('user.create')
@@ -54,8 +53,8 @@ def createuser(auth_info,**kwargs):
         data['password'] = hashlib.md5(data['password']).hexdigest()
         app.config['cursor'].execute_insert_sql('user', data)
 
-        if not git_passwd(username, data['password']):
-            return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
+        #if not git_passwd(username, data['password']):
+        #    return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
         util.write_log(username, "create_user %s" % data['username'])
         return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
     except:
@@ -212,8 +211,8 @@ def passwd(auth_info):
             password = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
 
-        if not git_passwd(username, data['password']):
-            return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
+        #if not git_passwd(username, data['password']):
+        #    return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
         util.write_log(username,'update user password')
         return json.dumps({'code':0,'result':'update password success'  })
     except:

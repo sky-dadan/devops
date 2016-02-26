@@ -41,7 +41,7 @@ def create(auth_info, **kwargs):
 	pro_field = ['name','path','principal','create_date','is_lock','comment']
 	try:
 		data = request.get_json()['params']
-		data['create_date'] = time.strftime('%Y-%m-%d %H:%M:%S')    #添加项目创建时间
+		data['create_date'] = time.strftime('%Y-%m-%d')    #添加项目创建时间
 		for key in data:
 			if key in pro_field:
 				p_data[key] = data[key]

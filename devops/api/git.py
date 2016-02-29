@@ -17,7 +17,7 @@ def getinfo(table_name,fields):
     result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
     return result
 
-#将用户id替换为username,组id替换为name
+#将用户id,组id替换为用户name和组name
 def id2name(pro_perm_result,fields,users,groups):
     for res in pro_perm_result:
         for key in fields:
@@ -98,11 +98,13 @@ def create(auth_info, **kwargs):
     if role != 0:
 	return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
-        pro_fields = ['id','name','path','principal','create_date','is_lock','comment']
+        pro_fields = ['id','name','path','principal','tag','create_date','is_lock','comment']
         pro_perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         data = request.get_json()
         data = data['params']
-        users = getinfo('user',['id','username'])
+        #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
+        users = getinfo('user',['id','name'])
+        #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
         groups = getinfo('groups',['id','name'])
         # 条件,项目ID 例如：{'id':1}
         where = kwargs.get('where',None)
@@ -135,7 +137,7 @@ def create(auth_info, **kwargs):
     if role != 0:
 	return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
-        pro_fields = ['id','name','path','principal','create_date','is_lock','comment']
+        pro_fields = ['id','name','path','principal','tag','create_date','is_lock','comment']
         pro_perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         data = request.get_json()
         data = data['params']

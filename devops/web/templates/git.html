@@ -302,7 +302,7 @@ $('#addBtn').on('click',function(){
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
 	if($('#add_principal').val() == null || $('#add_principal').val() ==""){
-			swal("OMG!", "你必须选择一个负责人", "error")
+			swal("OMG!", "你没有创建的权限，请联系管理员", "error")
 	}else{
 	   var str = $('#addForm').serialize()
        var data = {"method":'git',"formdata":str}

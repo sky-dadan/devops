@@ -400,12 +400,10 @@ function grouplist(){
 //获取列表  已选上的标记
 function selected(api,id){
 	var url = "/getapi?method=selected"+"&selected="+api+"&id="+id
-	alert(url)
 	var up_id = "#up_"+api
 	$.getJSON(url,function(data){
 		var str=''
 		data = JSON.parse(data.result)
-		alert(data)
         $.each(data.result,function(k,v){
             str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
             '</option>'

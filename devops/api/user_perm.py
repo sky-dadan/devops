@@ -311,24 +311,24 @@ def user_groups(auth_info, **kwargs):
         logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
         return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})
 #用户列表更新时，用户所属的组被选中
-@jsonrpc.method('groups_sel.get')
-@auth_login
-def get_color(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        where = kwargs.get('where',None)
-        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
-        r_id = getid_list([res['r_id']])
-
-        result = app.config['cursor'].get_results('groups', ['id', 'name'])
-        ids = set([str(x['id']) for x in result]) & set(r_id)
-        for x in result:
-            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
-        util.write_log(username, "groups_sel.get successful!")
-        return json.dumps({'code':0,'result':result})
-    except:
-        logging.getLogger().error('groups_sel.get error!')
-        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
-
+#@jsonrpc.method('groups_sel.get')
+#@auth_login
+#def get_color(auth_info, **kwargs):
+#    if auth_info['code'] == 1:
+#        return json.dumps(auth_info)
+#    username = auth_info['username']
+#    try:
+#        where = kwargs.get('where',None)
+#        res = app.config['cursor'].get_one_result('user', ['r_id'], where)
+#        r_id = getid_list([res['r_id']])
+#
+#        result = app.config['cursor'].get_results('groups', ['id', 'name'])
+#        ids = set([str(x['id']) for x in result]) & set(r_id)
+#        for x in result:
+#            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
+#        util.write_log(username, "groups_sel.get successful!")
+#        return json.dumps({'code':0,'result':result})
+#    except:
+#        logging.getLogger().error('groups_sel.get error!')
+#        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+#

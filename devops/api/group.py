@@ -124,25 +124,25 @@ def role_delete(auth_info,**kwargs):
         return json.dumps({'code':1,'errmsg':'error: %s'  % traceback.format_exc()})
 
 #组管理显示本来有的权限（给select多选加一个selected属性）
-@jsonrpc.method('power_sel.get')
-@auth_login
-def get_color(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    try:
-        where = kwargs.get('where',None)
-        res = app.config['cursor'].get_one_result('groups', ['p_id'], where)
-        p_id = getid_list([res['p_id']])
-
-        result = app.config['cursor'].get_results('power', ['id', 'name'])
-        ids = set([str(x['id']) for x in result]) & set(p_id)
-        for x in result:
-            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
-        util.write_log(username,"power_sel.get successful!")
-        return json.dumps({'code':0,'result':result})
-    except:
-        logging.getLogger().error('power_sel.get error! %s'  %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
-
+#@jsonrpc.method('power_sel.get')
+#@auth_login
+#def get_color(auth_info, **kwargs):
+#    if auth_info['code'] == 1:
+#        return json.dumps(auth_info)
+#    username = auth_info['username']
+#    try:
+#        where = kwargs.get('where',None)
+#        res = app.config['cursor'].get_one_result('groups', ['p_id'], where)
+#        p_id = getid_list([res['p_id']])
+#
+#        result = app.config['cursor'].get_results('power', ['id', 'name'])
+#        ids = set([str(x['id']) for x in result]) & set(p_id)
+#        for x in result:
+#            x['selected'] = 'selected="selected"' if str(x['id']) in ids else ''
+#        util.write_log(username,"power_sel.get successful!")
+#        return json.dumps({'code':0,'result':result})
+#    except:
+#        logging.getLogger().error('power_sel.get error! %s'  %  traceback.format_exc())
+#        return json.dumps({'code':1,'errmsg':'error: %s'  %  traceback.format_exc()})
+#
 

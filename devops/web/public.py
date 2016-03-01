@@ -79,11 +79,14 @@ def getapi():
     username = request.args.get('username',session['username']) #获取的是url传过来的username,如果没有取session
     uid = request.args.get('id')
     if uid is not None:
-        data['params'] = {"where":{'id':uid}}
+        data['params'] = {"where":{'id':uid},
+						  "selected":selected	
+						}
     else:
-        data['params'] = {"where":{'username':username}}
+        data['params'] = {"where":{'username':username},
+						  "selected":selected
+						}
     data['method'] = method+".get"
-    data['params'] = {"selected":selected}
     print data 
     r = requests.post(get_url(),headers=headers,json=data)
     print r.text

@@ -189,9 +189,6 @@ def selected(auth_info, **kwargs):
 	try:
 		where = kwargs.get('where',None)
 		sel = kwargs.get('selected',None)
-		print sel
-		print color_selected
-		print color_selected[sel]['c1']
 		res = app.config['cursor'].get_one_result(color_selected[sel]['t1'],color_selected[sel]['c1'],where)
 		tmp_list = getid_list([str(res[color_selected[sel]['c1'][0]])])
 		result = app.config['cursor'].get_results(color_selected[sel]['t2'],color_selected[sel]['c2'])

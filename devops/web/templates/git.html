@@ -49,9 +49,15 @@ position:static;
 			<label class='control-label'>负责人</label>
 			<div class='controls'>
 				<select name='principal' id='add_principal' class='user_list'>
-						<option value='test'>test</option>
 				</select>
 			</div>
+		<div class='form-group'>
+			<label class='control-label'>组标签</label>
+			<div class='controls'>
+				<select name='tag' id='add_tag' class='groups_list'>
+				</select>
+			</div>
+		</div>
 		</div><!--add principal -->
 		<div class='form-group'>
 			<label class='control-label'>状态</label>
@@ -95,7 +101,7 @@ position:static;
 		</div> <!--add group_rw_perm-->
 
 		<div class='from-group'>
-			<label class='control-label'>comment</label>
+			<label class='control-label'>描述</label>
 			<div class='controls'>
 				<textarea  rows='3' name='comment'></textarea>
 			</div>
@@ -144,6 +150,13 @@ position:static;
 				</select>
 			</div>
 		</div><!--update principal -->
+		<div class='form-group'>
+			<label class='control-label'>组标签</label>
+			<div class='controls'>
+				<select name='tag' id='up_id'  class='groups_list'>
+				</select>
+			</div>
+		</div>
 		<div class='form-group'>
 			<label class='control-label'>状态</label>
 			<div class='controls'>
@@ -317,6 +330,7 @@ $('tbody').on('click','.update-btn',function(){
 	selected('u_all_sel',id)
 	selected('u_rw_sel',id)
 	selected('principal_sel',id)
+	grouplist()
 	$.getJSON(url,function(data){
 //	  console.log(data)  
       data = JSON.parse(data['result'])

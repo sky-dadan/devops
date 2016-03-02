@@ -20,7 +20,9 @@ position:static;
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
       <h5>Git项目管理</h5>
+      {%if info and info.role ==0%}
       <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加项目</button>
+      {%endif%}
   </div> <!--end widget-title-->
 
 <!--add modal-->                                                                                 
@@ -228,7 +230,9 @@ position:static;
             <th scope="col">组RW+</th>
             <th scope="col">组RW</th>
             <th scope="col">状态</th>
+            {%if info and info.role ==0%}
             <th  scope="col">操作</th>
+            {%endif%}
         </tr>
     </thead> 
     <tbody>
@@ -273,9 +277,9 @@ function list(){
            '<td>'+v['group_all_perm']+'</td>'+ 
            '<td>'+v['group_rw_perm']+'</td>'+ 
            '<td>'+v['is_lock']+'</td>'+ 
-           '<td>'+
+           '<td>'+'{%if info and info.role ==0%}'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '</td>'+ 
+           '</td>'+ '{%endif%}'
            '</tr>'          
        })       
          $("tbody").html(str)

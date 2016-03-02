@@ -65,7 +65,7 @@ def get_git():
         return json.dumps({'code':'0','group':group,'project':p})
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':"error"})
+        return json.dumps({'code':1,'errmsg':"获取用户，组及项目报错"})
 
 @app.route('/api/gitolite',methods=['GET'])
 #@auth_login
@@ -84,31 +84,34 @@ def gitolite():
     if int(result['code']) ==0:
         group = result['group']
         project = result['project']
-        print project
 
-        #每次将原有配置文件删除
-	if os.path.exists("/tmp/test.conf"):
-	    os.system("rm -fr /tmp/test.conf") 
+        try:
+            #每次将原有配置文件删除
+            if os.path.exists("/root/gitconfig/gitolite-admin/conf/gitolite.conf"):
+                os.system("rm -fr  /root/gitconfig/gitolite-admin/conf/gitolite.conf") 
 
-        #将用户和组信息写入配置文件
-        str1 = ""
-        for k,v in group.items():
-            str1 += "@%s = %s \n" %(k,' '.join(v))
-	with open("/tmp/test.conf",'a') as f:
-	    f.write(str1)
+            #将用户和组信息写入配置文件
+            str1 = ""
+            for k,v in group.items():
+                str1 += "@%s = %s \n" %(k,' '.join(v))
+            with open("/root/gitconfig/gitolite-admin/conf/gitolite.conf",'a') as f:
+                f.write(str1)
 
-        #将项目信息写入配置文件
-	str2 = ""
-	for k,v in project.items():
-	 	str2 += "repo %s \n    RW+ = @%s %s \n    RW = @%s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
-	with open("/tmp/test.conf",'a') as f:
-	    f.write(str2)
+            #将项目信息写入配置文件
+            str2 = ""
+            for k,v in project.items():
+                    str2 += "repo %s \n    RW+ = @%s %s \n    RW = @%s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
+            with open("/root/gitconfig/gitolite-admin/conf/gitolite.conf",'a') as f:
+                f.write(str2)
 
-	#git add/commit/push生效
-        #os.system("cd ** && git add && git commit -m 'update git conf' && git push")
-	return "ok"
+            #git add/commit/push生效
+            #os.system("cd ** && git add && git commit -m 'update git conf' && git push origin master")
+            return json.dumps({'code':0,'errmsg':"git操作成功"})
+        except:
+            logging.getLogger().error("get config error: %s" % traceback.format_exc())
+            return json.dumps({'code':1,'errmsg':"写配置文件报错"})
     else:
-        return "no"
+        return json.dumps({'code':1,'errmsg':"获取用户，组或者仓库出错"})
 
 
 

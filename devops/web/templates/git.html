@@ -227,6 +227,7 @@ position:static;
             <th scope="col">用户RW</th>
             <th scope="col">组RW+</th>
             <th scope="col">组RW</th>
+            <th scope="col">状态</th>
             <th  scope="col">操作</th>
         </tr>
     </thead> 
@@ -253,15 +254,25 @@ function list(){
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-//           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
-           str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['name']+'</td>'+  
+//           console.log(v)   //Object {id: 1, name: "www.100xhs.com", path:"/www.100xhs.com",...} 
+           if (v['is_lock'] == 0){
+               v['is_lock'] ="正常"
+               str +='<tr class="odd gradeX">'
+           }
+           else{
+               v['is_lock'] ="锁定"
+               str +='<tr style="color: red" class="odd gradeX">'
+           }
+           
+   //        str +='<tr class="odd gradeX">'+ 
+        str +='<td>'+v['name']+'</td>'+  
            '<td>'+v['path']+'</td>'+  
            '<td>'+v['principal']+'</td>'+  
            '<td>'+v['user_all_perm']+'</td>'+ 
            '<td>'+v['user_rw_perm']+'</td>'+ 
            '<td>'+v['group_all_perm']+'</td>'+ 
            '<td>'+v['group_rw_perm']+'</td>'+ 
+           '<td>'+v['is_lock']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
            '</td>'+ 

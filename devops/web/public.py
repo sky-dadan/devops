@@ -78,14 +78,8 @@ def getapi():
     selected = request.args.get('selected',None)						#为后面的selected接口的统一，增加一个参数
     username = request.args.get('username',session['username']) #获取的是url传过来的username,如果没有取session
     uid = request.args.get('id')
-    if uid is not None:
-        data['params'] = {"where":{'id':uid},
-						  "selected":selected	
-						}
-    else:
-        data['params'] = {"where":{'username':username},
-						  "selected":selected
-						}
+    data['params']['selected'] = selected
+    data['params']['where'] = {'id':uid} if uid is not None else {'username':username}
     data['method'] = method+".get"
     print data 
     r = requests.post(get_url(),headers=headers,json=data)

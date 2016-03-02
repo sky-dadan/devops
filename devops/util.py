@@ -97,3 +97,59 @@ def run_script(cmd):
     except:
         logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
         return None
+
+
+def get_git():
+    try:  
+        #获取所有用户信息
+        users=app.config['cursor'].get_results('user',['username','r_id'])
+        users=dict((x['username'],x['r_id'].split(',')) for x in users)
+        #print users   #{u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
+
+        #获取所有组信息
+        groups=app.config['cursor'].get_results('groups',['id','name'])
+        groups=dict((str(x['id']),x['name']) for x in groups)
+        #print groups  #{'1': u'sa', '2': u'admin', '3': u'ask', '4': u'PHP']}
+
+        #获取每个组的成员——git配置文件分组数据渲染
+        group = {}
+        for g_name in groups.values():
+            group[g_name]=[]  
+        #print group     #{u'admin': [], u'iOS': [], u'sa': [], u'ask': [], u'PHP':[]}
+        for u_name,r_id in users.items():
+            for g_id,g_name in groups.items():
+                if g_id in r_id:
+                     group[g_name].append(u_name)
+        #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']}
+
+        #获取项目列表
+        projects = app.config['cursor'].get_results('project',['id','name'])
+        projects = dict((str(x['id']),x['name']) for x in projects)
+	
+        #获取每个项目的权限列表,取出来的是id
+	result  = [] 
+        perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
+        for id in projects.keys():
+            p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
+            result.append(p_perm)
+
+	#将权限对应的用户，组id换成适配为name
+        user_git=app.config['cursor'].get_results('user',['id','username'])
+        user_git=dict((str(x['id']),x['username']) for x in user_git)
+	
+	#将每个项目的权限id列表匹配为对应的username  gname,projectname
+        p = {}
+	for project in result:
+ 		name=projects[str(project['id'])]  #通过id匹配对应的project name
+                p[name]={}
+		p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git.keys()] #将用户或组id匹配为name 
+		p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git.keys()] 
+		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups.keys()]  
+	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups.keys()]
+	#print p	
+                
+        return json.dumps({'code':'0','group':group,'project':p})
+    except:
+        logging.getLogger().error("get config error: %s" % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':"获取用户，组及项目报错"})
+

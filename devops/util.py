@@ -142,13 +142,13 @@ def get_git():
 	for project in result:
  		name=projects[str(project['id'])]  #通过id匹配对应的project name
                 p[name]={}
-		p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git.keys()] #将用户或组id匹配为name 
-		p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git.keys()] 
-		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups.keys()]  
-	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups.keys()]
-	#print p	
+		p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git] 
+		p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git] 
+		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
+	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
+	print p	
                 
-        return json.dumps({'code':'0','group':group,'project':p})
+        return {'code':'0','group':group,'project':p}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"获取用户，组及项目报错"})

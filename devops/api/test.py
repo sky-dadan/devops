@@ -19,7 +19,6 @@ def gitolite():
         return json.dumps('code':1,'errmsg':'必须管理员才能执行')
     '''
     result = util.get_git() 
-    result = json.loads(result)
     if int(result['code']) ==0:
         group  = result['group']
         project = result['project']
@@ -28,7 +27,7 @@ def gitolite():
 		project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
 		project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
 		project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
-        print project
+        print group
 
 
         try:

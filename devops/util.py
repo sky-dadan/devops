@@ -8,6 +8,7 @@ import hashlib
 import logging
 import logging.handlers
 import ConfigParser
+import subprocess
 from api import app
 
 def get_config(config_filename, section=''):
@@ -80,3 +81,19 @@ def check_name(name):
         return name.isalnum() and len(name) > 2
     else:
         return False
+
+def run_script(cmd):
+    if isinstance(cmd, str) or isinstance(cmd, unicode):
+        cmd = cmd.trim().split()
+    elif not isinstance(cmd, list):
+        logging.getLogger().warning("执行命令格式不正确。命令为: %s" % str(cmd))
+        return None
+
+    try:
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        out = process.read().strip()
+        logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
+        return out
+    except:
+        logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
+        return None

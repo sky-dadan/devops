@@ -53,6 +53,8 @@ def createuser(auth_info,**kwargs):
     if auth_info['code'] == 1:
         return  json.dump(auth_info)
     username = auth_info['username']
+    if role !=0:
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
         if 'r_id' not in data:
@@ -89,12 +91,12 @@ def userinfo(auth_info,**kwargs):
         where = kwargs.get('where',None)     #前端传来的where条件，可能是uid或者username
         result = app.config['cursor'].get_one_result('user', fields, where)
         if result is '':
-            return json.dumps({'code':1, 'errmsg':'must need give a  where field'})
+            return json.dumps({'code':1, 'errmsg':'必须选择一个用户'})
         util.write_log(username, 'get_one_user info') 
         return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'Get  users error'})
+        return json.dumps({'code':1,'errmsg':'获取用户信息失败'})
 
 #获取用户信息
 @jsonrpc.method('user.getinfo')
@@ -122,7 +124,7 @@ def userselfinfo(auth_info,**kwargs):
         return  json.dumps({'code': 0, 'user': user})
     except:
         logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'Get users error'})
+        return json.dumps({'code':1,'errmsg':'获取用户信息失败'})
 
 #获取用户列表
 @jsonrpc.method('user.getlist')
@@ -135,7 +137,7 @@ def userlist(auth_info,**kwargs):
     users = []
     fields = ['id','username','name','email','mobile','role','is_lock','r_id']
     if role !=0:
-        return json.dumps({'code': 1,'errmsg':'you not admin ,Cannot look userlist' })
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
         gids = app.config['cursor'].get_results('groups', ['id', 'name'])
@@ -148,7 +150,7 @@ def userlist(auth_info,**kwargs):
         return  json.dumps({'code': 0, 'users': users,'count':len(users)})
     except:
         logging.getLogger().error("Get users list error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'Get users error'})
+        return json.dumps({'code':1,'errmsg':'获取用户列表失败'})
 
 
 #更新用户信息
@@ -159,7 +161,7 @@ def userupdate(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'只有管理员才可操作!'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try:
         data = request.get_json()['params']
         where = data.get('where',None)
@@ -186,17 +188,17 @@ def userdelete(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'you are not admin!'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try: 
         data = request.get_json()['params']
         result = app.config['cursor'].execute_delete_sql('user', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'you need give an id!'})
         util.write_log(username, 'delete user successed')
-        return json.dumps({'code':0,'result':'delete user successed'})
+        return json.dumps({'code':0,'result':'删除用户成功'})
     except:
         logging.getLogger().error('delete groups error: %s' %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'error: %s'  % traceback.format_exc()})
+        return json.dumps({'code':1,'errmsg':'删除用户失败'})
 
 
 #修改密码
@@ -229,7 +231,7 @@ def passwd(auth_info):
         if not git_passwd(username, data['password']):
             return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
         util.write_log(username,'update user password')
-        return json.dumps({'code':0,'result':'update password success'  })
+        return json.dumps({'code':0,'result':'更新密码成功'})
     except:
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'更新密码有异常'})
@@ -244,24 +246,24 @@ def login():
             passwd = request.args.get('passwd', None)
             passwd = hashlib.md5(passwd).hexdigest()
             if not (username and passwd):
-                return json.dumps({'code': 1, 'errmsg': "Please input username or password."})
+                return json.dumps({'code': 1, 'errmsg': "需要输入用户名和密码"})
 
             result = app.config['cursor'].get_one_result('user', ['id', 'username', 'password', 'role', 'is_lock'], {'username': username})
             if not result:
-                return json.dumps({'code': 1, 'errmsg': "No such user."})
+                return json.dumps({'code': 1, 'errmsg': "用户不存在"})
             if result['is_lock'] == 1:
-                return json.dumps({'code': 1, 'errmsg': "User '%s' is locked." % username})
+                return json.dumps({'code': 1, 'errmsg': "用户已被锁定"})
 
             if passwd == result['password']:
                 s = util.get_validate(result['username'], result['id'], result['role'], app.config['passport_key'])
                 return json.dumps({'code': 0, 'authorization': s})
             else:
-                return json.dumps({'code': 1, 'errmsg': "Password is wrong."})
+                return json.dumps({'code': 1, 'errmsg': "输入密码有误"})
         except:
             logging.getLogger().error("user login error: %s" % traceback.format_exc())
-            return json.dumps({'code': 1, 'errmsg': "login exception"})
+            return json.dumps({'code': 1, 'errmsg': "登录失败"})
     else:
-        return json.dumps({'code': 1, 'errmsg': "HTTP Method '%s' doesn't support" % request.method})
+        return json.dumps({'code': 1, 'errmsg': "不支持该请求" % request.method})
 
 
 
@@ -288,7 +290,7 @@ def getlist(auth_info,**kwargs):
         return json.dumps({'resu lt':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
-        return json.dumps({'cod e':1,'errmsg':'getlist error : %s'  % traceback.format_exc()})
+        return json.dumps({'cod e':1,'errmsg':'获取权限列表失败'})
 
 #用户登录成功后通过用户username获取自己的组信息，个人中心调用
 @jsonrpc.method('user_groups.getlist')
@@ -309,7 +311,7 @@ def user_groups(auth_info, **kwargs):
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("get list groups error: %s"  % traceback.format_exc())
-        return json.dumps({'code':1, 'errmsg':'get groups error %s'   %  traceback.format_exc()})
+        return json.dumps({'code':1, 'errmsg':'获取组列表失败'})
 #用户列表更新时，用户所属的组被选中
 #@jsonrpc.method('groups_sel.get')
 #@auth_login

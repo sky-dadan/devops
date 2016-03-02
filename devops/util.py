@@ -84,7 +84,7 @@ def check_name(name):
 
 def run_script(cmd):
     if isinstance(cmd, str) or isinstance(cmd, unicode):
-        cmd = cmd.trim().split()
+        cmd = cmd.strip().split()
     elif not isinstance(cmd, list):
         logging.getLogger().warning("执行命令格式不正确。命令为: %s" % str(cmd))
         return None

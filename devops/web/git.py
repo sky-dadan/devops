@@ -11,9 +11,6 @@ data = {
         "id":1,
 }
 
-def get_url():
-    return "http://%s/api" % app.config['api_host']
-
 @app.route('/git/list')
 def git():
     if session.get('username')  == None:
@@ -25,15 +22,3 @@ def git():
         return render_template('git.html',info=session)
     else:
         return render_template('git.html',errmsg=validate_result['errmsg'])
-
-@app.route('/git/listapi')
-def gitlistapi():
-    headers['authorization'] = session['author']
-    method = request.args.get('method')
-    data['method'] = method + ".getlist"
-    data['params'] = {}
-    r = requests.post(get_url(),headers=headers,json=data)
-    print r.text
-    return r.text 
-
-

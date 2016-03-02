@@ -35,9 +35,9 @@ def getinfo(table_name,fields):
 def id2name(pro_perm_result,fields,users,groups):
     for res in pro_perm_result:
         for key in fields:
-            if not key.find('user'):
+            if  key.startswith('user'):
                 res[key] = ','.join([users[x] for x in res[key].split(',') if x in users]) if res[key] else ''
-            elif not key.find('group'):
+            elif key.startswith('group'):
                 res[key] = ','.join([groups[x] for x in res[key].split(',') if x in groups]) if res[key] else ''
             else:
                 continue
@@ -168,11 +168,11 @@ def create(auth_info, **kwargs):
         pro_perm_result = app.config['cursor'].get_results('project_perm',pro_perm_fields)
         # 将权限表里的用户id,组id，替换成用户名，组名
         id2name(pro_perm_result,pro_perm_fields,users,groups)
+        #将pro_perm_result的结果改成{1,{'id':1,'user_all_perm':'tom,jerry',...},2:{'id':2,'user_all_perm':'jack,rose',...}}
+        pro_perm_result = dict([(x['id'], x) for x in pro_perm_result])
         #将权限信息追加到result字典里
         for project in result:
-            for pro_perm in pro_perm_result:
-                if project['id'] == pro_perm['id']:
-                    project.update(pro_perm)
+            project.update(pro_perm_result[project['id']])
         util.write_log(username, 'select project list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:

@@ -246,7 +246,7 @@ position:static;
 var name='git'
 /* list all data */
 function list(){
-    var url = "/git/listapi?method="+name
+    var url = "/listapi?method="+name
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 

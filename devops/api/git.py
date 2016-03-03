@@ -13,10 +13,10 @@ from user_perm import getid_list
 
 
 #获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
-def getinfo(table_name,fields):
-    result = app.config['cursor'].get_results(table_name,fields)
-    result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
-    return result
+#def getinfo(table_name,fields):
+#    result = app.config['cursor'].get_results(table_name,fields)
+#    result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
+#    return result
 
 #将用户id,组id替换为用户name和组name
 def id2name(pro_perm_result,fields,users,groups):
@@ -104,9 +104,9 @@ def create(auth_info, **kwargs):
         data = request.get_json()
         data = data['params']
         #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
-        users = getinfo('user',['id','name'])
+        users = util.getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
-        groups = getinfo('groups',['id','name'])
+        groups = util.getinfo('groups',['id','name'])
         # 条件,项目ID 例如：{'id':1}
         where = kwargs.get('where',None)
         #得到项目id为where条件的结果
@@ -142,9 +142,9 @@ def create(auth_info, **kwargs):
         data = request.get_json()
         data = data['params']
         #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
-        users = getinfo('user',['id','name'])
+        users = util.getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
-        groups = getinfo('groups',['id','name']) 
+        groups = util.getinfo('groups',['id','name']) 
         #查出项目列表
         result = app.config['cursor'].get_results('project', pro_fields)
         #将负责人id替换成name

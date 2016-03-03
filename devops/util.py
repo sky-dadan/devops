@@ -5,6 +5,7 @@ import os, os.path
 import time,json
 import base64
 import hashlib
+import traceback
 import logging
 import logging.handlers
 import ConfigParser
@@ -98,30 +99,38 @@ def run_script(cmd):
         logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
         return None
 
+def getinfo(table_name,fields):
+    '''
+    获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
+    {u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
+    fields 格式为['id','name']  ['username','r_id']
+    '''
+    result = app.config['cursor'].get_results(table_name,fields)
+    if fields[1] in ['r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm']:  #为了区分fields 里面的第二个字段的处理
+        result = dict((x[fields[0]],x[fields[1]].split(',')) for x in result)
+    else:
+        result = dict((str(x[fields[0]]), x[fields[1]]) for x in result)
+    return result
+
+#获取一个组里面所有的用户列表
+def group_users(users,groups):
+    group = {}
+    for g_name in groups.values():
+        group[g_name] = []
+    for u_name, r_id in users.items():
+        for g_id, g_name in groups.items():
+            if g_id in r_id:
+                group[g_name].append(u_name)
+    return group
+    #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']} 
+    
+
 
 def get_git():
     try:  
-        #获取所有用户信息
-        users=app.config['cursor'].get_results('user',['username','r_id'])
-        users=dict((x['username'],x['r_id'].split(',')) for x in users)
-        #print users   #{u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
-
-        #获取所有组信息
-        groups=app.config['cursor'].get_results('groups',['id','name'])
-        groups=dict((str(x['id']),x['name']) for x in groups)
-        #print groups  #{'1': u'sa', '2': u'admin', '3': u'ask', '4': u'PHP']}
-
-        #获取每个组的成员——git配置文件分组数据渲染
-        group = {}
-        for g_name in groups.values():
-            group[g_name]=[]  
-        #print group     #{u'admin': [], u'iOS': [], u'sa': [], u'ask': [], u'PHP':[]}
-        for u_name,r_id in users.items():
-            for g_id,g_name in groups.items():
-                if g_id in r_id:
-                     group[g_name].append(u_name)
-        #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']}
-
+        users = getinfo('user',['username','r_id'])
+        groups = getinfo('groups',['id','name'])
+        group = group_users(users,groups) 
         #获取项目列表
         projects = app.config['cursor'].get_results('project',['id','name'])
         projects = dict((str(x['id']),x['name']) for x in projects)
@@ -151,5 +160,5 @@ def get_git():
         return {'code':'0','group':group,'project':p}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':"获取用户，组及项目报错"})
+        return {'code':1,'errmsg':"获取用户，组及项目报错"}
 

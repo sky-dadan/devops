@@ -7,6 +7,7 @@ import logging, util
 import json, traceback
 from auth import auth_login
 from jsondate import MyEncoder
+from user_perm import getid_list
 
 #下拉菜单，已经选上的项目  已选下拉菜单统一接口selected.get  
 '''

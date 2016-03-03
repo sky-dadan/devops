@@ -148,8 +148,7 @@ def create(auth_info, **kwargs):
 	return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
-    if role != 0:
-	return json.dumps({'code':1,'errmsg':'you are not admin'})
+    uid = int(auth_info['uid'])
     try:
         pro_fields = ['id','name','path','principal','tag','create_date','is_lock','comment']
         pro_perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
@@ -173,8 +172,34 @@ def create(auth_info, **kwargs):
         #将权限信息追加到result字典里
         for project in result:
             project.update(pro_perm_result[project['id']])
-        util.write_log(username, 'select project list sucess') 
-        return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
+        #管理员反回所有的结果
+        if role == 0:
+            util.write_log(username, 'select project list sucess')  
+            return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
+        #普通用户返回他所拥有权限的项目
+        else:
+            perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
+            project_list = []
+            git_result = util.get_git() 
+            if int(git_result['code']) ==0:
+                project = git_result['project']
+            for key in project.keys():
+                #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
+                perm_users = []
+                for field in perm_fields:
+                    perm_users.extend(project[key][field])
+                perm_users = list(set(perm_users))
+                #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
+                if username in perm_users:
+                    project_list.append(key)
+            #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
+            res = []
+            for pro in result:
+                if pro['name'] in project_list:
+                    res.append(pro)
+            #最后返回过虑后的结果res
+            util.write_log(username, 'select project list sucess')  
+            return json.dumps({'code':0,'result':res,'count':len(res)},cls=MyEncoder)
     except:
         logging.getLogger().error("select project list error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': 'select project list error'})

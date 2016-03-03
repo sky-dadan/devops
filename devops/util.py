@@ -147,7 +147,7 @@ def get_git():
         #user_git=dict((str(x['id']),x['username']) for x in user_git)
 	    user_git = getinfo('user',['id','username'])
 	#将每个项目的权限id列表匹配为对应的username  gname,projectname
-        p = {}
+        p,p_users = {},{}
         for project in result:
  		name=projects[str(project['id'])]  #通过id匹配对应的project name
                 p[name]={}
@@ -156,9 +156,20 @@ def get_git():
 		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
 	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
         print p	
-        p_user = {}
-                
-        return {'code':'0','group':group,'project':p}
+        '''
+           p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
+        '''
+        print '##############################################################################'
+        for key,values in p.items():
+            p_users[key] = []
+            for k,v in values.items():
+                for i in v:
+                    if i in group:
+                        p_users[key] += group[i]       
+                    else: 
+                        p_users[key].append(i)
+        print p_users
+        return {'code':'0','group':group,'project':p,'p_all_users':p_users}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return {'code':1,'errmsg':"获取用户，组及项目报错"}

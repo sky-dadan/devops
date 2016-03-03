@@ -7,7 +7,7 @@ import logging, util
 import json, traceback
 from auth import auth_login
 import time
-import mail
+from mail import sendmail
 from jsondate import MyEncoder
 from user_perm import getid_list
 
@@ -46,6 +46,15 @@ def create(auth_info, **kwargs):
 		p_id = app.config['cursor'].get_one_result('project',['id'],{'name':p_data['name']})   #获取当前创建项目的id
 		p_perm_data['id'] = p_id['id']					#创建project_perm准备的数据
 		app.config['cursor'].execute_insert_sql('project_perm',p_perm_data)
+		project = util.get_git()    #获取当前项目的所有人  为下面发邮件准备数据
+		project = project['p_all_users'][p_data['name']]
+		project_name = list(set(project))                       #去掉重复的用户名 
+
+		'''sendemail'''
+		smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
+		send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
+		sendmail(send_info,send_info,smtp_to)
+
 		util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
 		return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})	
 	except:

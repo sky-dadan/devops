@@ -127,7 +127,7 @@ def get_git():
         projects = dict((str(x['id']),x['name']) for x in projects)
 	
         #获取每个项目的权限列表,取出来的是id
-	result  = [] 
+        result  = [] 
         perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         for id in projects.keys():
             p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
@@ -139,14 +139,14 @@ def get_git():
 	
 	#将每个项目的权限id列表匹配为对应的username  gname,projectname
         p = {}
-	for project in result:
+        for project in result:
  		name=projects[str(project['id'])]  #通过id匹配对应的project name
                 p[name]={}
 		p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git] 
 		p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git] 
 		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
 	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
-	print p	
+        print p	
                 
         return {'code':'0','group':group,'project':p}
     except:

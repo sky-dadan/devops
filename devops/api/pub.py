@@ -20,6 +20,7 @@ color_selected= {'u_all_sel':{'t1':'project_perm','c1':['user_all_perm'],'t2':'u
                  'principal_sel':{'t1':'project','c1':['principal'],'t2':'user','c2':['id','name']},
                  'power_sel':{'t1':'groups','c1':['p_id'],'t2':'power','c2':['id','name']},
                  'groups_sel':{'t1':'user','c1':['r_id'],'t2':'groups','c2':['id','name']}
+                }
 
 
 @jsonrpc.method('selected.get')

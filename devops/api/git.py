@@ -7,16 +7,10 @@ import logging, util
 import json, traceback
 from auth import auth_login
 import time
+import mail
 from jsondate import MyEncoder
 from user_perm import getid_list
 
-
-
-#获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
-#def getinfo(table_name,fields):
-#    result = app.config['cursor'].get_results(table_name,fields)
-#    result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
-#    return result
 
 #将用户id,组id替换为用户name和组name
 def id2name(pro_perm_result,fields,users,groups):
@@ -47,7 +41,7 @@ def create(auth_info, **kwargs):
 			if key in pro_field:
 				p_data[key] = data[key]
 			else:
-				p_perm_data[key] = data[key]
+				p_perm_data[key] = data[key]              #{'user_all_perm':'1,2,3','user_rw_perm':'1','group_all_perm':'4,5','group_rw_perm':'2'}
 		app.config['cursor'].execute_insert_sql('project',p_data)
 		p_id = app.config['cursor'].get_one_result('project',['id'],{'name':p_data['name']})   #获取当前创建项目的id
 		p_perm_data['id'] = p_id['id']					#创建project_perm准备的数据

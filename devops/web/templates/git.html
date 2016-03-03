@@ -229,8 +229,8 @@ position:static;
             <th scope="col">用户RW</th>
             <th scope="col">组RW+</th>
             <th scope="col">组RW</th>
-            <th scope="col">状态</th>
             {%if info and info.role ==0%}
+            <th scope="col">状态</th>
             <th  scope="col">操作</th>
             {%endif%}
         </tr>
@@ -275,9 +275,9 @@ function list(){
            '<td>'+v['user_all_perm']+'</td>'+ 
            '<td>'+v['user_rw_perm']+'</td>'+ 
            '<td>'+v['group_all_perm']+'</td>'+ 
-           '<td>'+v['group_rw_perm']+'</td>'+ 
+           '<td>'+v['group_rw_perm']+'</td>'+'{%if info and info.role ==0%}'+ 
            '<td>'+v['is_lock']+'</td>'+ 
-           '<td>'+'{%if info and info.role ==0%}'+
+           '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
            '</td>'+ '{%endif%}'
            '</tr>'          

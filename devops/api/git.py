@@ -7,16 +7,10 @@ import logging, util
 import json, traceback
 from auth import auth_login
 import time
+from mail import sendmail
 from jsondate import MyEncoder
 from user_perm import getid_list
 
-
-
-#获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
-def getinfo(table_name,fields):
-    result = app.config['cursor'].get_results(table_name,fields)
-    result = dict([(str(x[fields[0]]), x[fields[1]]) for x in result])
-    return result
 
 #将用户id,组id替换为用户name和组name
 def id2name(pro_perm_result,fields,users,groups):
@@ -47,11 +41,20 @@ def create(auth_info, **kwargs):
 			if key in pro_field:
 				p_data[key] = data[key]
 			else:
-				p_perm_data[key] = data[key]
+				p_perm_data[key] = data[key]              #{'user_all_perm':'1,2,3','user_rw_perm':'1','group_all_perm':'4,5','group_rw_perm':'2'}
 		app.config['cursor'].execute_insert_sql('project',p_data)
 		p_id = app.config['cursor'].get_one_result('project',['id'],{'name':p_data['name']})   #获取当前创建项目的id
 		p_perm_data['id'] = p_id['id']					#创建project_perm准备的数据
 		app.config['cursor'].execute_insert_sql('project_perm',p_perm_data)
+		project = util.get_git()    #获取当前项目的所有人  为下面发邮件准备数据
+		project = project['p_all_users'][p_data['name']]
+		project_name = list(set(project))                       #去掉重复的用户名 
+
+		'''sendemail'''
+		smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
+		send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
+		sendmail(send_info,send_info,smtp_to)
+
 		util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
 		return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})	
 	except:
@@ -104,9 +107,9 @@ def create(auth_info, **kwargs):
         data = request.get_json()
         data = data['params']
         #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
-        users = getinfo('user',['id','name'])
+        users = util.getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
-        groups = getinfo('groups',['id','name'])
+        groups = util.getinfo('groups',['id','name'])
         # 条件,项目ID 例如：{'id':1}
         where = kwargs.get('where',None)
         #得到项目id为where条件的结果
@@ -142,9 +145,9 @@ def create(auth_info, **kwargs):
         data = request.get_json()
         data = data['params']
         #user表里查出id,name,将查出来的数据改成例如{'1':'tom','2':'jerry'}重新赋值
-        users = getinfo('user',['id','name'])
+        users = util.getinfo('user',['id','name'])
         #groups表里查出id,name,将查出来的数据改成例如{'1':'sa','2':'ask'}
-        groups = getinfo('groups',['id','name']) 
+        groups = util.getinfo('groups',['id','name']) 
         #查出项目列表
         result = app.config['cursor'].get_results('project', pro_fields)
         #将负责人id替换成name

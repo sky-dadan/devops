@@ -153,3 +153,13 @@ def get_git():
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"获取用户，组及项目报错"})
 
+
+#获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
+def get_userlist(projects,key):
+    perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
+    perm_users = []
+    for field in perm_fields:
+        perm_users.extend(projects[key][field])
+    perm_users = list(set(perm_users))
+    return perm_users
+

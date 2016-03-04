@@ -10,6 +10,9 @@ import logging
 import logging.handlers
 import ConfigParser
 import subprocess
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 from api import app
 
 def get_config(config_filename, section=''):
@@ -52,6 +55,36 @@ def set_logging(log_path, log_level='error'):
 
 def write_log(user, msg):
     logging.getLogger('record').debug('%s %s %s' % (int(time.time()), user, msg))
+
+def sendmail(config, rcpt, subject, content):
+    smtp_host = config.get("smtp_host", "smtp.mxhichina.com")
+    smtp_port = config.get("smtp_port", 25)
+    smtp_user = config.get("smtp_user", "sa-notice@yuanxin-inc.com")
+    smtp_pass = config.get("smtp_pass", None)
+
+    if isinstance(rcpt, str) or isinstance(rcpt, unicode):
+        rcpt = rcpt.split(',')
+    elif not isinstance(rcpt, list):
+        logging.getLogger().warning("SendMail: rcpt_to format invalid")
+        return False
+
+    try:
+        smtp = smtplib.SMTP()
+        smtp.connect(smtp_host, smtp_port)
+        if smtp is not None:
+            smtp.login(smtp_user, smtp_pass)
+
+        msg = MIMEText(content,_subtype='plain',_charset='utf-8')
+        msg['From'] = smtp_user
+        msg['To'] = ','.join(rcpt)
+        msg['Subject'] = Header(subject, 'utf-8')
+
+        smtp.sendmail(smtp_user, rcpt, msg.as_string())
+        smtp.quit()
+        return True
+    except:
+        logging.getLogger().error("SendMail fail: %s" % traceback.format_exc())
+        return False
 
 def get_validate(username, uid, role, fix_pwd):
     t = int(time.time())
@@ -176,11 +209,15 @@ def get_git():
 
 
 #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
-def get_userlist(projects,key):
+def get_userlist(projects,groups,key):
     perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
     perm_users = []
     for field in perm_fields:
-        perm_users.extend(projects[key][field])
+        if field.startswith('user'):
+            perm_users.extend(projects[key][field])
+        else:
+            for group in projects[key][field]:
+                perm_users.extend(groups[group])
     perm_users = list(set(perm_users))
     return perm_users
 

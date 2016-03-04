@@ -2,7 +2,7 @@
 #coding: utf-8
 from flask import Flask, request
 from . import app
-import logging, util,mail
+import logging, util
 import json, traceback,os,subprocess
 from auth import auth_login
 
@@ -21,30 +21,30 @@ def gitolite():
     if int(result['code']) ==0:
         group  = result['group'] 
         project = result['project']
-        for p in  project.keys():
-		project[p]['user_ rw_perm'] = ' '.join(project[p]['user_rw_perm'])
-		project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
-		project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
-		project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
+        for p in project:
+            project[p]['user_ rw_perm'] = ' '.join(project[p]['user_rw_perm'])
+            project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
+            project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
+            project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
 #        print group
 
 
         try:
             #每次将原有配置文件删除
             if os.path.exists(git_confile):
-                 os.system("rm -fr  %s" % git_confile) 
+                os.unlink(git_confile)
 
             #将用户和组信息写入配置文件
             str1 = ""
             for k,v in group.items():
-                 str1 += "@%s = %s \n" %(k,' '.join(v))
+                str1 += "@%s = %s \n" %(k,' '.join(v))
             with open(git_confile,'a') as f:
                 f.write(str1)
 
             #将项目信息写入配置文件
             str2 = ""
             for k,v in project.items():
-                 str2  += "repo %s \n    RW+ = %s %s \n    RW = %s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
+                str2  += "repo %s \n    RW+ = %s %s \n    RW = %s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
             with open(git_confile,'a') as f:
                 f.write(str2)
 

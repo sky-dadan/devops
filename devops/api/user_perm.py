@@ -53,6 +53,7 @@ def createuser(auth_info,**kwargs):
     if auth_info['code'] == 1:
         return  json.dump(auth_info)
     username = auth_info['username']
+    role = int(auth_info['role'])
     if role !=0:
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
@@ -73,7 +74,7 @@ def createuser(auth_info,**kwargs):
         if not git_passwd(username, data['password']):
             return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
         util.write_log(username, "create_user %s" % data['username'])
-        return json.dumps({'code': 0, 'result': 'Create %s success' % data['username']})
+        return json.dumps({'code': 0, 'result': '创建用户%s成功' % data['username']})
     except:
         logging.getLogger().error("Create user error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '创建用户失败，有异常情况'})
@@ -172,12 +173,12 @@ def userupdate(auth_info, **kwargs):
         else:
             result =  app.config['cursor'].execute_update_sql('user', data, where,['name','username','email','mobile'])
         if result == '':
-            return json.dumps({'code':1, 'errmsg':'you need give an id!'})
+            return json.dumps({'code':1, 'errmsg':'需要指定一个用户'})
         util.write_log(username, 'update groups %s success!' % data['name'])
-        return json.dumps({'code':0,'result':'update  %s successed' % data['name']})
+        return json.dumps({'code':0,'result':'更新用户%s成功' % data['name']})
     except:
         logging.getLogger().error("update error: %s"  % traceback.format_exc())
-        return json.dumps({'code':1, 'errmsg':"error : %s" % traceback.format_exc()})
+        return json.dumps({'code':1, 'errmsg':"更新用户失败"})
 
 
 #删除用户
@@ -193,7 +194,7 @@ def userdelete(auth_info, **kwargs):
         data = request.get_json()['params']
         result = app.config['cursor'].execute_delete_sql('user', data)
         if result == '':
-            return json.dumps({'code':1,'errmsg':'you need give an id!'})
+            return json.dumps({'code':1,'errmsg':'需要指定一个用户'})
         util.write_log(username, 'delete user successed')
         return json.dumps({'code':0,'result':'删除用户成功'})
     except:

@@ -15,24 +15,25 @@ def create(auth_info,**kwargs):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
         app.config['cursor'].execute_insert_sql('Host', data)
         util.write_log(username, "create Host %s sucess" % data['hostname'])
-        return json.dumps({'code': 0, 'result': 'Create %s success' % data['hostname']})
+        return json.dumps({'code': 0, 'result': '创建主机%s成功' % data['hostname']})
     except:
         logging.getLogger().error("Create Host error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'Create Host  error'})
+        return json.dumps({'code': 1, 'errmsg': '创建主机失败'})
 
-@jsonrpc.method('host.get')     
+@jsonrpc.method('host.get')
 @auth_login
 def get(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         output = ['id','hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                 'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
@@ -43,18 +44,19 @@ def get(auth_info,**kwargs):
             util.write_log(username, 'select Host sucess') 
             return json.dumps({'code':0,'result':result},cls=MyEncoder)
         else:
-            return json.dumps({'code':1,'errmsg':'must input Host id'})
+            return json.dumps({'code':1,'errmsg':'需要指定一个主机'})
     except:
         logging.getLogger().error("select Host error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'select Host  error'})
+        return json.dumps({'code': 1, 'errmsg': '获取主机信息失败'})
 
-@jsonrpc.method('host.getlist')     
+@jsonrpc.method('host.getlist')
 @auth_login
 def getlist(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
-        return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
     username = auth_info['username']
-    print "kwargs = ",kwargs
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         output = ['id','hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                 'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
@@ -69,44 +71,41 @@ def getlist(auth_info,**kwargs):
 @jsonrpc.method('host.update')     
 @auth_login
 def update(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = kwargs.get('data',None)
-        #fields_int = ['host_no','cpu_num','disk_num','mem_num','manufacturer_id','supplier_id','idc_id','cabinet_id','service_id','status','vm_status']
         fields = ['hostname','sn','host_no','inner_ip','mac_address','wan_ip','remote_ip','os_info','cpu_num','disk_num','mem_num',\
                  'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
         where = kwargs.get('where',None)
         result = app.config['cursor'].execute_update_sql('Host', data, where, fields)
         if result == '':
-            return json.dumps({'code':1,'errmsg':'must need id '})
+            return json.dumps({'code':1,'errmsg':'需要指定一个主机'})
         util.write_log(username,'update Host %s sucess' % data['hostname'])
-        return json.dumps({'code':0,'result':'update %s success' % data['hostname']})
+        return json.dumps({'code':0,'result':'更新主机信息%s成功' % data['hostname']})
     except:
         logging.getLogger().error('update Host error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'update Host error'})
+        return json.dumps({'code':1,'errmsg':'更新主机失败'})
 
-@jsonrpc.method('host.delete')     
+@jsonrpc.method('host.delete')
 @auth_login
 def delete(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
         result = app.config['cursor'].execute_delete_sql('Host', data)
         if result == '':
-            return json.dumps({'code':1,'errmsg':'must need id '})
+            return json.dumps({'code':1,'errmsg':'需要指定一个主机'})
         util.write_log(username,'delete Host %s sucess' % data['id'])
-        return json.dumps({'code':0,'result':'delete %s success' % data['id']})
+        return json.dumps({'code':0,'result':'删除主机成功'})
     except:
         logging.getLogger().error('delete Host error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'delete Host error'})
+        return json.dumps({'code':1,'errmsg':'删除主机失败'})
 

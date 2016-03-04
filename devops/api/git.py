@@ -25,81 +25,81 @@ def id2name(pro_perm_result,fields,users,groups):
 @jsonrpc.method('git.create')
 @auth_login
 def create(auth_info, **kwargs):
-	if auth_info['code'] == 1:
-		return json.dumps(auth_info)
-	username = auth_info['username']
-	role = int(auth_info['role'])
-	if role != 0:
-		return json.dumps({'code':1,'errmsg':'you are not admin'})
-	p_data, p_perm_data = {},{}     # p_data是project表的相关数据，p_perm_data是project_perm表的相关数据
-	pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
-	try:
-		data = request.get_json()['params']
-		data['create_date'] = time.strftime('%Y-%m-%d')    #添加项目创建时间
-		for key in data:
-			if key in pro_field:
-				p_data[key] = data[key]
-			else:
-				p_perm_data[key] = data[key]              #{'user_all_perm':'1,2,3','user_rw_perm':'1','group_all_perm':'4,5','group_rw_perm':'2'}
-		app.config['cursor'].execute_insert_sql('project',p_data)
-		p_id = app.config['cursor'].get_one_result('project',['id'],{'name':p_data['name']})   #获取当前创建项目的id
-		p_perm_data['id'] = p_id['id']					#创建project_perm准备的数据
-		app.config['cursor'].execute_insert_sql('project_perm',p_perm_data)
-		project = util.get_git()    #获取当前项目的所有人  为下面发邮件准备数据
-		project = project['p_all_users'][p_data['name']]
-		project_name = list(set(project))                       #去掉重复的用户名 
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    if role != 0:
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
+    p_data, p_perm_data = {},{}     # p_data是project表的相关数据，p_perm_data是project_perm表的相关数据
+    pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
+    try:
+        data = request.get_json()['params']
+        data['create_date'] = time.strftime('%Y-%m-%d')    #添加项目创建时间
+        for key in data:
+            if key in pro_field:
+                p_data[key] = data[key]
+            else:
+                p_perm_data[key] = data[key]              #{'user_all_perm':'1,2,3','user_rw_perm':'1','group_all_perm':'4,5','group_rw_perm':'2'}
+        app.config['cursor'].execute_insert_sql('project',p_data)
+        p_id = app.config['cursor'].get_one_result('project',['id'],{'name':p_data['name']})   #获取当前创建项目的id
+        p_perm_data['id'] = p_id['id']                    #创建project_perm准备的数据
+        app.config['cursor'].execute_insert_sql('project_perm',p_perm_data)
+        project = util.get_git()    #获取当前项目的所有人  为下面发邮件准备数据
+        project = project['p_all_users'][p_data['name']]
+        project_name = list(set(project))                       #去掉重复的用户名 
 
-		'''sendemail'''
-		smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
-		send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
-		util.sendmail(app.config, smtp_to, send_info,send_info)
+        '''sendemail'''
+        smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
+        send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
+        util.sendmail(app.config, smtp_to, send_info,send_info)
 
-		util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
-		return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})	
-	except:
-		logging.getLogger().error('create project error: %s' % traceback.format_exc())
-		return json.dumps({'code':1,'errmsg':'git project create error: 重复的仓库路径'})
+        util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
+        return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})    
+    except:
+        logging.getLogger().error('create project error: %s' % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'git project create error: 重复的仓库路径'})
 
 
 @jsonrpc.method('git.update')
 @auth_login
 def update(auth_info,**kwargs):
-	if auth_info['code'] == 1:
-		return json.dumps(auth_info)
-	username = auth_info['username']
-	role = int(auth_info['role'])
-	if role != 0:
-		return json.dumps({'code':1,'errmsg':'you are not admin'})
-	p_data, p_perm_data = {},{}
-	pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
-	try:
-		data = kwargs.get('data',None)
-		where = kwargs.get('where',None)
-		for key in data:
-			if key in pro_field:
-				p_data[key] = data[key]
-			else:
-				p_perm_data[key] = data[key]
-		result = app.config['cursor'].execute_update_sql('project',p_data,where)
-		result2 = app.config['cursor'].execute_update_sql('project_perm',p_perm_data,where)
-		if result == '' or result2 == '':
-			return json.dumps({'code':1,'errmsg':'you must give an id!'})
-		util.write_log(username,'update project %s success' % data['name'])
-		return json.dumps({'code':0,'result':'update project %s success' % data['name']})
-	except:
-		logging.getLogger().error("update project error : %s" % traceback.format_exc())
-		return json.dumps({'code':1,'errmsg':'update project error'})
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    if role != 0:
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
+    p_data, p_perm_data = {},{}
+    pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
+    try:
+        data = kwargs.get('data',None)
+        where = kwargs.get('where',None)
+        for key in data:
+            if key in pro_field:
+                p_data[key] = data[key]
+            else:
+                p_perm_data[key] = data[key]
+        result = app.config['cursor'].execute_update_sql('project',p_data,where)
+        result2 = app.config['cursor'].execute_update_sql('project_perm',p_perm_data,where)
+        if result == '' or result2 == '':
+            return json.dumps({'code':1,'errmsg':'you must give an id!'})
+        util.write_log(username,'update project %s success' % data['name'])
+        return json.dumps({'code':0,'result':'update project %s success' % data['name']})
+    except:
+        logging.getLogger().error("update project error : %s" % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'update project error'})
 
 
 @jsonrpc.method('git.get')
 @auth_login
 def create(auth_info, **kwargs):
     if auth_info['code'] == 1:
-	return json.dumps(auth_info)
+        return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
-	return json.dumps({'code':1,'errmsg':'you are not admin'})
+        return json.dumps({'code':1,'errmsg':'you are not admin'})
     try:
         pro_fields = ['id','name','path','principal','tag','create_date','is_lock','comment']
         pro_perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
@@ -134,7 +134,7 @@ def create(auth_info, **kwargs):
 @auth_login
 def create(auth_info, **kwargs):
     if auth_info['code'] == 1:
-	return json.dumps(auth_info)
+        return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
     uid = int(auth_info['uid'])

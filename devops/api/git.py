@@ -172,9 +172,11 @@ def create(auth_info, **kwargs):
             git_result = util.get_git() 
             if int(git_result['code']) ==0:
                 projects = git_result['project']
+                groups = git_result['group']
             for key in projects.keys():
                 #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
-                perm_users = util.get_userlist(projects,key)
+                perm_users = util.get_userlist(projects,groups,key)
+                print "perm_users=",perm_users
                 #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
                 if username in perm_users:
                     project_list.append(key)

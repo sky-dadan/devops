@@ -13,25 +13,26 @@ def create(auth_info,**kwargs):
     if auth_info['code'] == 1:   #主要用于判断认证是否过期，过期会会在web提示
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
         app.config['cursor'].execute_insert_sql('Cabinet', data)
         util.write_log(username, "create Cabinet %s sucess" % data['name'])
-        return json.dumps({'code': 0, 'result': 'Create %s success' % data['name']})
+        return json.dumps({'code': 0, 'result': '创建机柜%s成功' % data['name']})
     except:
         logging.getLogger().error("Create Cabinet error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'Create Cabinet error'})
+        return json.dumps({'code': 1, 'errmsg': '创建机柜失败'})
 
 
 @jsonrpc.method('cabinet.get')     
 @auth_login
 def get(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         output = ['id','name','idc_id','u_num','power']
         fields = kwargs.get('output', output)
@@ -41,17 +42,19 @@ def get(auth_info,**kwargs):
             util.write_log(username, 'select Cabinet sucess') 
             return json.dumps({'code':0,'result':result})
         else:
-            return json.dumps({'code':1,'errmsg':'must input Cabinet id'})
+            return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
     except:
         logging.getLogger().error("select Cabinet error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'select Cabinet error'})
+        return json.dumps({'code': 1, 'errmsg': '获取机柜信息失败'})
 
 @jsonrpc.method('cabinet.getlist')     
 @auth_login
 def getlist(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         output = ['id','name','idc_id','u_num','power']
         fields = kwargs.get('output', output)
@@ -60,46 +63,44 @@ def getlist(auth_info,**kwargs):
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("select  Cabinet list error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': 'select Cabinet list error'})
+        return json.dumps({'code': 1, 'errmsg': '获取机柜列表失败'})
 
-@jsonrpc.method('cabinet.update')     
+@jsonrpc.method('cabinet.update')
 @auth_login
 def update(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
         result = app.config['cursor'].execute_update_sql('Cabinet', data, where, ['name', 'idc_id', 'u_num', 'power'])
         if result == '':
-            return json.dumps({'code':1,'errmsg':'must need id '})
+            return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
         util.write_log(username,'update cabinet %s sucess' % data['name'])
-        return json.dumps({'code':0,'result':'update %s success' % data['name']})
+        return json.dumps({'code':0,'result':'更新机柜%s成功' % data['name']})
     except:
         logging.getLogger().error('update cabinet error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'update cabinet error'})
+        return json.dumps({'code':1,'errmsg':'更新机柜失败'})
 
 @jsonrpc.method('cabinet.delete')     
 @auth_login
 def delete(auth_info,**kwargs):
-    if auth_info['code'] == 1:   
+    if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
-    if role != 0:
-        return json.dumps({'code':1,'errmsg':'you not admin '})
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
         result = app.config['cursor'].execute_delete_sql('Cabinet', data)
         if result == '':
-            return json.dumps({'code':1,'errmsg':'must need id '})
+            return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
         util.write_log(username,'delete cabinet sucess')
-        return json.dumps({'code':0,'result':'delete success'})
+        return json.dumps({'code':0,'result':'删除机柜成功'})
     except:
         logging.getLogger().error('delete cabinet error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'delete cabinet error'})
+        return json.dumps({'code':1,'errmsg':'删除机柜失败'})
 

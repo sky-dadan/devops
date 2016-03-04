@@ -49,9 +49,9 @@
 <div id="sidebar">
     <ul>
 		<li class="active"><a href="/"><i class="icon icon-home"></i> <span>控制面板</span></a> </li>
-        <li class="submenu open">
-            <a href="javascript:;">
-                <i class="icon icon-user-md"></i><span>账号中心</span>
+        <li class="submenu">
+             <a href="javascript:;">
+                 <i class="icon icon-user-md"></i><span>账号中心</span>
                 <span class="arrow icon-chevron-down"></span>
             </a>
             {% if info and info.role == 0 %}
@@ -90,7 +90,7 @@
         </ul>
         {% endif %}
         </li> <!--end cmdb-->
-        <li class="submenu">
+        <li class="submenu open">
         <a href="javascript:;">
             <i class="icon icon-bell"></i><span>代码管理</span>
             <span class="arrow icon-chevron-down"></span>
@@ -112,7 +112,7 @@
             <li class="sa"><a href="/project/up">正式上线</a></li>
         </ul>
         </li> <!--end project-->
-        <li class="submenu">
+        <li class="submenu open">
         <a href="javascript:;">
             <i class="icon icon-bell"></i><span>第三方接口</span>
             <span class="arrow icon-chevron-down"></span>

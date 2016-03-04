@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}cdn刷新{% endblock %}
+{% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
+
+{% block h1 %}CDN刷新{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+    <div><strong>格式： 每个URL一行 或 以英文逗号分隔,例如：http://www.chinanetcenter.com/index.html <br>
+            <span style="color:red">注意：推送的URL需要区分大小写,刷新url和刷新目录不能同时为空,也不能同时刷新 </span>
+            </strong> </div>
+<div class="widget-content">
+<form id="refresh" class="form-horizontal"  accept-charset="UTF-8">
+    <div class="control-group">
+        <label class="control-label">刷新url：</label>
+        <div class="controls">
+             <textarea class="form-control"  style="width: 50%; height: 150px;" name="urls" id="urls"></textarea>
+        </div>
+    </div><!--urls end-->
+    <div class="control-group">
+        <label class="control-label">刷新目录：</label>
+        <div class="controls">
+             <textarea class="form-control"  style="width: 50%; height: 150px;" name="dirs" id="dirs"></textarea>
+        </div>
+    </div> <!--dirs end-->
+    <div class="form-actions">
+         <input type="button"  value="确定刷新" class="btn btn-success" id="submit">
+    </div>
+</form> 
+</div> <!--widget-content  end -->
+
+</div><!--widget-box end-->
+{% endblock %}
+{% block js %}
+<script>
+
+$("#submit").on('click',function(){
+    if ($('#urls').val() == "" && $('#dirs').val() == "" ){
+        swal("OMG!", "url和目录不能全部为空", "error")
+    }else{
+        commit()
+    }
+ })
+
+function commit(){
+    var data = $('#refresh').serialize()
+    console.log(data)
+    $.post("/api/cdn",data,function(data){
+        data = JSON.parse(data)
+        console.log(data)
+        if(data['code'] == 1){
+            swal(data['errmsg'])      
+        }else{
+            swal(data['result'])
+        }
+    })
+    return false;
+}
+
+
+</script>
+{% endblock %}

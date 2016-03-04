@@ -7,7 +7,6 @@ import logging, util
 import json, traceback
 from auth import auth_login
 import time
-from mail import sendmail
 from jsondate import MyEncoder
 from user_perm import getid_list
 
@@ -53,7 +52,7 @@ def create(auth_info, **kwargs):
 		'''sendemail'''
 		smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
 		send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
-		sendmail(send_info,send_info,smtp_to)
+		util.sendmail(app.config, smtp_to, send_info,send_info)
 
 		util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
 		return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})	

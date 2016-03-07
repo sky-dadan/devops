@@ -172,23 +172,23 @@ def get_git():
         result  = [] 
         perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
         for id in projects.keys():
-            p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
-            result.append(p_perm)
+           p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
+           result.append(p_perm)
 
-	#将权限对应的用户，组id换成适配为name
+    #将权限对应的用户，组id换成适配为name
         #user_git=app.config['cursor'].get_results('user',['id','username'])
         #user_git=dict((str(x['id']),x['username']) for x in user_git)
-	    user_git = getinfo('user',['id','username'])
-	#将每个项目的权限id列表匹配为对应的username  gname,projectname
+        user_git = getinfo('user',['id','username'])
+    #将每个项目的权限id列表匹配为对应的username  gname,projectname
         p,p_users = {},{}
         for project in result:
- 		name=projects[str(project['id'])]  #通过id匹配对应的project name
-                p[name]={}
-		p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git] 
-		p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git] 
-		p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
-	 	p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
-        print p	
+            name=projects[str(project['id'])]  #通过id匹配对应的project name
+            p[name]={}
+        p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git] 
+        p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git] 
+        p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
+        p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
+        print p    
         '''
            p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
         '''

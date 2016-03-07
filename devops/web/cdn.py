@@ -18,7 +18,7 @@ def apicdn() :
     qs['username'] = USER
     resource = ''
     try:
-	data = dict(request.form)
+        data = dict(request.form)
         #print data
         urls = data['urls'][0].split("\r\n")
         dirs = data['dirs'][0].split("\r\n")
@@ -33,12 +33,12 @@ def apicdn() :
             resource = ';'.join(["%s" % v.strip()  for v in dirs])
             qs['dir']=resource
 
-	hash_str = "%s%s%s" % (USER, PASS, resource)
-	qs['passwd'] = hashlib.md5(hash_str).hexdigest()
+        hash_str = "%s%s%s" % (USER, PASS, resource)
+        qs['passwd'] = hashlib.md5(hash_str).hexdigest()
         #print qs
 
-	f = urllib2.urlopen(url, '&'.join(['%s=%s' % (k,v) for k,v in qs.items()]))
-	res = f.read().strip()
+        f = urllib2.urlopen(url, '&'.join(['%s=%s' % (k,v) for k,v in qs.items()]))
+        res = f.read().strip()
         code = f.getcode()
         print "Push CDN:%s: [%s]" % (code,res)
         return json.dumps({"code":code,"result":res})

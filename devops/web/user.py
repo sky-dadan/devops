@@ -10,7 +10,7 @@ headers = {'content-type': 'application/json'}
 @app.route("/",methods=['GET'])
 @app.route("/user/info",methods=['GET'])
 def index():
-    if session.get('username') == None:
+    if not session['author']:
         return redirect('/login')
     headers['authorization'] = session['author']
     url = "http://%s/api" % app.config['api_host']

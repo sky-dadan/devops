@@ -213,7 +213,6 @@ function have_perm(){
 
 function uphave_perm(id){
 	var url = "/getapi?method=selected&id="+id+"&selected=power_sel"
-	alert(url)
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		var str=''

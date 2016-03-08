@@ -6,11 +6,13 @@ from . import app, jsonrpc
 import logging, util
 import json, traceback
 from auth import auth_login
-import time
+import time,requests
 from jsondate import MyEncoder
 from user_perm import getid_list
 
 
+#headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' }
+headers = {"Content-Type": "application/json"}
 #将用户id,组id替换为用户name和组name
 def id2name(pro_perm_result,fields,users,groups):
     for res in pro_perm_result:
@@ -53,6 +55,8 @@ def create(auth_info, **kwargs):
         smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
         send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
         util.sendmail(app.config, smtp_to, send_info,send_info)
+
+        requests.get("http://%s/api/gitolite" % app.config['api_host'], headers = headers)
 
         util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
         return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})    

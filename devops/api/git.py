@@ -51,18 +51,21 @@ def create(auth_info, **kwargs):
         project = project['p_all_users'][p_data['name']]
         project_name = list(set(project))                       #去掉重复的用户名 
 
+        r = requests.get("http://%s/api/gitolite" % app.config['api_host'], headers = headers)
+        r = json.loads(r.text)
+        if r['code'] == '1':
+            return json.dumps({'code':1,'errmsg':'%s' % r['errmsg']})
+
         '''sendemail'''
         smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
         send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
         util.sendmail(app.config, smtp_to, send_info,send_info)
 
-        requests.get("http://%s/api/gitolite" % app.config['api_host'], headers = headers)
-
         util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
-        return json.dumps({'code':0,'result':'create  %s success'  %  data['name']})    
+        return json.dumps({'code':0,'result':'创建项目%s成功'  %  data['name']})    
     except:
         logging.getLogger().error('create project error: %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'git project create error: 重复的仓库路径'})
+        return json.dumps({'code':1,'errmsg':'创建项目失败'})
 
 
 @jsonrpc.method('git.update')
@@ -89,10 +92,10 @@ def update(auth_info,**kwargs):
         if result == '' or result2 == '':
             return json.dumps({'code':1,'errmsg':'you must give an id!'})
         util.write_log(username,'update project %s success' % data['name'])
-        return json.dumps({'code':0,'result':'update project %s success' % data['name']})
+        return json.dumps({'code':0,'result':'更新项目%s成功' % data['name']})
     except:
         logging.getLogger().error("update project error : %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'update project error'})
+        return json.dumps({'code':1,'errmsg':'更新项目失败'})
 
 
 @jsonrpc.method('git.get')

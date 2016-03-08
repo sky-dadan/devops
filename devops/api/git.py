@@ -52,9 +52,9 @@ def create(auth_info, **kwargs):
         project_name = list(set(project))                       #去掉重复的用户名 
 
         r = requests.get("http://%s/api/gitolite" % app.config['api_host'], headers = headers)
-        r = json.loads(r.text)
-        if r['code'] == '1':
-            return json.dumps({'code':1,'errmsg':'%s' % r['errmsg']})
+        t = json.loads(r.text)
+        if t['code'] == '1':
+            return r.text
 
         '''sendemail'''
         smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]

@@ -22,7 +22,7 @@ def gitolite():
         group  = result['group'] 
         project = result['project']
         for p in project:
-            project[p]['user_ rw_perm'] = ' '.join(project[p]['user_rw_perm'])
+            project[p]['user_rw_perm'] = ' '.join(project[p]['user_rw_perm'])
             project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
             project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
             project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
@@ -55,10 +55,10 @@ def gitolite():
 
 
             #给相关人员发邮件,在主程序中调用,格式如下
- #           subject = "devops项目创建成功"
- #           content = "项目地址为：%s" % ("devops")
- #           smtp_to = ['sa@yuanxin-inc.com','liuziping@yuanxin-inc.com']
- #           mail.sendmail(subject,content,smtp_to)
+#            subject = "devops项目创建成功"
+#            content = "项目地址为：%s" % ("devops")
+#            smtp_to = ['sa@yuanxin-inc.com','liuziping@yuanxin-inc.com']
+#            util.sendmail(app.config,subject,content,smtp_to)
 
 
             return  json.dumps({'code':0,'result':"git操作成功"})

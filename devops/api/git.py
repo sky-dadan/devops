@@ -148,6 +148,7 @@ def git_getlist(auth_info, **kwargs):
             projects = git_result['project']
             groups = git_result['group']
             pro_all_users =git_result['p_all_users']
+        print "pro_all_users = ",pro_all_users
         #将上面projects里的列表变成以逗号分隔的字符串{'ask.100xhs.com':{'user_all_perm':['zhangxunan','lisi']}}
         for pro in projects:
             for pro_field in pro_perm_fields:
@@ -168,19 +169,7 @@ def git_getlist(auth_info, **kwargs):
             return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
         #普通用户返回他所拥有权限的项目
         else:
-            project_list = []
-            for key in projects.keys():
-                #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
-                perm_users = list(set(pro_all_users[key]))
-                #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
-                if username in perm_users:
-                    project_list.append(key)
-            #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
-            res = []
-            for pro in result:
-                if pro['name'] in project_list:
-                    res.append(pro)
-            #最后返回过虑后的结果res
+            res = util.partOfTheProject(result,projects,pro_all_users,username)
             util.write_log(username, '查询项目列表成功')  
             return json.dumps({'code':0,'result':res,'count':len(res)},cls=MyEncoder)
     except:

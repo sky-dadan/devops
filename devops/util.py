@@ -178,7 +178,7 @@ def get_git():
     #将权限对应的用户，组id换成适配为name
         #user_git=app.config['cursor'].get_results('user',['id','username'])
         #user_git=dict((str(x['id']),x['username']) for x in user_git)
-        user_git = getinfo('user',['id','username'])
+        user_git = getinfo('user',['id','name'])
     #将每个项目的权限id列表匹配为对应的username  gname,projectname
         p,p_users = {},{}
         for project in result:
@@ -206,3 +206,20 @@ def get_git():
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return {'code':1,'errmsg':"获取用户，组及项目报错"}
+
+#普通用户返回他所拥有权限的项目
+def partOfTheProject(result,projects,pro_all_users,username):
+    project_list = []
+    for key in projects.keys():
+        #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
+        perm_users = list(set(pro_all_users[key]))
+        #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
+        if username in perm_users:
+            project_list.append(key)
+        #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
+    res = []
+    for pro in result:
+        if pro['name'] in project_list:
+            res.append(pro)
+    return res
+

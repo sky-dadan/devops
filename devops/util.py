@@ -134,12 +134,13 @@ def run_script(cmd):
 
 def getinfo(table_name,fields):
     '''
-    获取用户信息或组信息，返回例如用户信息：{'1':'tom','2','jerry'};组信息{'1':'sa','2':'ask'}
-    {u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
-    fields 格式为['id','name']  ['username','r_id']
+    查询单个数据表任意两列的内容，然后将结果拼接成字 
+    fields 格式为 ['field1','field2'], 例如['id','name'],['name','r_id']
+    返回结果一，两列都是字符串如：用户id2name {'1':'tom','2','jerry'}; 组信息id2name {'1':'sa','2':'ask'}
+    返回结果二，第二列是个列表如：用户权限信息：{u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
     '''
     result = app.config['cursor'].get_results(table_name,fields)
-    if fields[1] in ['r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm']:  #为了区分fields 里面的第二个字段的处理
+    if fields[1] in ['r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm']:  #第二列的结果为列表的字段拼接为字符串
         result = dict((x[fields[0]],x[fields[1]].split(',')) for x in result)
     else:
         result = dict((str(x[fields[0]]), x[fields[1]]) for x in result)

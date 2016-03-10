@@ -166,6 +166,8 @@ CREATE TABLE `switch` (
   `cabinet_id` int(10) DEFAULT NULL COMMENT '机柜ID',
   `port_num` int(10) DEFAULT NULL COMMENT '端口数量',
   `status` int(10) DEFAULT NULL COMMENT '0正常，1未使用',
+  `store_date` date DEFAULT NULL COMMENT '采购时间',
+  `expire` date DEFAULT NULL COMMENT '有效时间',
   `remark` varchar(50) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

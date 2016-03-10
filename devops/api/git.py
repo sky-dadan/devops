@@ -194,7 +194,9 @@ Use:
     curl http://127.0.0.1:1000/api/gitolite
 '''
 def gitolite():
-    git_confile = "/root/gitconfig/gitolite-admin/conf/gitolite.conf"
+    git_confile = app.config['git_confile']
+    api_dir = os.path.dirname(os.path.realpath(__file__))
+    script_dir =  os.path.join(api_dir.rstrip('api'),'script')
     result = util.get_git() 
     if int(result['code']) ==0:
         group  = result['group'] 
@@ -224,7 +226,7 @@ def gitolite():
                 f.write(str2)
 
             #git add/commit/push生效.路径暂时写死，定版前修改
-            stdout=util.run_script("sh /home/liuziping/devops.aiyuanxin.com/devops/script/git.sh")
+            stdout=util.run_script("sh %s/git.sh" % script_dir)
             print stdout
             return  json.dumps({'code':0,'result':"git操作成功"})
         except:

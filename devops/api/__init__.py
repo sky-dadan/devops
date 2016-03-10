@@ -9,9 +9,7 @@ sys.setdefaultencoding('utf-8')
 app = Flask(__name__)
 jsonrpc = JSONRPC(app, '/api')
 
-import  test
 import group
-#import user
 import cabinet
 import host
 import softassets

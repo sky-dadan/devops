@@ -125,7 +125,7 @@ def run_script(cmd):
 
     try:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        out = process.read().strip()
+        out = process.stdout.read().strip()
         logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
         return out
     except:
@@ -147,6 +147,7 @@ def getinfo(table_name,fields):
     return result
 
 #获取一个组里面所有的用户列表
+#需要传入用户信息users=getinfo(user,['username','r_id'])和组信息groups=getinfo(group,['id','name'])
 def group_users(users,groups):
     group = {}
     for g_name in groups.values():
@@ -159,28 +160,23 @@ def group_users(users,groups):
     #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']} 
     
 
-
+#获取项目对应权限的人员和组，
 def get_git():
     try:  
+        #获取项目，用户，组表中对应的两个字段返回字典
+        projects = getinfo('project',['id','name'])
         users = getinfo('user',['username','r_id'])
         groups = getinfo('user_group',['id','name'])
         group = group_users(users,groups) 
-        #获取项目列表
-        #projects = app.config['cursor'].get_results('project',['id','name'])
-        #projects = dict((str(x['id']),x['name']) for x in projects)
-        projects = getinfo('project',['id','name'])
         #获取每个项目的权限列表,取出来的是id
         result  = [] 
         perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
-        for id in projects.keys():
+        for id in projects:
            p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
-           result.append(p_perm)
+           result.append(p_perm)   #[{'id':'1','user_all_perm':'1,2','user_rw_perm':'1,3',.....},.......]
 
-    #将权限对应的用户，组id换成适配为name
-        #user_git=app.config['cursor'].get_results('user',['id','username'])
-        #user_git=dict((str(x['id']),x['username']) for x in user_git)
+        #将每个项目的权限id列表匹配为对应的username  gname,projectname
         user_git = getinfo('user',['id','username'])
-    #将每个项目的权限id列表匹配为对应的username  gname,projectname
         p,p_users = {},{}
         for project in result:
             name=projects[str(project['id'])]  #通过id匹配对应的project name
@@ -193,7 +189,7 @@ def get_git():
         '''
            p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
         '''
-        print '##############################################################################'
+        #进一步查询每个项目都有哪些人参与，即将p里组的成员都都替换为具体的人
         for key,values in p.items():
             p_users[key] = []
             for k,v in values.items():
@@ -207,3 +203,20 @@ def get_git():
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return {'code':1,'errmsg':"获取用户，组及项目报错"}
+
+#普通用户返回他所拥有权限的项目
+def partOfTheProject(result,projects,pro_all_users,username):
+    project_list = []
+    for key in projects.keys():
+        #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
+        perm_users = list(set(pro_all_users[key]))
+        #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
+        if username in perm_users:
+            project_list.append(key)
+        #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
+    res = []
+    for pro in result:
+        if pro['name'] in project_list:
+            res.append(pro)
+    return res
+

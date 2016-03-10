@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_jsonrpc import JSONRPC
 from . import app, jsonrpc
 import logging, util
-import json, traceback
+import json, traceback,os
 from auth import auth_login
 import time,requests
 from jsondate import MyEncoder
@@ -41,10 +41,11 @@ def git_create(auth_info, **kwargs):
         project = project['p_all_users'][p_data['name']]
         project_name = list(set(project))                       #去掉重复的用户名 
 
-        r = requests.get("http://%s/api/gitolite" % app.config['api_host'], headers = headers)
-        t = json.loads(r.text)
+        r = gitolite()
+        t = json.loads(r)
+        print t
         if t['code'] == '1':
-            return r.text
+            return r
 
         '''sendemail'''
         smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
@@ -81,6 +82,12 @@ def git_update(auth_info,**kwargs):
         result2 = app.config['cursor'].execute_update_sql('project_perm',p_perm_data,where)
         if result == '' or result2 == '':
             return json.dumps({'code':1,'errmsg':'you must give an id!'})
+        else:
+            r = gitolite()
+            t = json.loads(r)
+            print t
+            if t['code'] == '1':
+                return r
         util.write_log(username,'update project %s success' % data['name'])
         return json.dumps({'code':0,'result':'更新项目%s成功' % data['name']})
     except:
@@ -148,6 +155,7 @@ def git_getlist(auth_info, **kwargs):
             projects = git_result['project']
             groups = git_result['group']
             pro_all_users =git_result['p_all_users']
+        print "pro_all_users = ",pro_all_users
         #将上面projects里的列表变成以逗号分隔的字符串{'ask.100xhs.com':{'user_all_perm':['zhangxunan','lisi']}}
         for pro in projects:
             for pro_field in pro_perm_fields:
@@ -168,23 +176,65 @@ def git_getlist(auth_info, **kwargs):
             return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
         #普通用户返回他所拥有权限的项目
         else:
-            project_list = []
-            for key in projects.keys():
-                #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
-                perm_users = list(set(pro_all_users[key]))
-                #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
-                if username in perm_users:
-                    project_list.append(key)
-            #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
-            res = []
-            for pro in result:
-                if pro['name'] in project_list:
-                    res.append(pro)
-            #最后返回过虑后的结果res
+            res = util.partOfTheProject(result,projects,pro_all_users,username)
             util.write_log(username, '查询项目列表成功')  
             return json.dumps({'code':0,'result':res,'count':len(res)},cls=MyEncoder)
     except:
         logging.getLogger().error("select project list error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目列表错误'})
+
+@app.route('/api/gitolite',methods=['GET'])
+def git_api():
+    res = gitolite()
+    return res
+
+'''
+渲染gitolite配置文件及推送接口
+Use:
+    curl http://127.0.0.1:1000/api/gitolite
+'''
+def gitolite():
+    git_confile = app.config['git_confile']
+    api_dir = os.path.dirname(os.path.realpath(__file__))
+    script_dir =  os.path.join(api_dir.rstrip('api'),'script')
+    result = util.get_git() 
+    if int(result['code']) ==0:
+        group  = result['group'] 
+        project = result['project']
+        for p in project:
+            project[p]['user_rw_perm'] = ' '.join(project[p]['user_rw_perm'])
+            project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
+            project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
+            project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
+
+        try:
+            #每次将原有配置文件删除
+            if os.path.exists(git_confile):
+                os.unlink(git_confile)
+            #将用户和组信息写入配置文件
+            str1 = ""
+            for k,v in group.items():
+                str1 += "@%s = %s \n" %(k,' '.join(v))
+            with open(git_confile,'a') as f:
+                f.write(str1)
+
+            #将项目信息写入配置文件
+            str2 = ""
+            for k,v in project.items():
+                str2  += "repo %s \n    RW+ = %s %s \n    RW = %s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
+            with open(git_confile,'a') as f:
+                f.write(str2)
+
+            #git add/commit/push生效.路径暂时写死，定版前修改
+            stdout=util.run_script("sh %s/git.sh" % script_dir)
+            print stdout
+            return  json.dumps({'code':0,'result':"git操作成功"})
+        except:
+            logging.getLogger().error("get config error: %s" % traceback.format_exc())
+            return json.dumps({'code':1,'errmsg':"写配置文件报错"})
+    else:
+         return json.dumps({'code':1,'errmsg':"获取用户，组或者仓库出错"})
+
+
 
 

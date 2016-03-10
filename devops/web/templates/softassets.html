@@ -219,14 +219,19 @@ $('#addForm').on('submit',function(){
          data = JSON.parse(data)  //object
          data = JSON.parse(data['result']) //object
          if (data['code']==0){
-            alert(data['result'])
-		    $('#addModal').modal('hide')
-            list()
-            location.reload()
+			  swal({
+						title:"添加成功",
+						type: "success",
+						confirmButtonText: "Cool"
+					},function(){                    
+						$('#addModal').modal('hide')
+						list()
+						location.reload()
+					})  //end swal
          }else{
 		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
          }
-       })
+ }) //end post
 	   return false
 })  //submit form
 
@@ -245,7 +250,7 @@ $('tbody').on('click','.update-btn',function(){
           $('#upexpire').val(data['result']['expire'])
           $('#upremark').val(data['result']['remark'])
       }else{
-          alert(data['errmsg'])
+          swal("OMG!",data['errmsg'], "error"); 
       }
 	})
 	$('#updateModal').modal('show')  //show modal
@@ -257,21 +262,27 @@ $('#updateForm').on('submit',function(){
     str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
     str = decodeURIComponent(str)  //对serialize后的内容进行解码
     console.log(str)
-var data = {'method':name,'formdata':str}
-console.log(data)
+    var data = {'method':name,'formdata':str}
+    console.log(data)
 $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data)    //object
     data = JSON.parse(data['result']) //object
     console.log(data)
     if (data['code']==0){   
-        alert(data['result'])
-        $('#updateModal').modal('hide')
-        list()
-        location.reload()
+		swal({ 
+			 title: "更新成功!", 
+			 text: data['result'],   
+			 type: "success",   
+			 confirmButtonText: "Cool"
+		 },function(){               
+			$('#updateModal').modal('hide')
+			list()
+			location.reload()
+		});
     }else{
-		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+		$('#uperrorMsg').html('Failed:'+data['errmsg']).show()
     }
-})
+}) //end post
     return false   //get data and end
 })  //submit form
 
@@ -284,15 +295,21 @@ $("tbody").on('click','.delete-btn',function(){
 		$.getJSON(url,function(data){
       		data = JSON.parse(data['result'])
 			if (data['code']== 0 ){
-				alert(data['result'])
-                $(that).parents('tr').remove();
-                list()
-                location.reload()
-			}else{
-				alert(data['errmsg'])
-			}
-    	})
-    }  // end confirm
+                 swal({ 
+                          title: "删除成功", 
+                          text: data['result'],   
+                          type: "success",   
+                          confirmButtonText: "Cool"    
+                      },function(){               
+                         $(that).parents('tr').remove();
+                        list()
+                        location.reload()
+                });
+            }else{
+                swal("OMG!", data['errmsg'], "error"); 	
+            }
+    })  //end getJSON
+  }  // end confirm
     return false   //get data and end
 })   
 </script>

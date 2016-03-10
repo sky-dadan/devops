@@ -163,7 +163,7 @@ def group_users(users,groups):
 def get_git():
     try:  
         users = getinfo('user',['username','r_id'])
-        groups = getinfo('groups',['id','name'])
+        groups = getinfo('user_group',['id','name'])
         group = group_users(users,groups) 
         #获取项目列表
         #projects = app.config['cursor'].get_results('project',['id','name'])

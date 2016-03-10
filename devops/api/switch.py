@@ -18,8 +18,8 @@ def create(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Switch', data)
-        util.write_log(username, "create Switch %s sucess" % data['name'])
+        app.config['cursor'].execute_insert_sql('switch', data)
+        util.write_log(username, "create switch %s sucess" % data['name'])
         return json.dumps({'code': 0, 'result': '创建网络设备%s成功' % data['name']})
     except:
         logging.getLogger().error("Create Switch error: %s" % traceback.format_exc())
@@ -37,9 +37,9 @@ def get(auth_info,**kwargs):
         output = ['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('Switch', fields, where)
+        result = app.config['cursor'].get_one_result('switch', fields, where)
         if result:
-            util.write_log(username, 'select Switch sucess') 
+            util.write_log(username, 'select switch sucess') 
             return json.dumps({'code':0,'result':result},cls=MyEncoder)
         else:
             return json.dumps({'code':1,'errmsg':'需要指定一个网络设备'})
@@ -57,8 +57,8 @@ def getlist(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         fields =['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
-        result = app.config['cursor'].get_results('Switch', fields)
-        util.write_log(username, 'select Switch list sucess') 
+        result = app.config['cursor'].get_results('switch', fields)
+        util.write_log(username, 'select switch list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
         logging.getLogger().error("select Switch list error: %s" % traceback.format_exc())
@@ -76,10 +76,10 @@ def update(auth_info,**kwargs):
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
         fields = ['name', 'ip', 'type','manufacturer_id','supplier_id','idc_id', 'cabinet_id', 'port_num', 'status', 'remark']
-        result = app.config['cursor'].execute_update_sql('Switch', data, where, fields)
+        result = app.config['cursor'].execute_update_sql('switch', data, where, fields)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个网络设备'})
-        util.write_log(username,'update Switch %s sucess' % data['name'])
+        util.write_log(username,'update switch %s sucess' % data['name'])
         return json.dumps({'code':0,'result':'更新网络设备%s成功' % data['name']})
     except:
         logging.getLogger().error('update Switch error : %s' % traceback.format_exc())
@@ -95,10 +95,10 @@ def delete(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Switch', data)
+        result = app.config['cursor'].execute_delete_sql('switch', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个网络设备'})
-        util.write_log(username,'delete Switch %s sucess' % data['id'])
+        util.write_log(username,'delete switch %s sucess' % data['id'])
         return json.dumps({'code':0,'result':'删除网络设备成功'})
     except:
         logging.getLogger().error('delete Switch error : %s' % traceback.format_exc())

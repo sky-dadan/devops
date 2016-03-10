@@ -21,11 +21,11 @@ def create(auth_info,**kwargs):
         data = request.get_json()['params']
         if not util.check_name(data['name']):
             return json.dumps({'code': 1, 'errmsg': '权限名必须为字母和数字'})
-        app.config['cursor'].execute_insert_sql('power', data)
-        util.write_log(username, "create power %s success"  %  data['name'])
+        app.config['cursor'].execute_insert_sql('permission', data)
+        util.write_log(username, "create permission %s success"  %  data['name'])
         return json.dumps({'code':0,'result':'创建权限%s成功' %  data['name']})
     except:
-        logging.getLogger().error('create power error:%s' % traceback.format_exc())
+        logging.getLogger().error('create permission error:%s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg': '创建权限失败'})
 
 @jsonrpc.method('power.delete')
@@ -40,8 +40,8 @@ def delete(auth_info,**kwargs):
         data = request.get_json()['params']
         if not data.has_key('id'):
             return json.dumps({'code':1,'errmsg':'需要指定一个权限'})
-        record = app.config['cursor'].get_one_result('power', ['name', 'url'], data)
-        app.config['cursor'].execute_delete_sql('power', data)
+        record = app.config['cursor'].get_one_result('permission', ['name', 'url'], data)
+        app.config['cursor'].execute_delete_sql('permission', data)
         util.write_log(username, "delete permission %s success"  % record['name'])
         return json.dumps({'code':0,'result':'删除权限%s成功' % record['name']})
     except:
@@ -57,10 +57,10 @@ def getlist(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
-        output = ['id','name','name_cn','url','info']
+        output = ['id','name','name_cn','url','comment']
         fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('power', fields)
-        util.write_log(username, 'select power list success')
+        result = app.config['cursor'].get_results('permission', fields)
+        util.write_log(username, 'select permission list success')
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("get list permission error: %s"  %  traceback.format_exc())
@@ -75,17 +75,17 @@ def getbyid(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
-        output = ['id','name','name_cn','url','info']
+        output = ['id','name','name_cn','url','comment']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
         if where.has_key('id'):
-            result = app.config['cursor'].get_one_result('power', fields, where)
-            util.write_log(username,'select power by id successed!')
+            result = app.config['cursor'].get_one_result('permission', fields, where)
+            util.write_log(username,'select permission by id successed!')
             return json.dumps({'code':0, 'result':result})
         else:
             return json.dumps({'code':1, 'errmsg':'需要指定一个权限'})
     except:
-        logging.getLogger().error("select power by id error: %s" %  traceback.format_exc())
+        logging.getLogger().error("select permission by id error: %s" %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'获取权限信息失败'})
 
 
@@ -103,7 +103,7 @@ def update(auth_info, **kwargs):
         data = data.get('data',None)
         if not util.check_name(data['name']):
             return json.dumps({'code': 1, 'errmsg': '权限名必须为字母和数字'})
-        result=app.config['cursor'].execute_update_sql('power', data, where, ['name', 'name_cn', 'url', 'info'])
+        result=app.config['cursor'].execute_update_sql('permission', data, where, ['name', 'name_cn', 'url', 'comment'])
         if result == '': 
             return json.dumps({'code':1, 'errmsg':'需要指定一个权限'})
         util.write_log(username,"update %s successed" % data['name'])

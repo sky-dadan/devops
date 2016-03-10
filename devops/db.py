@@ -73,7 +73,7 @@ class Cursor():
         self.execute(sql)
         result_set = self.fetchone()
         if result_set:
-            return dict([(k, result_set[i]) for i,k in enumerate(fields)])
+            return dict([(k, '' if result_set[i] is None else result_set[i]) for i,k in enumerate(fields)])
         else:
             return {}
 
@@ -81,7 +81,7 @@ class Cursor():
         sql = self.select_sql(table_name, fields, where, limit)
         self.execute(sql)
         result_sets = self.fetchall()
-        return [dict([(k, row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+        return [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]
 
     def update_sql(self, table_name, data, where, fields=None):
         if not (where and isinstance(where, dict)):
@@ -126,7 +126,7 @@ class Cursor():
             return False
 
     def if_groupid_exist(self, group_id):
-        result = self.get_one_result('groups', ['id'], {'id': group_id})
+        result = self.get_one_result('group', ['id'], {'id': group_id})
         if result:
             return True
         else:

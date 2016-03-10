@@ -18,7 +18,7 @@ def create(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Manufacturers', data)
+        app.config['cursor'].execute_insert_sql('manufacturer', data)
         util.write_log(username, 'create manufactures %s success'  % data['name'])
         return json.dumps({'code':0,'result':'创建供应商%s成功'  %  data['name']})
     except:
@@ -37,7 +37,7 @@ def manufact_get(auth_info,**kwargs):
         output = ['id','name','supplier_name','interface_user','email','user_phone']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('Manufacturers', fields, where)
+        result = app.config['cursor'].get_one_result('manufacturer', fields, where)
         if result:
             util.write_log(username, 'select manufacturers success')
             return json.dumps({'code':0,'result':result})
@@ -58,7 +58,7 @@ def manufact_getlist(auth_info, **kwargs):
     try:
         output = ['id','name','supplier_name','interface_user','email','user_phone']
         fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('Manufacturers', fields)
+        result = app.config['cursor'].get_results('manufacturer', fields)
         util.write_log(username, 'select manufact list success!')
         return json.dumps({'code':0, 'result':result,'count':len(result)})
     except:
@@ -70,13 +70,14 @@ def manufact_getlist(auth_info, **kwargs):
 def manufact_update(auth_info, **kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
+    username = auth_info['username']
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
         fields = ['name','supplier_name','interface_user','email','user_phone']
-        result = app.config['cursor'].execute_update_sql('Manufacturers', data, where, fields)
+        result = app.config['cursor'].execute_update_sql('manufacturer', data, where, fields)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个供应商'})
         util.write_log(username ,"update manufact %s success!"  %  data['name'])
@@ -95,7 +96,7 @@ def manufact_delete(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Manufacturers', data)
+        result = app.config['cursor'].execute_delete_sql('manufacturer', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个供应商'})
         util.write_log(username, 'delete manufacturers success')

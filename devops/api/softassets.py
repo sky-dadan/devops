@@ -18,8 +18,8 @@ def create(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Soft_Assets', data)
-        util.write_log(username, "create Soft_Assets %s sucess" % data['type'])
+        app.config['cursor'].execute_insert_sql('soft_asset', data)
+        util.write_log(username, "create soft_asset %s sucess" % data['type'])
         return json.dumps({'code': 0, 'result': '创建软资产%s成功' % data['type']})
     except:
         logging.getLogger().error("Create Soft_Assets error: %s" % traceback.format_exc())
@@ -37,9 +37,9 @@ def get(auth_info,**kwargs):
         output =['id','type','manufacturer','store_date','expire','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('Soft_Assets', fields, where)
+        result = app.config['cursor'].get_one_result('soft_asset', fields, where)
         if result:
-            util.write_log(username, 'select Soft_Assets sucess') 
+            util.write_log(username, 'select soft_asset sucess') 
             return json.dumps({'code':0,'result':result},cls=MyEncoder)
         else:
             return json.dumps({'code':1,'errmsg':'需要指定一个软资产'})
@@ -59,8 +59,8 @@ def getlist(auth_info,**kwargs):
         fields = ['id','type','manufacturer','store_date','expire','remark']
         data = request.get_json()
         data = data['params']
-        result = app.config['cursor'].get_results('Soft_Assets', fields)
-        util.write_log(username, 'select Soft_Assets list sucess') 
+        result = app.config['cursor'].get_results('soft_asset', fields)
+        util.write_log(username, 'select soft_asset list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
         logging.getLogger().error("select Soft_Assets list error: %s" % traceback.format_exc())
@@ -77,11 +77,11 @@ def update(auth_info,**kwargs):
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].execute_update_sql('Soft_Assets', data, where,
+        result = app.config['cursor'].execute_update_sql('soft_asset', data, where,
                     ['type','manufacturer','store_date','expire','remark'])
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个软资产'})
-        util.write_log(username,'update Soft_Assets %s sucess' % data['type'])
+        util.write_log(username,'update soft_asset %s sucess' % data['type'])
         return json.dumps({'code':0,'result':'更新软资产%s成功' % data['type']})
     except:
         logging.getLogger().error('update Soft_Assets error : %s' % traceback.format_exc())
@@ -97,10 +97,10 @@ def delete(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Soft_Assets', data)
+        result = app.config['cursor'].execute_delete_sql('soft_asset', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个软资产'})
-        util.write_log(username,'delete Soft_Assets %s sucess' % data['id'])
+        util.write_log(username,'delete soft_asset %s sucess' % data['id'])
         return json.dumps({'code':0,'result':'删除软资产成功'})
     except:
         logging.getLogger().error('delete Soft_Assets error : %s' % traceback.format_exc())

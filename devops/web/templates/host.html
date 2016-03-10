@@ -608,6 +608,7 @@ $("tbody").on('click','.delete-btn',function(){
 				alert(data['result'])
                 $(that).parents('tr').remove();
                 list()
+                location.reload()
 			}else{
 				alert(data['errmsg'])
 			}

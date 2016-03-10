@@ -17,7 +17,9 @@ def create(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Idc', data)
+        if not util.check_name(data['idc_name']):
+            return json.dumps({'code': 1, 'errmsg': "用户名必须为字母和数字"})
+        app.config['cursor'].execute_insert_sql('idc', data)
         util.write_log(username, "create idc %s success"  %  data['name'])
         return json.dumps({'code':0, 'result': '创建IDC"%s"成功' % data['name']})
     except:
@@ -36,7 +38,7 @@ def idc_get(auth_info,**kwargs):
         output = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where', None)
-        result = app.config['cursor'].get_one_result('Idc', fields, where)
+        result = app.config['cursor'].get_one_result('idc', fields, where)
         if result:
             util.write_log(username, 'select idc information success')
             return json.dumps({'code':0,'result':result})
@@ -57,7 +59,7 @@ def idc_getlist(auth_info, **kwargs):
     try:
         output = ['id','idc_name','name','address','email','interface_user','user_phone','pact_cabinet_num','rel_cabinet_num','remark']
         fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('Idc', fields)
+        result = app.config['cursor'].get_results('idc', fields)
         util.write_log(username,'select idc list success')
         return json.dumps({'code':0, 'result':result, 'count':len(result)})
     except:
@@ -74,8 +76,10 @@ def idc_update(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = kwargs.get('data',None)
+        if not util.check_name(data['idc_name']):
+            return json.dumps({'code': 1, 'errmsg': "用户名必须为字母和数字"})
         where = kwargs.get('where', None)
-        result = app.config['cursor'].execute_update_sql('Idc', data, where,
+        result = app.config['cursor'].execute_update_sql('idc', data, where,
             ['idc_name', 'name', 'address', 'email', 'interface_user', 'user_phone',
              'pact_cabinet_num', 'rel_cabinet_num', 'remark'])
         if result == '':
@@ -96,7 +100,7 @@ def idc_delete(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Idc', data)
+        result = app.config['cursor'].execute_delete_sql('idc', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个IDC'})
         util.write_log(username, 'delete idc success')

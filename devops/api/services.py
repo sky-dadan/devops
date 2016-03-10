@@ -17,7 +17,7 @@ def create(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Services', data)
+        app.config['cursor'].execute_insert_sql('service', data)
         util.write_log(username, "create Services %s success"  % data['name'])
         return json.dumps({'code':0,'result':'创建服务%s成功'  % data['name']})
     except:
@@ -36,7 +36,7 @@ def get(auth_info, **kwargs):
         output = ['id','name','dev_interface','sa_interface','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('Services', fields, where)
+        result = app.config['cursor'].get_one_result('service', fields, where)
         if result:
             util.write_log(username,'select services success')
             return json.dumps({'code':0,'result':result})
@@ -57,7 +57,7 @@ def getlist(auth_info, **kwargs):
     try:
         output = ['id','name','dev_interface','sa_interface','remark']
         fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('Services', fields)
+        result = app.config['cursor'].get_results('service', fields)
         util.write_log(username, 'select services list success')
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
@@ -75,7 +75,7 @@ def update(auth_info, **kwargs):
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where', None)
-        result = app.config['cursor'].execute_update_sql('Services', data, where,
+        result = app.config['cursor'].execute_update_sql('service', data, where,
                 ['name', 'dev_interface', 'sa_interface', 'remark'])
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个服务'})
@@ -95,7 +95,7 @@ def delete(auth_info, **kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Services', data)
+        result = app.config['cursor'].execute_delete_sql('service', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个服务'})
         util.write_log(username , 'delete services success' )

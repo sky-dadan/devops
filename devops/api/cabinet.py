@@ -17,8 +17,8 @@ def create(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        app.config['cursor'].execute_insert_sql('Cabinet', data)
-        util.write_log(username, "create Cabinet %s sucess" % data['name'])
+        app.config['cursor'].execute_insert_sql('cabinet', data)
+        util.write_log(username, "create cabinet %s sucess" % data['name'])
         return json.dumps({'code': 0, 'result': '创建机柜%s成功' % data['name']})
     except:
         logging.getLogger().error("Create Cabinet error: %s" % traceback.format_exc())
@@ -37,9 +37,9 @@ def get(auth_info,**kwargs):
         output = ['id','name','idc_id','u_num','power']
         fields = kwargs.get('output', output)
         where = kwargs.get('where', {})
-        result = app.config['cursor'].get_one_result('Cabinet', fields, where)
+        result = app.config['cursor'].get_one_result('cabinet', fields, where)
         if result:
-            util.write_log(username, 'select Cabinet sucess') 
+            util.write_log(username, 'select cabinet sucess') 
             return json.dumps({'code':0,'result':result})
         else:
             return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
@@ -58,8 +58,8 @@ def getlist(auth_info,**kwargs):
     try:
         output = ['id','name','idc_id','u_num','power']
         fields = kwargs.get('output', output)
-        result = app.config['cursor'].get_results('Cabinet', fields)
-        util.write_log(username, 'select Cabinet list sucess') 
+        result = app.config['cursor'].get_results('cabinet', fields)
+        util.write_log(username, 'select cabinet list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:
         logging.getLogger().error("select  Cabinet list error: %s" % traceback.format_exc())
@@ -76,7 +76,7 @@ def update(auth_info,**kwargs):
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        result = app.config['cursor'].execute_update_sql('Cabinet', data, where, ['name', 'idc_id', 'u_num', 'power'])
+        result = app.config['cursor'].execute_update_sql('cabinet', data, where, ['name', 'idc_id', 'u_num', 'power'])
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
         util.write_log(username,'update cabinet %s sucess' % data['name'])
@@ -95,7 +95,7 @@ def delete(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         data = request.get_json()['params']
-        result = app.config['cursor'].execute_delete_sql('Cabinet', data)
+        result = app.config['cursor'].execute_delete_sql('cabinet', data)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个机柜'})
         util.write_log(username,'delete cabinet sucess')

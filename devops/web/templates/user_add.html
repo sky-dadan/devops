@@ -102,9 +102,8 @@ $("form :input.required").each(function(){
     $(this).parent().append($required); //然后将它追加到文档中
 });
 
-$('#repwd').hover(function(){
+$('#repwd').focusout(function(){
     password=$('#password').val()
-},function(){
     repwd=$('#repwd').val()
     if (password != repwd){
         swal("OMG!", "两次输入密码不一致", "error")

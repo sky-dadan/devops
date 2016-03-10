@@ -3,7 +3,7 @@
 from flask import Flask, request
 from flask_jsonrpc import JSONRPC
 from . import app , jsonrpc
-import logging, util
+import time, logging, util
 from auth import auth_login
 import json, traceback,hashlib
 import crypt, random
@@ -69,6 +69,7 @@ def createuser(auth_info,**kwargs):
         else:
             data.pop('repwd')    #因为表单是整体打包过来的，第二次输入的密码字段不存在，需要删除
         data['password'] = hashlib.md5(data['password']).hexdigest()
+        data['join_date'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         app.config['cursor'].execute_insert_sql('user', data)
 
         if not git_passwd(username, data['password']):
@@ -109,17 +110,23 @@ def userselfinfo(auth_info,**kwargs):
     fields = ['id','username','name','email','mobile','role','is_lock','r_id']
     try:
         user = app.config['cursor'].get_one_result('user', fields, where={'username': username})
-        r_id = user['r_id'].split(',') if user['r_id'] else 0
+        if user.get('r_id', None):
+            r_id = user['r_id'].split(',')
 
-        #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
-        gids = app.config['cursor'].get_results('groups', ['id', 'name', 'p_id'], where={'id': r_id})
+            #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
+            gids = app.config['cursor'].get_results('user_group', ['id', 'name', 'p_id'], where={'id': r_id})
+        else:
+            gids = {}
         own_pids = set([])
         for x in gids:
                 own_pids |= set(x['p_id'].split(','))
         user['r_id'] = [x['name'] for x in gids]
 
-        pids = app.config['cursor'].get_results('power', ['id', 'name', 'name_cn', 'url'], where={'id': list(own_pids) if own_pids else 0})
-        user['p_id'] = dict([(str(x['name']), dict([(k, x[k]) for k in ('name_cn', 'url')])) for x in pids])
+        if own_pids:
+            pids = app.config['cursor'].get_results('permission', ['id', 'name', 'name_cn', 'url'], where={'id': list(own_pids)})
+            user['p_id'] = dict([(str(x['name']), dict([(k, x[k]) for k in ('name_cn', 'url')])) for x in pids])
+        else:
+            user['p_id'] = {}
 
         util.write_log(username, 'get_user_info')
         return  json.dumps({'code': 0, 'user': user})
@@ -141,10 +148,10 @@ def userlist(auth_info,**kwargs):
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
         #获取组所有的id,name并存为字典如：{'1': 'sa', '2': 'php'}
-        gids = app.config['cursor'].get_results('groups', ['id', 'name'])
+        gids = app.config['cursor'].get_results('user_group', ['id', 'name'])
         gids = dict([(str(x['id']), x['name']) for x in gids])
         result = app.config['cursor'].get_results('user', fields)
-        for user in result: #查询user表中的r_id,与groups表生成的字典对比，一致则将id替换为name,如，"sa,php"
+        for user in result: #查询user表中的r_id,与user_groups表生成的字典对比，一致则将id替换为name,如，"sa,php"
             user['r_id'] = ','.join([gids[x] for x in user['r_id'].split(',') if x in gids])
             users.append(user)
         util.write_log(username, 'get_all_users')
@@ -256,6 +263,8 @@ def login():
                 return json.dumps({'code': 1, 'errmsg': "用户已被锁定"})
 
             if passwd == result['password']:
+                data = {'last_login': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}
+                app.config['cursor'].execute_update_sql('user', data, {'username': username})
                 s = util.get_validate(result['username'], result['id'], result['role'], app.config['passport_key'])
                 return json.dumps({'code': 0, 'authorization': s})
             else:
@@ -283,10 +292,10 @@ def getlist(auth_info,**kwargs):
         res = app.config['cursor'].get_one_result('user', ['r_id'], {'username': username})
         r_id = getid_list([res['r_id']])
 
-        res = app.config['cursor'].get_results('groups', ['p_id'], {'id': r_id})
+        res = app.config['cursor'].get_results('group', ['p_id'], {'id': r_id})
         perm_result = getid_list([x['p_id'] for x in res])
 
-        result = app.config['cursor'].get_results('power', fields, {'id': perm_result})
+        result = app.config['cursor'].get_results('permission', fields, {'id': perm_result})
         util.write_log(username, "get permission success")
         return json.dumps({'resu lt':0,'result':result,'count':len(result)})
     except:
@@ -307,7 +316,7 @@ def user_groups(auth_info, **kwargs):
         res = app.config['cursor'].get_one_result('user', ['r_id'], {'username': username})
         r_id= getid_list([res['r_id']])
 
-        result = app.config['cursor'].get_results('groups', fields, {'id': r_id})
+        result = app.config['cursor'].get_results('user_group', fields, {'id': r_id})
         util.write_log(username, "get groups success")
         return json.dumps({'code':0,'result':result,'count':len(result)})
     except:

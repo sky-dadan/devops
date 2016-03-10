@@ -55,7 +55,7 @@ position:static;
              <div class="form-group">
             <label class="control-label">备注</label>
       		<div class="controls">
-                <textarea class="form-control" rows="3" id="info" name="info"></textarea>
+                <textarea class="form-control" rows="3" id="info" name="comment"></textarea>
       		</div> 
 		</div><!--add remark end -->
     	<div class="form-group">
@@ -104,7 +104,7 @@ position:static;
             <div class="form-group">
                 <label class="control-label">备注</label>
       		<div class="controls">
-                <textarea class="form-control" rows="3" id="upinfo" name="info"></textarea>
+                <textarea class="form-control" rows="3" id="upinfo" name="comment"></textarea>
       		</div> 
         </div><!--update remark end -->
     	<div class="form-group">
@@ -176,7 +176,7 @@ function list(){
            '<td>'+v['name']+'</td>'+  
            '<td>'+v['name_cn']+'</td>'+  
            '<td>'+v['p_id']+'</td>'+  
-           '<td>'+v['info']+'</td>'+ 
+           '<td>'+v['comment']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
            '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
@@ -243,7 +243,7 @@ $('#addForm').on('submit',function(){
          data = JSON.parse(data)  //object
          data = JSON.parse(data['result']) //object
          if (data['code']==0){
-            alert(data['result'])
+            swal("Good!", data['result'], "success")
 		    $('#addModal').modal('hide')
             list()
             location.reload()
@@ -266,10 +266,10 @@ $('tbody').on('click','.update-btn',function(){
           $('#upname').val(data['result']['name'])
           $('#upname_cn').val(data['result']['name_cn'])
           $('#upp_id').val(data['result']['p_id'])
-          $('#upinfo').val(data['result']['info'])
+          $('#upinfo').val(data['result']['comment'])
           uphave_perm(id)
       }else{
-          alert(data['errmsg'])
+          swal("Error", data['errmsg'], "error")
       }
 	})
 })
@@ -285,7 +285,7 @@ $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data['result']) //object
     console.log(data)
     if (data['code']==0){   
-        alert(data['result'])
+        swal("Good!", data['result'], "success")
         $('#updateModal').modal('hide')
         list()
         location.reload()
@@ -305,13 +305,13 @@ $("tbody").on('click','.delete-btn',function(){
 		$.getJSON(url,function(data){
       		data = JSON.parse(data['result'])
 			if (data['code']== 0 ){
-				alert(data['result'])
+				swal("Good!", data['result'], "success")
                 $(that).parents('tr').remove();
                 location.reload()
                 list()
                 location.reload()
 			}else{
-				alert(data['errmsg'])
+				swal("Error", data['errmsg'], "error")
 			}
     	})
     }  // end confirm

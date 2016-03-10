@@ -15,12 +15,12 @@ from user_perm import getid_list
     以后需要添加  已选中的下拉菜单,直接在color_selected字典里面添加元素即可
 '''
 color_selected= {'u_all_sel':{'t1':'project_perm','c1':['user_all_perm'],'t2':'user','c2':['id','name']},
-                 'g_all_sel':{'t1':'project_perm','c1':['group_all_perm'],'t2':'groups','c2':['id','name']},
-                 'g_rw_sel':{'t1':'project_perm','c1':['group_rw_perm'],'t2':'groups','c2':['id','name']},
+                 'g_all_sel':{'t1':'project_perm','c1':['group_all_perm'],'t2':'user_group','c2':['id','name']},
+                 'g_rw_sel':{'t1':'project_perm','c1':['group_rw_perm'],'t2':'user_group','c2':['id','name']},
                  'u_rw_sel':{'t1':'project_perm','c1':['user_rw_perm'],'t2':'user','c2':['id','name']},
                  'principal_sel':{'t1':'project','c1':['principal'],'t2':'user','c2':['id','name']},
-                 'power_sel':{'t1':'groups','c1':['p_id'],'t2':'power','c2':['id','name']},
-                 'groups_sel':{'t1':'user','c1':['r_id'],'t2':'groups','c2':['id','name']}
+                 'power_sel':{'t1':'user_group','c1':['p_id'],'t2':'permission','c2':['id','name']},
+                 'groups_sel':{'t1':'user','c1':['r_id'],'t2':'user_group','c2':['id','name']}
                 }
 
 

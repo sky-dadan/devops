@@ -125,7 +125,7 @@ def run_script(cmd):
 
     try:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        out = process.read().strip()
+        out = process.stdout.read().strip()
         logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
         return out
     except:

@@ -1,0 +1,66 @@
+#!/bin/bash
+pythonpath='/usr/local/devops/devops'
+pidfile='/var/run/uwsgi'
+logpath='/data/devops/log'
+lockdir='/var/lock/subsys'
+lock_file_path=$lockdir/uwsgi
+
+[ -d $pidfile ] || mkdir -pv $pidfile
+
+
+function start(){
+    echo "start uwsgi web and api.........."
+    cd $pythonpath
+    source $pythonpath/../.venv/bin/activate
+    if [ $? -eq 0 ]
+    then
+        uwsgi --ini config_web.ini -d $logpath/web/uwsgi_web.log  --pidfile $pidfile/web.pid &&
+        uwsgi --ini config_api.ini -d $logpath/api/uwsgi_api.log   --pidfile $pidfile/api.pid ; return_value=$?
+        if test -w "$lockdir"
+        then
+            touch $lock_file_path
+            echo "start SUCCESS"
+        fi
+        exit $return_value
+    else
+        echo "start uwsgi web and api failed.......permission deny!"
+    fi
+    
+}
+
+function stop(){
+    echo "stop uwsgi web, api"
+    killall uwsgi
+    [ $? -eq 0 ] && rm -rf $lockfile
+    echo "STOP  all uwsgi   SUCCESS"
+}
+
+function restart(){
+    stop
+    start
+}
+
+function status(){
+    [ ! -e $lockfile ] || echo "uwsgi is running........."
+    ps aux | grep 'uwsgi'  | grep -v 'grep'
+}
+
+
+
+case "$1" in
+    start)
+    start
+    ;;
+    stop)
+    stop
+    ;;
+    restart)
+    restart
+    ;;
+    status)
+    status
+    ;;
+*)
+    echo $"Usage: $0 {start|stop|relstart|status}"
+    exit 2
+esac

@@ -378,15 +378,20 @@ $('#addForm').on('submit',function(){
          data = JSON.parse(data)  //object
          data = JSON.parse(data['result']) //object
          if (data['code']==0){
-            alert(data['result'])
-		    $('#addModal').modal('hide')
-            list()
-            location.reload()
+            swal({
+                title:"添加成功",
+                type: "success",
+                confirmButtonText: "Cool"
+            },function(){
+                $('#addModal').modal('hide')
+                list()
+                location.reload()
+            })
          }else{
-		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
-         }
-       })
-	   return false
+		    $('#errorMsg').html('Failed:'+data['errmsg']).show()
+         }  //end swal
+    })   //end post
+	return false
 })  //submit form
 
 /*get one data from id for update*/
@@ -414,7 +419,7 @@ $('tbody').on('click','.update-btn',function(){
           $('#upstatus').val(data['result']['status'])
           $('#upremark').val(data['result']['remark'])
       }else{
-          alert(data['errmsg'])
+          swal("OMG!",data['errmsg'], "error"); 
       }
 	})
 })
@@ -432,12 +437,18 @@ $.post('/updateapi',data, function(data){  // data is string
     data = JSON.parse(data['result']) //object
     console.log(data)
     if (data['code']==0){   
-        alert(data['result'])
-        $('#updateModal').modal('hide')
-        list()
-        location.reload()
+		swal({ 
+			 title: "更新成功!", 
+			 text: data['result'],   
+			 type: "success",   
+			 confirmButtonText: "Cool"
+		 },function(){               
+			$('#updateModal').modal('hide')
+			list()
+			location.reload()
+		});
     }else{
-		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
+		$('#uperrorMsg').html('Failed:'+data['errmsg']).show()
     }
 })
     return false   //get data and end
@@ -445,23 +456,43 @@ $.post('/updateapi',data, function(data){  // data is string
 
 /*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
 $("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
         var that = this;
 		var id = $(this).attr('data-id')
         var url = "/deleteapi?method="+name+"&id="+id
-		$.getJSON(url,function(data){
-      		data = JSON.parse(data['result'])
-			if (data['code']== 0 ){
-				alert(data['result'])
-                $(that).parents('tr').remove();
-                list()
-                location.reload()
-			}else{
-				alert(data['errmsg'])
+				swal({
+					   title: "确定要删除吗?",
+					   text: "一旦删除就无法恢复，请三思！！！ ",
+					   type: "warning",
+					   showCancelButton: true,
+					   confirmButtonColor: "#DD6B55",
+					   confirmButtonText: "确认删除!",
+				  	   cancelButtonText: "容我再想想!",  
+                       closeOnConfirm: false, 	
+					   closeOnConfirm: false                     
+				}, function(isConfirm){
+					if (isConfirm){
+						$.getJSON(url,function(data){
+							data = JSON.parse(data['result'])
+							if (data['code']== 0 ){
+				 				swal({ 
+				   						 title: "删除成功", 
+										  text: data['result'],   
+										  type: "success",   
+										  confirmButtonText: "Cool"    
+									  },function(){               
+										$(that).parents('tr').remove();
+										list()
+										location.reload()
+							 });
+						}else{
+							swal("OMG!", data['errmsg'], "error"); 	
+					   }
+				}) //end getJSON
+            }else{
+				 swal("Cancelled", "取消删除成功", "error");   
 			}
-    	})
-    }  // end confirm
-    return false   //get data and end
+	     })
+ return false   //get data and end
 })   
 </script>
 {% endblock %}

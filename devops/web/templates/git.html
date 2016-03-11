@@ -363,7 +363,7 @@ $('tbody').on('click','.update-btn',function(){
 		  $('#up_comment').val(data['result']['comment'])
 		$('#updateModal').modal('show')  //show modal
       }else{
-          alert(data['errmsg'])
+         swal("OMG!", data['errmsg'], "error"); 
       }
 	})
 })

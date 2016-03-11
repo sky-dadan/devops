@@ -476,8 +476,14 @@ function list(){
            {
                 v['status']="离线"
            }
-           str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['hostname']+'</td>'+  
+           if (v['warning'] == 1) {
+               str += '<tr class="odd gradeX warning">';
+           } else if (v['warning'] == 2) {
+               str += '<tr class="odd gradeX error">';
+           } else {
+               str += '<tr class="odd gradeX">';
+           }
+           str += '<td>'+v['hostname']+'</td>'+  
            '<td>'+v['inner_ip']+'</td>'+  
            '<td>'+v['wan_ip']+'</td>'+  
            '<td>'+v['os_info']+'</td>'+ 

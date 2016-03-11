@@ -29,7 +29,7 @@
 	  </div><!--modal-header end-->
 
       <div class="modal-body">
-      <p hidden id="errorMsg" class="text-danger" style="color:red">this is a test</p> <!-- foe error msg-->
+      <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
 
      <form class="form-horizontal" id="updateForm">
         <input type="hidden" id='id' name="id">  <!--update need id-->
@@ -42,7 +42,7 @@
      	<div class="form-group">
             <label class="control-label">姓名</label>
      		 <div class="controls">
-       		 	<input id="upname"  type="text"  name="name" >
+       		 	<input id="upname"  type="text"  name="name" />
       		</div> 
        	</div> <!--update name end-->
 		<div class="form-group">
@@ -111,7 +111,7 @@
      	<div class="form-group">
             <label class="control-label">新密码</label>
      		 <div class="controls">
-       		 	<input id="changepasswd"  type="password"  name="changepasswd" >
+       		 	<input id="changepasswd"  type="password"  name="changepasswd" />
       		</div> 
         </div>
     	<div class="form-group">
@@ -290,7 +290,7 @@ $('#ChangePasswdForm').on('submit',function(){
 })
 /*delete data*/
 $("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
+	if(confirm("是否确认删除？")){
         var that = this;
 		var id = $(this).attr('data-id')
 		var url =  "/deleteapi?method="+name+"&id="+id

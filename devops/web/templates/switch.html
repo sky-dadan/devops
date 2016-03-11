@@ -82,6 +82,18 @@ position:static;
       		</div> 
 		</div><!--add cabinet_id end -->
         <div class="form-group">
+            <label class="control-label">采购时间</label>
+      		<div class="controls">
+       			<input id="store_date" type="date"  name="store_date" >
+      		</div> 
+		</div><!--add store_date end -->
+        <div class="form-group">
+            <label class="control-label">过期时间</label>
+      		<div class="controls">
+       			<input id="expire"  type="date"  name="expire" >
+      		</div> 
+		</div><!--add expire end -->
+        <div class="form-group">
             <label class="control-label">端口数量</label>
       		<div class="controls">
        			<input id="port_num"  type="text"  name="port_num" >
@@ -175,6 +187,18 @@ position:static;
                 </select>
       		</div> 
 		</div><!--update cabinet_id end -->
+     	<div class="form-group">
+            <label class="control-label">采购时间</label>
+      		<div class="controls">
+                <input id="upstore_date" type="date"  name="store_date" >
+      		</div> 
+		</div><!--update store_date  end -->
+        <div class="form-group">
+            <label class="control-label">过期时间</label>
+      		<div class="controls">
+       			<input id="upexpire" type="date"  name="expire" >
+      		</div> 
+		</div><!--update expire  end -->
         <div class="form-group">
             <label class="control-label">端口数量</label>
       		<div class="controls">
@@ -308,8 +332,14 @@ function list(){
            else{
                v['status']="离线"
            }
-           str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['name']+'</td>'+  
+           if (v['warning'] == 1) {
+               str += '<tr class="odd gradeX warning">';
+           } else if (v['warning'] == 2) {
+               str += '<tr class="odd gradeX error">';
+           } else {
+               str += '<tr class="odd gradeX">';
+           }
+           str += '<td>'+v['name']+'</td>'+  
            '<td>'+v['ip']+'</td>'+  
            '<td>'+v['type']+'</td>'+  
            '<td>'+idc_array[v['idc_id']]+'</td>'+  

@@ -4,7 +4,7 @@
 from flask import Flask,request
 from . import jsonrpc
 from . import app
-import logging,util
+import time,logging,util
 from auth import auth_login
 import json,traceback
 from jsondate import MyEncoder
@@ -64,6 +64,13 @@ def getlist(auth_info,**kwargs):
                 'host_type','manufacturer_id','supplier_id','store_date','expire','idc_id','cabinet_id','service_id','status','vm_status','remark']
         fields = kwargs.get('output', output)
         result = app.config['cursor'].get_results('host', fields)
+        now = int(time.time())
+        warning_date = int(app.config.get('asset_warning_day', 0))
+        for asset in result:
+            if 'expire' in asset and asset['expire']:
+                expire = int(time.mktime(asset['expire'].timetuple()))
+                remain_date = (expire-now)/(24*60*60)
+                asset['warning'] = 2 if remain_date <= 0 else 1 if warning_date > 0 and warning_date > remain_date else 0
         util.write_log(username, 'select host list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:

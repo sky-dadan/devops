@@ -48,7 +48,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>URL</label>
 			<div class='controls'>
-				 <input  type="text" name="url" id="add_url" value="http://" />
+				 <input  type="text" name="url" id="add_url" placeholder="http://" />
 			</div>
 		</div>
 		<div class='form-group'>
@@ -149,7 +149,6 @@ function list(){
        //  data = data['result']  //string
        data=JSON.parse(data['result']); //object 
        console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
-	   console.log("hello,world")
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
@@ -258,7 +257,7 @@ $.post('/updateapi',data, function(data){  // data is string
 
 /*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
 $("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
+	if(confirm("是否确认删除？")){
         var that = this;
 		var id = $(this).attr('data-id')
         var url = "/deleteapi?method="+name+"&id="+id

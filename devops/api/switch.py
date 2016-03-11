@@ -3,7 +3,7 @@
 from flask import Flask,request
 from . import jsonrpc
 from . import app
-import logging,util
+import time,logging,util
 from auth import auth_login
 import json,traceback
 from jsondate import MyEncoder
@@ -34,7 +34,7 @@ def get(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
-        output = ['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
+        output = ['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','store_date','expire','remark']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('switch', fields, where)
@@ -56,8 +56,15 @@ def getlist(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
-        fields =['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','remark']
+        fields =['id','name','ip','type','manufacturer_id','supplier_id','idc_id','cabinet_id','port_num','status','store_date','expire','remark']
         result = app.config['cursor'].get_results('switch', fields)
+        now = int(time.time())
+        warning_date = int(app.config.get('asset_warning_day', 0))
+        for asset in result:
+            if 'expire' in asset and asset['expire']:
+                expire = int(time.mktime(asset['expire'].timetuple()))
+                remain_date = (expire-now)/(24*60*60)
+                asset['warning'] = 2 if remain_date <= 0 else 1 if warning_date > 0 and warning_date > remain_date else 0
         util.write_log(username, 'select switch list sucess') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
@@ -75,7 +82,7 @@ def update(auth_info,**kwargs):
     try:
         data = kwargs.get('data',None)
         where = kwargs.get('where',None)
-        fields = ['name', 'ip', 'type','manufacturer_id','supplier_id','idc_id', 'cabinet_id', 'port_num', 'status', 'remark']
+        fields = ['name', 'ip', 'type','manufacturer_id','supplier_id','idc_id', 'cabinet_id', 'port_num', 'status', 'store_date', 'expire', 'remark']
         result = app.config['cursor'].execute_update_sql('switch', data, where, fields)
         if result == '':
             return json.dumps({'code':1,'errmsg':'需要指定一个网络设备'})

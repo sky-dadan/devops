@@ -42,7 +42,7 @@ function restart(){
 
 function status(){
     [ ! -e $lockfile ] || echo "uwsgi is running........."
-    ps aux | grep 'uwsgi'  | grep -v 'grep'
+    ps aux | grep 'uwsgi'  | grep -v 'grep'   || echo "uwsgi not running........"
 }
 
 

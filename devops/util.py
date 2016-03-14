@@ -112,7 +112,7 @@ def validate(key, fix_pwd):
 
 def check_name(name):
     if isinstance(name, str) or isinstance(name, unicode):
-        return name.isalnum() and len(name) > 2
+        return name.isalnum() and len(name) >= 2
     else:
         return False
 

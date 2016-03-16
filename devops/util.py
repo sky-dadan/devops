@@ -141,7 +141,7 @@ def getinfo(table_name,fields):
     '''
     result = app.config['cursor'].get_results(table_name,fields)
     if fields[1] in ['r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm']:  #第二列的结果为列表的字段拼接为字符串
-        result = dict((x[fields[0]],x[fields[1]].split(',')) for x in result)
+        result = dict((str(x[fields[0]]), x[fields[1]].split(',')) for x in result)
     else:
         result = dict((str(x[fields[0]]), x[fields[1]]) for x in result)
     return result
@@ -149,9 +149,7 @@ def getinfo(table_name,fields):
 #获取一个组里面所有的用户列表
 #需要传入用户信息users=getinfo(user,['username','r_id'])和组信息groups=getinfo(group,['id','name'])
 def group_users(users,groups):
-    group = {}
-    for g_name in groups.values():
-        group[g_name] = []
+    group = dict([(g_name, []) for g_name in groups.values()])
     for u_name, r_id in users.items():
         for g_id, g_name in groups.items():
             if g_id in r_id:
@@ -169,11 +167,9 @@ def get_git():
         groups = getinfo('user_group',['id','name'])
         group = group_users(users,groups) 
         #获取每个项目的权限列表,取出来的是id
-        result  = [] 
         perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
-        for id in projects:
-           p_perm = app.config['cursor'].get_one_result('project_perm',perm_fields,{"id":int(id)})
-           result.append(p_perm)   #[{'id':'1','user_all_perm':'1,2','user_rw_perm':'1,3',.....},.......]
+        result = app.config['cursor'].get_results('project_perm', perm_fields)
+        #[{'id':'1','user_all_perm':'1,2','user_rw_perm':'1,3',.....},.......]
 
         #将每个项目的权限id列表匹配为对应的username  gname,projectname
         user_git = getinfo('user',['id','username'])
@@ -181,23 +177,19 @@ def get_git():
         for project in result:
             name=projects[str(project['id'])]  #通过id匹配对应的project name
             p[name]={}
-            p[name]['user_all_perm'] = [user_git[str(uid)] for uid in project['user_all_perm'].split(',') if uid in user_git] 
-            p[name]['user_rw_perm'] = [user_git[str(uid)] for uid in project['user_rw_perm'].split(',') if uid in user_git] 
-            p[name]['group_rw_perm'] = [groups[str(gid)] for gid in project['group_rw_perm'].split(',') if gid in groups]  
-            p[name]['group_all_perm'] = [groups[str(gid)] for gid in project['group_all_perm'].split(',') if gid in groups]
-        print p    
-        '''
-           p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
-        '''
+            for k, v in [('user_all_perm', user_git), ('user_rw_perm', user_git), ('group_all_perm', groups), ('group_rw_perm', groups)]:
+                p[name][k] = [v[x] for x in project[k].split(',') if x in v]
+        #p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
+
         #进一步查询每个项目都有哪些人参与，即将p里组的成员都都替换为具体的人
         for key,values in p.items():
-            p_users[key] = []
+            p_users[key] = set([])
             for k,v in values.items():
-                for i in v:
-                    if i in group:
-                        p_users[key] += group[i]       
-                    else: 
-                        p_users[key].append(i)
+                if k.startswith('group'):
+                    for x in v:
+                        p_users[key] |= set(group[x])
+                elif k.startswith('user'):
+                    p_users[key] |= set(v)
         print p_users
         return {'code':'0','group':group,'project':p,'p_all_users':p_users}
     except:

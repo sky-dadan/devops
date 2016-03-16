@@ -117,9 +117,11 @@
             <i class="icon icon-bell"></i><span>第三方接口</span>
             <span class="arrow icon-chevron-down"></span>
         </a>
+        {% if info and 'cdn' in info.perm %}
         <ul>
             <li ><a href="/cdn">cdn刷新接口</a></li>
         </ul>
+        {% endif %}
         </li> <!--end priviage-->
     </ul>
 </div>

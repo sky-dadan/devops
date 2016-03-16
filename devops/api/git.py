@@ -43,8 +43,7 @@ def git_create(auth_info, **kwargs):
 
         r = gitolite()
         t = json.loads(r)
-        print t
-        if t['code'] == '1':
+        if t['code'] == 1:
             return r
 
         '''sendemail'''
@@ -68,7 +67,8 @@ def git_update(auth_info,**kwargs):
     role = int(auth_info['role'])
     if role != 0:
         return json.dumps({'code':1,'errmsg':'you are not admin'})
-    p_data, p_perm_data = {},{}
+    p_data = {}
+    p_perm_data = {'user_all_perm': '', 'group_all_perm': '', 'user_rw_perm': '', 'group_rw_perm': ''}
     pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
     try:
         data = kwargs.get('data',None)
@@ -85,8 +85,7 @@ def git_update(auth_info,**kwargs):
         else:
             r = gitolite()
             t = json.loads(r)
-            print t
-            if t['code'] == '1':
+            if t['code'] == 1:
                 return r
         util.write_log(username,'update project %s success' % data['name'])
         return json.dumps({'code':0,'result':'更新项目%s成功' % data['name']})
@@ -155,7 +154,6 @@ def git_getlist(auth_info, **kwargs):
             projects = git_result['project']
             groups = git_result['group']
             pro_all_users =git_result['p_all_users']
-        print "pro_all_users = ",pro_all_users
         #将上面projects里的列表变成以逗号分隔的字符串{'ask.100xhs.com':{'user_all_perm':['zhangxunan','lisi']}}
         for pro in projects:
             for pro_field in pro_perm_fields:
@@ -199,30 +197,36 @@ def gitolite():
     script_dir =  os.path.join(api_dir.rstrip('api'),'script')
     result = util.get_git() 
     if int(result['code']) ==0:
+        unlock_project = app.config['cursor'].get_results('project', ['name'], {'is_lock': 0})
+        unlock_project = [x['name'] for x in unlock_project]
         group  = result['group'] 
         project = result['project']
         for p in project:
             project[p]['user_rw_perm'] = ' '.join(project[p]['user_rw_perm'])
             project[p]['user_all_perm'] = ' '.join(project[p]['user_all_perm'])
-            project[p]['group_rw_perm'] = "@%s" %  ' @'.join(project[p]['group_rw_perm'])
-            project[p]['group_all_perm'] = "@%s" % ' @'.join(project[p]['group_all_perm'])
+            project[p]['group_rw_perm'] = ' '.join(['@%s' % x for x in project[p]['group_rw_perm']])
+            project[p]['group_all_perm'] = ' '.join(['@%s' % x for x in project[p]['group_all_perm']])
 
         try:
-            #每次将原有配置文件删除
-            if os.path.exists(git_confile):
-                os.unlink(git_confile)
             #将用户和组信息写入配置文件
-            str1 = ""
-            for k,v in group.items():
-                str1 += "@%s = %s \n" %(k,' '.join(v))
-            with open(git_confile,'a') as f:
+            with open(git_confile,'w') as f:
+                str1 = ""
+                for k,v in group.items():
+                    str1 += "@%s = %s\n" %(k,' '.join(v))
                 f.write(str1)
 
-            #将项目信息写入配置文件
-            str2 = ""
-            for k,v in project.items():
-                str2  += "repo %s \n    RW+ = %s %s \n    RW = %s %s \n" % (k,v['group_all_perm'],v['user_all_perm'],v['group_rw_perm'],v['user_rw_perm'])
-            with open(git_confile,'a') as f:
+                #将项目信息写入配置文件
+                str2 = ""
+                for k,v in project.items():
+                    if k not in unlock_project:
+                        continue
+                    if not any([v['group_all_perm'], v['user_all_perm'], v['group_rw_perm'], v['user_rw_perm']]):
+                        continue
+                    str2 += "repo %s\n" % k
+                    if v['group_all_perm'] or v['user_all_perm']:
+                        str2 += "    RW+ = %s %s\n" % (v['group_all_perm'], v['user_all_perm'])
+                    if v['group_rw_perm'] or v['user_rw_perm']:
+                        str2 += "    RW = %s %s\n" % (v['group_rw_perm'], v['user_rw_perm'])
                 f.write(str2)
 
             #git add/commit/push生效.路径暂时写死，定版前修改
@@ -234,7 +238,4 @@ def gitolite():
             return json.dumps({'code':1,'errmsg':"写配置文件报错"})
     else:
          return json.dumps({'code':1,'errmsg':"获取用户，组或者仓库出错"})
-
-
-
 

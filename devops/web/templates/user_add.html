@@ -27,63 +27,57 @@
 	<div class="control-group">
 		<label class="control-label">所属组</label>
 		<div class="controls">
-                <select id="r_id" name="r_id" class="multiselect" multiple="multiple">
+                <select id="r_id" name="r_id" class="multiselect" multiple="multiple" >
                 </select>
 		</div>
 	</div>
     <div class="control-group">
         <label class="control-label">用户名：</label>
         <div class="controls">
-            <input type="text" name="username" id="username"/>
-            <span for="required" generated="true" class="help-inline"></span>
+         <input type="text" name="username" id="username"  datatype="s5-16" errormsg="必须是5-16个字符" />
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">姓名：</label>
         <div class="controls">
-            <input  type="text" name="name" id="name" />
-            <span for="required" generated="true" class="help-inline"></span>
+            <input  type="text" name="name" id="name" datatype="zh2-4" errormsg="必须是2-4个中文字符" />
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">E-mail：</label>
         <div class="controls">
-            <input  type="email" ng-model="user.email" name="email" id="email" />
-            <span for="required" generated="true" class="help-inline"></span>
+            <input  type="email"  name="email" id="email" datatype="e" errormsg="Email格式不正确" />
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">手机：</label>
         <div class="controls">
-            <input type="text" name="mobile" id="mobile" />
-            <span for="required" generated="true" class="help-inline"></span>
+            <input type="text" name="mobile" id="mobile" datatype="m" errormsg="手机格式不对"  />
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">状态：</label>
         <div class="controls">
             <select name='is_lock' id='is_lock' style='width:120px'> 
-                <option value=0>正常</option>
-                <option value=1>锁定</option>
-            </select>
+                 <option value=0>正常</option>
+                 <option value=1>锁定</option>
+              </select>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">登录密码：</label>
         <div class="controls">
-            <input  type="password" name="password" id="password" />
-            <span for="required" generated="true" class="help-inline"></span>
+             <input  type="password" name="password" id="password" datatype="*6-15" errormsg="密码需要6~15位之间" />
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">重复输入密码：</label>
         <div class="controls">
-             <input  type="password" name="repwd" id="repwd" />
-             <span for="required" generated="true" class="help-inline"></span>
+               <input  type="password" name="repwd" id="repwd"  datatype="*" recheck="password" errormsg="您两次输入的账号密码不一致！" />
         </div>
     </div>
     <div class="form-actions">
-         <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定添加" class="btn btn-success global_radius_4">
+          <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定添加" class="btn btn-success global_radius_4">
     </div>
     </form> 
        
@@ -96,18 +90,13 @@
 <script>
 
 /*检查表单数据是否合法*/
-
-$("form :input.required").each(function(){
-     var $required = $("<strong class='high'> *</strong>"); //创建元素
-    $(this).parent().append($required); //然后将它追加到文档中
-});
-
-$('#repwd').focusout(function(){
-    password=$('#password').val()
-    repwd=$('#repwd').val()
-    if (password != repwd){
-        swal("OMG!", "两次输入密码不一致", "error")
+$("#user_signup_form").Validform({
+    btnSubmit:"#submit_data_btn",
+    tiptype:3, 
+    datatype:{
+        "zh2-4" : /^[\u4E00-\u9FA5\uf900-\ufa2d]{2,4}$/,
     }
+    
 })
 
 $("#submit_data_btn").on('click',function(){
@@ -115,13 +104,13 @@ $("#submit_data_btn").on('click',function(){
         swal("OMG!", "你必须选择一个组", "error")
     }else{
         add()
-    }
+     }
  })
 
 name="user"
 /*通过jsonrpc接口统一处理*/
 function add(){
-        var str = $('#user_signup_form').serialize()
+          var str = $('#user_signup_form').serialize()
         console.log(str)
         var data={'method':name,'formdata':str}
         $.post('/addapi',data,function(data){ 
@@ -129,10 +118,10 @@ function add(){
             data = JSON.parse(data['result']) //object
             if (data['code']==0){
                 swal("Good!", "创建用户成功", "success"); 
-                window.location='/user/list'
+                 window.location='/user/list'
             }else{
                 swal("error","创建用户失败," + data['errmsg'],"error")
-            }
+             }
          })
 }
 

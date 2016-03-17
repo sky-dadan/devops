@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block css %} 
-<style type="text/css">
-.Validform_right {color:green}
-.Validform_wrong {color:red}
-</style>
+
+<link rel="stylesheet" href="{{url_for('static',filename='css/validform.css')}}">
 {% endblock%}
 
 {% block title %}添加用户{% endblock %}

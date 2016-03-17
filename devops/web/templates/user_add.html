@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% block css %} 
+<style type="text/css">
+.Validform_right {color:green}
+.Validform_wrong {color:red}
+</style>
+{% endblock%}
+
 {% block title %}添加用户{% endblock %}
 {% block breadcrumb %}<a href="/user/add">添加用户</a>{% endblock %}
 
@@ -96,7 +103,6 @@ $("#user_signup_form").Validform({
     datatype:{
         "zh2-4" : /^[\u4E00-\u9FA5\uf900-\ufa2d]{2,4}$/,
     }
-    
 })
 
 $("#submit_data_btn").on('click',function(){

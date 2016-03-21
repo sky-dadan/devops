@@ -19,15 +19,9 @@ def login():
             token = result["authorization"]
             res = util.validate(token,app.config['passport_key'])  #返回json对象
             res = json.loads(res)                        #return : dict(username:*,uid:*,role:*)
-            #if int(res['role']) == 0:                   #针对管理员和普通用户的前端页面展示，已经通过前端代码处理，后端可忽略
-            #    print "%s is admin" % res['username']
-            #else:
-            #    print "%s is user" % res['username']
             session['author'] = token
-           # return redirect('/')
     	    return json.dumps({'code':0})
         else:
-            #return redirect('/login')
             return json.dumps({'code':1,'errmsg':result['errmsg']})
     return render_template('login.html')
 

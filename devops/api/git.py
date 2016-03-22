@@ -163,8 +163,11 @@ def git_getlist(auth_info, **kwargs):
         #查出项目列表
         result = app.config['cursor'].get_results('project', pro_fields)
         #将负责人id替换成name
+        url_prefix = app.config.get('git_url_prefix', '').strip('/')
         for res in result:
             res['principal'] = users[str(res['principal'])]
+            if not res['path'].startswith("http://"):
+                res['path'] = '/'.join([url_prefix, res['path'].strip('/')])
         #将权限信息追加到result字典里
         for project in result:
             project.update(projects[project['name']])
@@ -180,6 +183,23 @@ def git_getlist(auth_info, **kwargs):
     except:
         logging.getLogger().error("select project list error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目列表错误'})
+
+#新添加查询某个用户所拥有的项目列表，后期将起优化到getlist对应的部分
+@app.route('/api/userproject',methods=['GET','POST'])
+@auth_login
+def myproject(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    uid = int(auth_info['uid'])
+    try:
+        res =  util.userproject(username) #list 
+        return json.dumps({'code': 0, 'result': res})
+    except:
+        logging.getLogger().error("调用userproject函数失败: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '查询项目列表错误'})
+
 
 @app.route('/api/gitolite',methods=['GET'])
 def git_api():
@@ -230,7 +250,7 @@ def gitolite():
                 f.write(str2)
 
             #git add/commit/push生效.路径暂时写死，定版前修改
-            stdout=util.run_script("sh %s/git.sh" % script_dir)
+            stdout=util.run_script_with_timeout("sh %s/git.sh" % script_dir)
             print stdout
             return  json.dumps({'code':0,'result':"git操作成功"})
         except:

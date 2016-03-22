@@ -181,6 +181,23 @@ def git_getlist(auth_info, **kwargs):
         logging.getLogger().error("select project list error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目列表错误'})
 
+#新添加查询某个用户所拥有的项目列表，后期将起优化到getlist对应的部分
+@app.route('/api/userproject',methods=['GET','POST'])
+@auth_login
+def myproject(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    uid = int(auth_info['uid'])
+    try:
+        res =  util.userproject(username) #list 
+        return json.dumps({'code': 0, 'result': res})
+    except:
+        logging.getLogger().error("调用userproject函数失败: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '查询项目列表错误'})
+
+
 @app.route('/api/gitolite',methods=['GET'])
 def git_api():
     res = gitolite()

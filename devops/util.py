@@ -211,7 +211,7 @@ def partOfTheProject(result,projects,pro_all_users,username):
         if pro['name'] in project_list:
             res.append(pro)
     return res
-#用户返回他所拥有权限的项目
+#用户返回他所拥有权限的项目,后期替换掉上面的partOfTheProject的方法
 def userproject(username):
     res = get_git()
     p_users = res['p_all_users']

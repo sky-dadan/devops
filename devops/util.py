@@ -214,7 +214,7 @@ def get_git():
                         p_users[key] |= set(group[x])
                 elif k.startswith('user'):
                     p_users[key] |= set(v)
-        print p_users
+        #print p_users
         return {'code':'0','group':group,'project':p,'p_all_users':p_users}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
@@ -235,4 +235,10 @@ def partOfTheProject(result,projects,pro_all_users,username):
         if pro['name'] in project_list:
             res.append(pro)
     return res
-
+#用户返回他所拥有权限的项目
+def userproject(username):
+    res = get_git()
+    p_users = res['p_all_users']
+    #print username
+    result = [ p_name for p_name,p_user in p_users.items() if username in p_user ]  #返回有权限的项目名
+    return result  

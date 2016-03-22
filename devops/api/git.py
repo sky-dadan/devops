@@ -163,8 +163,11 @@ def git_getlist(auth_info, **kwargs):
         #查出项目列表
         result = app.config['cursor'].get_results('project', pro_fields)
         #将负责人id替换成name
+        url_prefix = app.config.get('git_url_prefix', '').strip('/')
         for res in result:
             res['principal'] = users[str(res['principal'])]
+            if not res['path'].startswith("http://"):
+                res['path'] = '/'.join([url_prefix, res['path'].strip('/')])
         #将权限信息追加到result字典里
         for project in result:
             project.update(projects[project['name']])
@@ -230,7 +233,7 @@ def gitolite():
                 f.write(str2)
 
             #git add/commit/push生效.路径暂时写死，定版前修改
-            stdout=util.run_script("sh %s/git.sh" % script_dir)
+            stdout=util.run_script_with_timeout("sh %s/git.sh" % script_dir)
             print stdout
             return  json.dumps({'code':0,'result':"git操作成功"})
         except:

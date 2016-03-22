@@ -219,12 +219,11 @@ position:static;
 </div><!-- /.modal -->
 
 <div class="widget-content">
-   <table id ="datatable"  class="table table-bordered table-striped">
+   <table id ="datatable"  class="table table-bordered table-striped" width="100%">
 	<thead>
 		<tr>
             <th scope="col">项目名称</th>
-            <th scope="col">项目路径</th>
-            <th scope="col">项目负责人</th>
+            <th scope="col">负责人</th>
             <th scope="col">用户RW+</th>
             <th scope="col">用户RW</th>
             <th scope="col">组RW+</th>
@@ -269,8 +268,7 @@ function list(){
            }
            
    //        str +='<tr class="odd gradeX">'+ 
-        str +='<td>'+v['name']+'</td>'+  
-           '<td>'+v['path']+'</td>'+  
+        str +='<td><a href="'+v['path']+'">'+v['name']+'</a></td>'+  
            '<td>'+v['principal']+'</td>'+  
            '<td>'+v['user_all_perm']+'</td>'+ 
            '<td>'+v['user_rw_perm']+'</td>'+ 
@@ -290,6 +288,7 @@ list()
 /* DataTable */
 function datatable(){
 $('#datatable').DataTable({
+	"scrollX": true,
 	"bDestroy":true,
     "language": {
         "lengthMenu": "每页 _MENU_ 条记录",

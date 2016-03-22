@@ -15,8 +15,12 @@ def project_apply():
     if int(validate_result['code']) == 0:
         url = "http://%s/api/userproject" % app.config['api_host']
         r = requests.post(url, headers=headers)
-        print type(r.text)
-        print r.text
-        return render_template('apply.html',info=session)
+        result = json.loads(r.text)
+        if int(result['code']) == 0:
+            print result
+            return render_template('apply.html',info=session,result=result['result'])
+        else:
+            return render_template('apply.html',info=session,result=result['errmsg'])
+
     else:
         return render_template('apply.html',errmsg=validate_result['errmsg'])

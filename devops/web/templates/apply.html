@@ -24,7 +24,7 @@
       <form class="form-horizontal" id="applyform">
          <input type="hidden" id='id' name="id">  <!--update need id-->
      	<div class="form-group">
-            <label class="control">项目名</label>
+            <label class="control-label">项目名</label>
      		 <div class="controls">
        		 	<input id="project_name"  type="text"  name="project_username">
       		</div> 
@@ -38,7 +38,7 @@
         <div class="form-group">
             <label class="control-label">发布详情</label>
       		<div class="controls">
-       			<input id="project_detail " type="text"  name="project_detail" >
+                <textarea id="project_detail " type="text"  rows="5" name="project_detail" ></textarea>
       		</div> 
 		</div><!--project_detail  end -->
     	<div class="form-group">
@@ -61,9 +61,23 @@
             <th scope="col">申请时间</th>
             <th scope="col">发布状态</th>
             <th  scope="col">操作</th>
- 		</tr>
+        </tr>
 	</thead>
 	<tbody>
+        {% if result %}
+        {% for res in result %}
+        <tr>
+            <td style="text-align: center;">{{ res }}</td>
+            <td style="text-align: center;">001</td>
+            <td style="text-align: center;">111</td>
+            <td style="text-align: center;">11</td>
+            <td style="text-align: center;">11</td>
+            <td style="text-align: center;">
+                <button  class='btn btn-primary btn-sm applybtn' data='{{ res }}'>申请发布</button>   
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
 	</tbody>
    </table>
 
@@ -72,4 +86,29 @@
 {% endblock %}
 
 {% block js %}
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+$('#datatable').DataTable({
+        "language": {
+            "lengthMenu": "每页 _MENU_ 条记录",
+            "zeroRecords": "没有找到记录",
+            "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+            "infoEmpty": "无记录",
+            "infoFiltered": "(从 _MAX_ 条记录过滤)",
+            "sSearch": "搜索:",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上一页",
+                "sNext": "下一页",
+                "sLast": "末页"
+            }
+        }
+});
+/*申请表单*/
+$("tbody").on('click','.applybtn',function(){
+    var project_name = $(this).attr('data')
+    $('#project_name').val(project_name)
+    $('#applyModal').modal('show')
+})
+</script>
 {% endblock %}

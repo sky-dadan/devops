@@ -194,7 +194,7 @@ def myproject(auth_info,**kwargs):
     role = int(auth_info['role'])
     uid = int(auth_info['uid'])
     try:
-        res =  util.userproject(username) #list 
+        res =  util.userproject(username) #dict
         return json.dumps({'code': 0, 'result': res})
     except:
         logging.getLogger().error("调用userproject函数失败: %s" % traceback.format_exc())

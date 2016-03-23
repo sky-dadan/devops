@@ -65,16 +65,16 @@
 	</thead>
 	<tbody>
         {% if result %}
-        {% for res in result %}
+        {% for p_id,p_name in result.iteritems() %}
         <tr>
-            <td style="text-align: center;">{{ res }}</td>
+            <td style="text-align: center;">{{ p_name }}</td>
             <td style="text-align: center;">001</td>
             <td style="text-align: center;">111</td>
             <td style="text-align: center;">11</td>
             <td style="text-align: center;">11</td>
             <td style="text-align: center;">
-                <button  class='btn btn-primary btn-sm applybtn' data='{{ res }}'>申请发布</button>   
-            </td>
+                <button  class='btn btn-primary btn-sm applybtn' data-id='{{ p_id }}' data='{{ p_name }}'>申请发布</button>   
+             </td>
         </tr>
         {% endfor %}
         {% endif %}

@@ -22,7 +22,8 @@
       <div class="modal-body">
       <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
       <form class="form-horizontal" id="applyform">
-         <input type="hidden" id='id' name="id">  <!--update need id-->
+        <input type="hidden" id='project_id' name="project_id">  <!--update need id-->
+        <input type="hidden" id='applicant' name="applicant">  <!--获取当前用户-->
      	<div class="form-group">
             <label class="control-label">项目名</label>
      		 <div class="controls">
@@ -32,18 +33,18 @@
      	<div class="form-group">
             <label class="control-label">发布简介</label>
      		 <div class="controls">
-       		 	<input id="project_info"   type="text"  name="project_info" />
+       		 	<input id="info"   type="text"  name="info" />
       		</div>  
        	</div> <!-- project_info  end-->
         <div class="form-group">
             <label class="control-label">发布详情</label>
       		<div class="controls">
-                <textarea id="project_detail " type="text"  rows="5" name="project_detail" ></textarea>
-      		</div> 
+                <textarea id="detail" type="text"  rows="5" name="detail" ></textarea>
+       		</div> 
 		</div><!--project_detail  end -->
     	<div class="form-group">
      		<div class="modal-footer">
-                <button class="btn btn-primary" >确定</button>
+                <button type="submit" class="btn btn-primary" >确定</button>
                 <button class="btn btn-warning" data-dismiss="modal">取消</button>
          	</div>
        </div><!--button end-->
@@ -104,11 +105,39 @@ $('#datatable').DataTable({
             }
         }
 });
-/*申请表单*/
+/*弹出申请表单*/
 $("tbody").on('click','.applybtn',function(){
     var project_name = $(this).attr('data')
+    var project_id = $(this).attr('data-id')
+    var applicant = '{{ info.username }}'
     $('#project_name').val(project_name)
+    $('#project_id').val(project_id)
+    $('#applicant').val(applicant)
     $('#applyModal').modal('show')
+})
+/*提交表单*/
+$('#applyform').on('submit',function(){
+    var str = $('#applyform').serialize()
+    var data = {'method':'apply','formdata':str}
+    $.post('/addapi',data,function(result){
+        console.log(result)
+        result = JSON.parse(result)
+        result = JSON.parse(result['result'])
+        if (result['code']==0){
+            swal({
+                title:"success",
+                text:"申请成功",
+                type:"success",
+                confirmButtonText:'确定'
+                },function(){
+                    $('#applyModal').modal('hide')
+                    location.reload()
+                })
+        }else{
+            $('#errorMsg').html('failed '+result['errmsg']).show()
+        }
+    })
+    return false
 })
 </script>
 {% endblock %}

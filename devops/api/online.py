@@ -4,11 +4,39 @@ from jsondate import MyEncoder
 from flask import Flask, request
 from flask_jsonrpc import JSONRPC
 from . import app, jsonrpc
-import logging, util
+import logging, util,time
 import json, traceback,datetime
 from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
+
+#创建申请任务列表
+@jsonrpc.method('apply.create') 
+@auth_login
+def apply_create(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    field = ['project_id','info','applicant','commit','apply_date','status','detail']
+    try:
+        data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
+        data['commit']='11111'               #脚本获取
+        data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
+        data['status'] = 1
+        where = {"project_id":int(data['project_id'])}
+        data.pop('project_username')  
+        res = app.config['cursor'].get_one_result('project_apply',field,where)
+        if not res: 
+            app.config['cursor'].execute_insert_sql('project_apply', data)
+        else:
+            app.config['cursor'].execute_update_sql('project_apply',data,where)
+        app.config['cursor'].execute_insert_sql('project_deploy',data)  
+        util.write_log(username,{'code':0,'result':'project apply success'})
+        return json.dumps({'code':0,'result':'project apply  success'})    
+    except:
+        logging.getLogger().error('project apply error: %s' % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'project apply error'})
 
 
 #申请列表，任务列表

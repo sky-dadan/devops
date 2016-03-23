@@ -68,11 +68,11 @@
          {% if result %}
         {% for p_id,p_name in result.iteritems() %}
         <tr>
-            <td style="text-align: center;" data='{{ p_id }}'>{{ p_name }}</td>
-            <td style="text-align: center;">001</td>
-            <td style="text-align: center;">111</td>
-            <td style="text-align: center;">11</td>
-            <td style="text-align: center;">11</td>
+            <td class="p_name" style="text-align: center;">{{ p_name }}</td>
+            <td class="commit" style="text-align: center;">新项目</td>
+            <td class="applicant" style="text-align: center;">新项目</td>
+            <td class="apply_date" style="text-align: center;">新项目</td>
+            <td class="status" style="color:#5EDF47; text-align: center;">新项目</td>
             <td style="text-align: center;">
             <button  class='btn btn-primary btn-sm applybtn' data-id='{{ p_id }}' data='{{ p_name }}'>申请发布</button>   
               </td>
@@ -114,11 +114,30 @@ function list(){
         data=JSON.parse(data['result'])
         console.log(data)
         if (data['code']==0){
-            $.each(data.data,function(k,v){
+             $.each(data.data,function(k,v){
                 console.log(v)
-            })
-        }
-   })
+                var parent=$("[data-id="+v.project_id+"]").parents('tr');  //找到project_id 对应的列
+                var statusDom=parent.find('.status');   //找到这一列中class为status的元素<td>
+                for(var i in v){
+                     parent.find("."+i).html(v[i]);  //将第一组数据根据对应的class名渲染数据
+                }
+                if(v.status=='2'){
+                     statusDom.html('审核中').css('color','gray')
+                     parent.find('.applybtn').attr('disabled',true);  
+                }else if(v.status=='1'){
+                    statusDom.html('申请中')
+                }else if(v.status=='3'){
+                    statusDom.html('发布完成').css('color','blue');
+                }else{
+                    statusDom.html('发布失败').css('color','red')
+                
+                }
+
+             })<!--end each -->
+    }else{
+                swal("error", data['errmsg'],"error")
+    } <!--end if -->
+   }) <!--end getJSON -->
 
 }
 list()

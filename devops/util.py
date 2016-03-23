@@ -11,6 +11,7 @@ import traceback
 import logging
 import logging.handlers
 import ConfigParser
+import collections
 import subprocess
 import multiprocessing 
 from email.mime.text import MIMEText
@@ -242,3 +243,54 @@ def userproject(username):
     #print username
     result = [ p_name for p_name,p_user in p_users.items() if username in p_user ]  #返回有权限的项目名
     return result  
+
+class ProjectConfig:
+    def __init__(self, config_filename):
+        self.name = config_filename
+        self.project_list = collections.defaultdict(set)
+        self.host_list = []
+        self.default_host = None
+
+        self._load_config()
+
+    #配置文件中以[[]]内标示主机，其余行为项目名，其中行以'#'开头的为注释行
+    #有效的第一行必须为主机项
+    def _load_config(self):
+        in_all = False
+        for l in file(self.name):
+            l = l.strip()
+            if not l or l.startswith('#'):
+                continue
+
+            if l.startswith('[[') and l.endswith(']]'):
+                l = l.lower()[2:-2]
+                if l == 'all':
+                    in_all = True
+                else:
+                    self.host_list.append(l)
+            else:
+                if not self.host_list:
+                    logging.getLogger().warning("配置文件'%s'需要先指定一个主机")
+                    return
+                #若主机下的项目设置为default，则对未设置主机的项目默认为该主机
+                if l == 'default':
+                    self.default_host = self.host_list[-1]
+                    continue
+                if in_all:
+                    for x in self.host_list:
+                        self.project_list[l].add(x)
+                else:
+                    self.project_list[l].add(self.host_list[-1])
+
+    def reload(self, filename):
+        self.name = filename
+        self._load_config()
+
+    def get(self, project):
+        if project in self.project_list:
+            return self.project_list[project]
+        else:
+            return set([self.default_host])
+
+    def gets(self, projects):
+        return dict([(x, self.get(x)) for x in projects])

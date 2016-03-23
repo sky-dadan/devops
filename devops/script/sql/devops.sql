@@ -248,6 +248,68 @@ CREATE TABLE `project_perm` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `project_test`
+--
+
+DROP TABLE IF EXISTS `project_test`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `project_test` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` int(10) NOT NULL COMMENT '对应project项目ID',
+  `host` varchar(64) NOT NULL COMMENT '测试主机',
+  `commit` varchar(64) NOT NULL COMMENT '推送版本号',
+  `pusher` varchar(128) NOT NULL COMMENT '推送人',
+  `push_date` datetime NOT NULL COMMENT '推送时间',
+  `comment` varchar(256) COMMENT '备注',
+  PRIMARY KEY (`id`),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `project_apply`
+--
+
+DROP TABLE IF EXISTS `project_apply`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `project_apply` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` int(10) NOT NULL COMMENT '对应project项目ID',
+  `info` varchar(64) NOT NULL COMMENT '发布简介',
+  `applicant` int(10) unsigned NOT NULL COMMENT '申请人',
+  `version` varchar(64) NOT NULL COMMENT '发布版本',
+  `commit` varchar(64) NOT NULL COMMENT '代码最新版本',
+  `apply_date` datetime NOT NULL COMMENT '申请时间',
+  `apply_status` int(10) DEFAULT 0 COMMENT '发布状态',
+  `detail` text COMMENT '发布详情',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `project_id` (`project_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `project_deploy`
+--
+
+DROP TABLE IF EXISTS `project_deploy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `project_deploy` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `project_id` int(10) NOT NULL COMMENT '对应project的项目ID',
+  `info` varchar(64) NOT NULL COMMENT '发布简介',
+  `version` varchar(64) NOT NULL COMMENT '发布版本',
+  `commit` varchar(64) NOT NULL COMMENT '代码最新版本',
+  `applicant` int(10) unsigned NOT NULL COMMENT '操作人',
+  `apply_date` datetime NOT NULL COMMENT '操作时间',
+  `status` int(10) DEFAULT 0 COMMENT '发布状态',
+  `detail` text COMMENT '发布详情',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `user`
 --
 

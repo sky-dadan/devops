@@ -4,13 +4,16 @@
 import os, os.path
 import time,json
 import base64
+import shlex
 import hashlib
+import smtplib
 import traceback
 import logging
 import logging.handlers
 import ConfigParser
+import collections
 import subprocess
-import smtplib
+import multiprocessing 
 from email.mime.text import MIMEText
 from email.header import Header
 from api import app
@@ -116,21 +119,43 @@ def check_name(name):
     else:
         return False
 
-def run_script(cmd):
+def run_script(cmd, queue=None):
     if isinstance(cmd, str) or isinstance(cmd, unicode):
-        cmd = cmd.strip().split()
+        cmd = shlex.split(cmd.strip())
     elif not isinstance(cmd, list):
         logging.getLogger().warning("执行命令格式不正确。命令为: %s" % str(cmd))
         return None
 
     try:
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        out = process.stdout.read().strip()
+        subproc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if queue is not None:
+            queue.put(subproc)
+        out = subproc.stdout.read().strip()
+        if queue is not None:
+            queue.put(out)
         logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
         return out
     except:
         logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
         return None
+
+def run_script_with_timeout(cmd, timeout=30):
+    queue = multiprocessing.Queue()
+    try:
+        process = multiprocessing.Process(target=run_script, args=(cmd, queue))
+        process.start()
+        process.join(timeout)
+        subproc = queue.get(2)
+        if process.is_alive():
+            subproc.terminate()
+            process.terminate()
+            logging.getLogger().warning("执行命令超时退出")
+        else:
+            return queue.get(2)
+    except:
+        logging.getLogger().warning("执行超时命令[%s]异常: %s" % (cmd, traceback.format_exc()))
+    finally:
+        queue.close()
 
 def getinfo(table_name,fields):
     '''
@@ -190,7 +215,7 @@ def get_git():
                         p_users[key] |= set(group[x])
                 elif k.startswith('user'):
                     p_users[key] |= set(v)
-        print p_users
+        #print p_users
         return {'code':'0','group':group,'project':p,'p_all_users':p_users}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
@@ -211,4 +236,61 @@ def partOfTheProject(result,projects,pro_all_users,username):
         if pro['name'] in project_list:
             res.append(pro)
     return res
+#用户返回他所拥有权限的项目,后期替换掉上面的partOfTheProject的方法
+def userproject(username):
+    res = get_git()
+    p_users = res['p_all_users']
+    #print username
+    result = [ p_name for p_name,p_user in p_users.items() if username in p_user ]  #返回有权限的项目名
+    return result  
 
+class ProjectConfig:
+    def __init__(self, config_filename):
+        self.name = config_filename
+        self.project_list = collections.defaultdict(set)
+        self.host_list = []
+        self.default_host = None
+
+        self._load_config()
+
+    #配置文件中以[[]]内标示主机，其余行为项目名，其中行以'#'开头的为注释行
+    #有效的第一行必须为主机项
+    def _load_config(self):
+        in_all = False
+        for l in file(self.name):
+            l = l.strip()
+            if not l or l.startswith('#'):
+                continue
+
+            if l.startswith('[[') and l.endswith(']]'):
+                l = l.lower()[2:-2]
+                if l == 'all':
+                    in_all = True
+                else:
+                    self.host_list.append(l)
+            else:
+                if not self.host_list:
+                    logging.getLogger().warning("配置文件'%s'需要先指定一个主机")
+                    return
+                #若主机下的项目设置为default，则对未设置主机的项目默认为该主机
+                if l == 'default':
+                    self.default_host = self.host_list[-1]
+                    continue
+                if in_all:
+                    for x in self.host_list:
+                        self.project_list[l].add(x)
+                else:
+                    self.project_list[l].add(self.host_list[-1])
+
+    def reload(self, filename):
+        self.name = filename
+        self._load_config()
+
+    def get(self, project):
+        if project in self.project_list:
+            return self.project_list[project]
+        else:
+            return set([self.default_host]) if self.default_host else self.default_host
+
+    def gets(self, projects):
+        return dict([(x, self.get(x)) for x in projects])

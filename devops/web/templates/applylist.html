@@ -33,8 +33,8 @@ position:static;
    
     <div class="modal-body">
     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
-    <form class="form-horizontal" id="addForm">
-        <input id='project_id' type="hidden" name='project_id'>
+    <form class="form-horizontal" id="addForm_emulation">
+        <input id='id' type="hidden" name='id'>
         
         <div class="form-grop">
             <label class="control-label">版本号</label>
@@ -44,7 +44,7 @@ position:static;
         </div>
         <div class="form-group">
             <div class="modal-footer">
-                <button class="btn btn-primary" >仿真发布</button>
+                <button class="btn btn-primary" id='Emulation_btn'>仿真发布</button>
                 <button class="btn btn-warning" data-dismiss="modal">退出</button>
             </div>
       </div><!--button end-->
@@ -52,57 +52,6 @@ position:static;
     </div> <!--modal body  end-->
 </div><!--add modal emulation end-->
 
-
-<!--apply list detail-->
-<div id="apply_detail" class="modal hide fade">
-     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">申请详情</h4>
-      </div><!--modal-header end-->
-   
-    <div class="modal-body">
-    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
-    <form class="form-horizontal" id="addForm">
-        <div class="form-grop">
-            <label class="control-label">项目名</label>
-            <div class="controls">
-                <input id='project_id' type='text' name='project_id'>
-            </div>
-        </div>
-
-        <div class="form-grop">
-            <label class="control-label">发布简介</label>
-            <div class="controls">
-                <input id='info' type='text' name='info'>
-            </div>
-        </div>
-        
-        <div class="form-grop">
-            <label class="control-label">发布详情</label>
-            <div class="controls">
-                <input id='detail' type='text' name='detail'>
-            </div>
-        </div>
-        <div class="form-grop">
-            <label class="control-label">代码最新版本</label>
-            <div class="controls">
-                <input id='commit' type='text' name='commit'>
-            </div>
-        </div>
-        <div class="form-grop">
-            <label class="control-label">申请者</label>
-            <div class="controls">
-                <input id='applicant' type='text' name='applicant'>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="modal-footer">
-                <button class="btn btn-warning" data-dismiss="modal">退出</button>
-            </div>
-      </div><!--button end-->
-    </form><!--form end-->
-    </div> <!--modal body  end-->
-</div>
 
 
 <div class="widget-content">
@@ -147,10 +96,10 @@ function list(){
            '<td>'+v['apply_date']+'</td>'+ 
            '<td>'+v['apply_status']+'</td>'+ 
            '<td>'+
-           '<button class="btn btn-info btn-sm emulation-btn" project_id="'+v['project_id']+'"  data-id="'+v['id']+'">仿真</button>'+
-           '<button class="btn btn-success btn-sm product-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">正式</button>'+
-           '<button class="btn btn-danger btn-sm cancel-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">取消</button>'+
-           '<button class="btn btn-primary btn-sm detail-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">详情</button>'+
+           '<button class="btn btn-info btn-sm emulation-btn"  data-id="'+v['id']+'">仿真</button>'+
+           '<button class="btn btn-success btn-sm product-btn"  data-id="'+v['id']+'">正式</button>'+
+           '<button class="btn btn-danger btn-sm cancel-btn" data-id="'+v['id']+'">取消</button>'+
+           '<button class="btn btn-primary btn-sm detail-btn"  data-id="'+v['id']+'">详情</button>'+
            '</td>'+ 
            '</tr>'          
        })       
@@ -180,9 +129,8 @@ $('#datatable').DataTable({
 });
 }
 
-//弹出仿真模态串口
+//弹出仿真
 $('tbody').on('click','.emulation-btn', function(){
-    var project_id = $(this).attr('project_id')
     var id = $(this).attr('data-id')
     alert(id)
     var  url = "/getapi?method=apply&id="+id
@@ -190,12 +138,25 @@ $('tbody').on('click','.emulation-btn', function(){
         console.log(data)
         data = JSON.parse(data['result'])
         if (data['code']==0){
-            $('#project_id').val(data['result']['project_id'])
+            $('#id').val(data['result']['id'])
         }else{
             swal("OMG",data['errmsg'],"error");
         }
     })
     $('#add_emulation').modal('show')
+})
+//提交仿真测试
+$('#Emulation_btn').on('click',function(){
+    var str=$('#addForm_emulation').serialize()
+    $.post('/apply/emulation', str,function(data){
+        data = JSON.parse(data)
+        console.log(data)
+        data = JSON.parse(data['result'])
+        if (data['code']==0){
+            swal("success")
+            location.reload()
+        } 
+    })
 })
 
 //弹出详细按钮页面
@@ -203,6 +164,19 @@ $("tbody").on('click','.detail-btn',function(){
     var id = $(this).attr('data-id')
     detail(id)
 })
+
+//点击正式发布按钮
+$('tbody').on('click','.product-btn',function(){
+    var id = $(this).attr('data-id')
+    product(id)
+})
+
+//点击取消按钮
+$('tbody').on('click','.cancel-btn',function(){
+    var id = $(this).attr('data-id')
+    cancel(id)
+})
+
 //详情按钮信息页面
 function detail(id){
     var url = "/getapi?method=apply&id="+id
@@ -220,7 +194,36 @@ function detail(id){
         })
         swal(str)
     })
-    
+}
+
+//正式发布
+function product(id){
+    var url = "/apply/success?id="+id
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        console.log(data)
+        if(data['code']==0){
+            swal("正式发布成功")
+            location.reload()
+        }else{
+            swal("正式发布错误")
+        }
+    })
+}
+
+//取消
+function cancel(id){
+    var url = "/apply/cancel?id="+id
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        if(data['code']==0){
+            swal("取消发布成功,请提醒开发继续调试Bug!")
+            location.reload()
+        }else{
+            swal("网站后端出现错误!")
+            location.reload()
+        }
+    })
 }
 </script>
 {% endblock %}

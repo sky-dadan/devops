@@ -54,8 +54,8 @@
 
 <div class="widget-content">
    <table id ="datatable"  class="table table-bordered table-striped">
-	<thead>
-		<tr>
+ 	<thead>
+ 		<tr>
             <th scope="col">项目名</th>
             <th scope="col">最新版本</th>
             <th scope="col">申请人</th>
@@ -65,17 +65,17 @@
         </tr>
 	</thead>
 	<tbody>
-        {% if result %}
+         {% if result %}
         {% for p_id,p_name in result.iteritems() %}
         <tr>
-            <td style="text-align: center;">{{ p_name }}</td>
+            <td style="text-align: center;" data='{{ p_id }}'>{{ p_name }}</td>
             <td style="text-align: center;">001</td>
             <td style="text-align: center;">111</td>
             <td style="text-align: center;">11</td>
             <td style="text-align: center;">11</td>
             <td style="text-align: center;">
-                <button  class='btn btn-primary btn-sm applybtn' data-id='{{ p_id }}' data='{{ p_name }}'>申请发布</button>   
-             </td>
+            <button  class='btn btn-primary btn-sm applybtn' data-id='{{ p_id }}' data='{{ p_name }}'>申请发布</button>   
+              </td>
         </tr>
         {% endfor %}
         {% endif %}
@@ -89,6 +89,7 @@
 {% block js %}
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
+name = "apply"
 $('#datatable').DataTable({
         "language": {
             "lengthMenu": "每页 _MENU_ 条记录",
@@ -105,6 +106,22 @@ $('#datatable').DataTable({
             }
         }
 });
+
+/*负责人项目列表*/
+function list(){
+   var url = "/listapi?method="+name
+   $.getJSON(url,function(data){
+        data=JSON.parse(data['result'])
+        console.log(data)
+        if (data['code']==0){
+            $.each(data.data,function(k,v){
+                console.log(v)
+            })
+        }
+   })
+
+}
+list()
 /*弹出申请表单*/
 $("tbody").on('click','.applybtn',function(){
     var project_name = $(this).attr('data')
@@ -117,8 +134,8 @@ $("tbody").on('click','.applybtn',function(){
 })
 /*提交表单*/
 $('#applyform').on('submit',function(){
-    var str = $('#applyform').serialize()
-    var data = {'method':'apply','formdata':str}
+     var str = $('#applyform').serialize()
+    var data = {'method':name,'formdata':str}
     $.post('/addapi',data,function(result){
         console.log(result)
         result = JSON.parse(result)

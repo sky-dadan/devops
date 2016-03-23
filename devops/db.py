@@ -45,7 +45,7 @@ class Cursor():
         sql = self.insert_sql(table_name, data)
         return self.execute(sql)
 
-    def select_sql(self, table_name, fields, where=None, limit=None):
+    def select_sql(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
         if isinstance(where, dict) and where:
             conditions = []
             for k, v in where.items():
@@ -61,13 +61,15 @@ class Cursor():
             sql = "SELECT %s FROM %s" % (','.join(fields), table_name)
         else:
             sql = ""
+        if order and (isinstance(order, str) or isinstance(order, unicode)):
+            sql = "%s ORDER BY %s %s" % (sql, order, 'ASC' if asc_order else 'DESC')
         if limit and isinstance(limit, tuple) and len(limit) == 2:
             sql = "%s LIMIT %s,%s" % (sql, limit[0], limit[1])
         logging.getLogger().info("Select sql: %s" % sql)
         return sql
 
-    def get_one_result(self, table_name, fields, where=None, limit=None):
-        sql = self.select_sql(table_name, fields, where, limit)
+    def get_one_result(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
+        sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
         if not sql:
             return None
         self.execute(sql)
@@ -77,8 +79,8 @@ class Cursor():
         else:
             return {}
 
-    def get_results(self, table_name, fields, where=None, limit=None):
-        sql = self.select_sql(table_name, fields, where, limit)
+    def get_results(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
+        sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
         self.execute(sql)
         result_sets = self.fetchall()
         return [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]

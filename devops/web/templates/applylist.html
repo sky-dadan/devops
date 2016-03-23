@@ -24,6 +24,35 @@ position:static;
 </div>  
 
 
+<!--add modal emulation-->
+<div id="add_emulation" class="modal hide fade">
+     <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">仿真发布</h4>
+      </div><!--modal-header end-->
+   
+    <div class="modal-body">
+    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+    <form class="form-horizontal" id="addForm_emulation">
+        <input id='id' type="hidden" name='id'>
+        
+        <div class="form-grop">
+            <label class="control-label">版本号</label>
+            <div class="controls">
+                <input id='version' type='text' name='version'>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="modal-footer">
+                <button class="btn btn-primary" id='Emulation_btn'>仿真发布</button>
+                <button class="btn btn-warning" data-dismiss="modal">退出</button>
+            </div>
+      </div><!--button end-->
+    </form><!--form end-->
+    </div> <!--modal body  end-->
+</div><!--add modal emulation end-->
+
+
 
 <div class="widget-content">
    <table id ="datatable"  class="table table-bordered table-striped">
@@ -55,19 +84,20 @@ function list(){
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['name']+'</td>'+  
-           '<td>'+v['interface_user']+'</td>'+  
-           '<td>'+v['user_phone']+'</td>'+  
-           '<td>'+v['address']+'</td>'+ 
+           '<td>'+v['project_name']+'</td>'+  
+           '<td>'+v['commit']+'</td>'+  
+           '<td>'+v['applicant_name']+'</td>'+  
+           '<td>'+v['apply_date']+'</td>'+ 
+           '<td>'+v['apply_status']+'</td>'+ 
            '<td>'+
-           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '<button class="btn btn-info btn-sm emulation-btn"  data-id="'+v['id']+'">仿真</button>'+
+           '<button class="btn btn-success btn-sm product-btn"  data-id="'+v['id']+'">正式</button>'+
+           '<button class="btn btn-danger btn-sm cancel-btn" data-id="'+v['id']+'">取消</button>'+
+           '<button class="btn btn-primary btn-sm detail-btn"  data-id="'+v['id']+'">详情</button>'+
            '</td>'+ 
            '</tr>'          
        })       
@@ -96,111 +126,95 @@ $('#datatable').DataTable({
     }
 });
 }
-/*  add data */
-/*click show modal*/
-$('#addBtn').on('click',function(){
-		$('#addModal').modal('show')
-})
-/* add data for ajax */ 
-$('#addForm').on('submit',function(){
-	   var str = $('#addForm').serialize()
-       var data = {"method":name,"formdata":str}
-	   $.post("/addapi",data,function(data){
-	     //console.log(data)    //string
-         data = JSON.parse(data)  //object
-         data = JSON.parse(data['result']) //object
-         if (data['code']==0){
-			  swal({
-						title:"添加成功",
-						type: "success",
-						confirmButtonText: "Cool"
-					},function(){                    
-						$('#addModal').modal('hide')
-						list()
-						location.reload()
-					})  //end swal
-         }else{
-		    $('#errorMsg').html('Failed:'+data['errmsg']).show()
-         }
-       }) //end post
-	   return false
-})  //submit form
 
-/*get one data from id for update*/
-$('tbody').on('click','.update-btn',function(){
-	var id = $(this).attr('data-id')
-    var url = "/getapi?method="+name+"&id="+id
-	$.getJSON(url,function(data){
-	  console.log(data)  
-      data = JSON.parse(data['result'])
-      if (data['code']==0){
-          $('#upid').val(data['result']['id'])
-          $('#up_idc_name').val(data['result']['idc_name'])
-		  $('#up_name').val(data['result']['name'])
-		  $('#up_address').val(data['result']['address'])
-		  $('#up_email').val(data['result']['email'])
-		  $('#up_interface_user').val(data['result']['interface_user'])
-		  $('#up_user_phone').val(data['result']['user_phone'])
-		  $('#up_pact_cabinet_num').val(data['result']['pact_cabinet_num'])
-		  $('#up_rel_cabinet_num').val(data['result']['rel_cabinet_num'])
-		  $('#up_remark').val(data['result']['remark'])
-		$('#updateModal').modal('show')  //show modal
-      }else{
-          swal("OMG!",data['errmsg'], "error"); 
-      }
-	})
+//弹出仿真
+$('tbody').on('click','.emulation-btn', function(){
+    var id = $(this).attr('data-id')
+    var  url = "/getapi?method=apply&id="+id
+    $.getJSON(url,function(data){
+        console.log(data)
+        data = JSON.parse(data['result'])
+        if (data['code']==0){
+            $('#id').val(data['result']['id'])
+        }else{
+            swal("OMG",data['errmsg'],"error");
+        }
+    })
+    $('#add_emulation').modal('show')
+})
+//提交仿真测试
+$('#Emulation_btn').on('click',function(){
+    var str=$('#addForm_emulation').serialize()
+    $.post('/apply/emulation', str,function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        if (data['code']==0){
+            swal("Good~","仿真上线完成!","info")
+        } 
+    })
 })
 
-/*update data*/
-$('#updateForm').on('submit',function(){
-var str = $('#updateForm').serialize()
-var data = {'method':name,'formdata':str}
-$.post('/updateapi',data, function(data){  // data is string
-    data = JSON.parse(data)    //object
-    data = JSON.parse(data['result']) //object
-    if (data['code']==0){   
-		swal({ 
-			 title: "更新成功!", 
-			 text: data['result'],   
-			 type: "success",   
-			 confirmButtonText: "Cool"
-		 },function(){               
-			$('#updateModal').modal('hide')
-			list()
-			location.reload()
-		});
-    }else{
-		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
-    }
-})  //end post 
-    return false   //get data and end
-})  //submit form
+//弹出详细按钮页面
+$("tbody").on('click','.detail-btn',function(){
+    var id = $(this).attr('data-id')
+    detail(id)
+})
 
-/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
-$("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
-        var that = this;
-		var id = $(this).attr('data-id')
-        var url = "/deleteapi?method="+name+"&id="+id
-		$.getJSON(url,function(data){
-      		data = JSON.parse(data['result'])
-			if (data['code']== 0 ){
-                 swal({ 
-                          title: "删除成功", 
-                          text: data['result'],   
-                          type: "success",   
-                          confirmButtonText: "Cool"    
-                      },function(){               
-                         $(that).parents('tr').remove();
-                        list()
-                        location.reload()
-                });
-            }else{
-                swal("OMG!", data['errmsg'], "error"); 	
+//点击正式发布按钮
+$('tbody').on('click','.product-btn',function(){
+    var id = $(this).attr('data-id')
+    product(id)
+})
+
+//点击取消按钮
+$('tbody').on('click','.cancel-btn',function(){
+    var id = $(this).attr('data-id')
+    cancel(id)
+})
+
+//详情按钮信息页面
+function detail(id){
+    var url = "/getapi?method=apply&id="+id
+    var str = ''
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        $.each(data,function(k,v){
+            if (v!=0){
+            str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
+                '     发布版本: ' + v['version'] + '     代码最新版本: '+v['commit']+
+                '     申请者: '+v['applicant_name'] + '    申请时间: '+v['apply_date']+
+                '     发布状态: '+v['apply_status']+'     发布详情: '+v['detail']
             }
-    	}) //end getJSON
-    }  // end confirm
-    return false   //get data and end
-})   
+        })
+        swal(str)
+    })
+}
+
+//正式发布
+function product(id){
+    var url = "/apply/success?id="+id
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        console.log(data)
+        if(data['code']==0){
+            swal('Good! Job!',"正式发布成功","success")
+        }else{
+            swal("ERROR!","正式发布错误","error")
+        }
+    })
+}
+
+//取消
+function cancel(id){
+    var url = "/apply/cancel?id="+id
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        if(data['code']==0){
+            swal("Execute!","取消发布成功,请提醒开发继续调试Bug!","warning")
+        }else{
+            swal("No!","网站后端出现错误!","error")
+        }
+    })
+}
 </script>
 {% endblock %}

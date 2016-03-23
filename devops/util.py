@@ -240,8 +240,10 @@ def partOfTheProject(result,projects,pro_all_users,username):
 def userproject(username):
     res = get_git()
     p_users = res['p_all_users']
+    projects = getinfo('project',['name','id']) #由于发布和申请表中存的都是project_id, 将项目的id 和 name
     #print username
-    result = [ p_name for p_name,p_user in p_users.items() if username in p_user ]  #返回有权限的项目名
+    myproject = [p_name for p_name,p_user in p_users.items() if username in p_user] #用户所有项目名的列表
+    result = dict((projects[p_name],p_name) for p_name in myproject)  #返回用户所有项目字典{p_id:p_name,...}
     return result  
 
 class ProjectConfig:

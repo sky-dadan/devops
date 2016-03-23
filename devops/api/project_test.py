@@ -80,8 +80,9 @@ def project_test_getlist(auth_info, **kwargs):
     username = auth_info['username']
     try:
         conf = util.ProjectConfig('../ip.conf')
-        projectlist = util.userproject(username)
-        result = conf.gets(projectlist)
+        projects = util.userproject(username)
+        print "projects.values():",projects.values()
+        result = conf.gets(projects.values())
         for res in result:
             result[res] = ','.join(list(result[res]))
         return json.dumps({'code':0,'result':result})

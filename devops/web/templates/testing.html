@@ -74,61 +74,6 @@ position:static;
 
    </div> <!--modal body end-->
 </div><!-- /.modal -->
-  
-
-
-<!--update modal-->                                                                                 
-<div id="updateModal" class="modal hide fade">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">软资产管理</h4>
-	  </div><!--modal-header end-->
-
-      <div class="modal-body">
-     <p hidden id="uperrorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
-     <form class="form-horizontal" id="updateForm">
-        <input type="hidden" id='upid' name="id">  <!--update need id-->
-     	<div class="form-group">
-            <label class="control-label">资产类型</label>
-     		 <div class="controls">
-       		 	<input id="uptype"  type="text"  name="type" >
-      		</div> 
-       	</div> <!--update name end-->
-     	<div class="form-group">
-            <label class="control-label">厂商</label>
-     		 <div class="controls">
-       		 	<input id="upmanu"  type="text"  name="manufacturer" >
-      		</div> 
-       	</div> <!--update name end-->
-     	        <div class="form-group">
-            <label class="control-label">采购时间</label>
-      		<div class="controls">
-                <input id="upstore_date" type="date"  name="store_date" >
-      		</div> 
-		</div><!--update u_num  end -->
-        <div class="form-group">
-            <label class="control-label">过期时间</label>
-      		<div class="controls">
-       			<input id="upexpire" type="date"  name="expire" >
-      		</div> 
-		</div><!--update power  end -->
-        <div class="form-group">
-            <label class="control-label">备注</label>
-      		<div class="controls">
-                <!--       			<input id="upremark" type="text"  name="remark" >-->
-                <textarea class="form-control" rows="3" id="upremark" name="remark"></textarea>
-      		</div> 
-        </div><!--update power  end -->
-    	<div class="form-group">
-     		<div class="modal-footer">
-				<button class="btn btn-primary" >更新</button>
-				<button class="btn btn-warning" data-dismiss="modal">退出</button>
-         	</div>
-      </div><!--button end-->
-    </form><!--form end-->
-
-   </div> <!--modal body end-->
-</div><!-- /.modal -->
 
 <div class="widget-content">
    <table id ="datalist"  class="table table-bordered table-striped">
@@ -143,6 +88,21 @@ position:static;
         </tr>
     </thead> 
     <tbody>
+        {% if result %}
+        {% for res in result %}
+        <tr>
+            <td>{{ res }}</td>
+            <td>{{ resip[res] }}</td>
+            <td>zhangxunan</td>
+            <td>2016-03-23 10:16:10</td>
+            <td>测试</td>
+            <td>
+                <button class="btn btn-primary btn-sm online-btn" >上线</button>
+                <button class="btn btn-primary btn-sm details-btn">上线记录</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
     </tbody>
    </table>
 </div> <!--widget-content-->

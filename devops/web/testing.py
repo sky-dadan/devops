@@ -13,12 +13,21 @@ data = {
 
 @app.route('/project/testing')
 def testing():
-    if session.get('username')  == None:
-       return redirect('/login')
+    if  session.get('author','nologin') == 'nologin':
+        return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
     if int(validate_result['code']) == 0:
-        return render_template('testing.html',info=session)
-    else:
-        return render_template('testing.html',errmsg=validate_result['errmsg'])
+        url = "http://%s/api/userproject" % app.config['api_host']
+        r = requests.post(url, headers=headers)
+        result = json.loads(r.text)
+        url = "http://%s/api/testhost" % app.config['api_host']
+        r = requests.post(url,headers=headers)
+        resip = json.loads(r.text)
+        if int(result['code']) == 0 and int(resip['code']) == 0:
+            print result
+            print resip
+            return render_template('testing.html',info=session,result=result['result'],resip = resip['result'])
+        else:
+            return render_template('testing.html',errmsg=validate_result['errmsg'])

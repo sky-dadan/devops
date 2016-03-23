@@ -34,8 +34,7 @@ def project_test_create(auth_info, **kwargs):
         logging.getLogger().error('add project_test error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'add project_test error'})
 
-
-@jsonrpc.method('project_test.getlist')
+@jsonrpc.method('project_test.get')
 @auth_login
 def project_test_get(auth_info, **kwargs):
     if auth_info['code'] == 1:
@@ -53,3 +52,39 @@ def project_test_get(auth_info, **kwargs):
     except:
         logging.getLogger().error("select project error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
+
+@jsonrpc.method('project_test.getlist')
+@auth_login
+def project_test_getlist(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    try:
+        
+        fields = ['project_id','host','commit','pusher','push_date','comment']
+        data = request.get_json()['params']
+        where = kwargs.get('where',None)
+        result = app.config['cursor'].get_results('project_test',fields,where)
+        util.write_log(username, '查询项目成功') 
+        return json.dumps({'code':0,'result':result},cls=MyEncoder)
+    except:
+        logging.getLogger().error("select project error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
+
+@app.route('/api/testhost',methods=['GET','POST'])
+@auth_login
+def project_test_getlist(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        conf = util.ProjectConfig('../ip.conf')
+        projectlist = util.userproject(username)
+        result = conf.gets(projectlist)
+        for res in result:
+            result[res] = ','.join(list(result[res]))
+        return json.dumps({'code':0,'result':result})
+    except:
+        logging.getLogger().error("/api/testhost: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '调用/api/testhost错误'})

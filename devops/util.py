@@ -290,7 +290,7 @@ class ProjectConfig:
         if project in self.project_list:
             return self.project_list[project]
         else:
-            return set([self.default_host])
+            return set([self.default_host]) if self.default_host else self.default_host
 
     def gets(self, projects):
         return dict([(x, self.get(x)) for x in projects])

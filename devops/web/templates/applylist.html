@@ -24,6 +24,86 @@ position:static;
 </div>  
 
 
+<!--add modal emulation-->
+<div id="add_emulation" class="modal hide fade">
+     <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">仿真发布</h4>
+      </div><!--modal-header end-->
+   
+    <div class="modal-body">
+    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+    <form class="form-horizontal" id="addForm">
+        <input id='project_id' type="hidden" name='project_id'>
+        
+        <div class="form-grop">
+            <label class="control-label">版本号</label>
+            <div class="controls">
+                <input id='version' type='text' name='version'>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="modal-footer">
+                <button class="btn btn-primary" >仿真发布</button>
+                <button class="btn btn-warning" data-dismiss="modal">退出</button>
+            </div>
+      </div><!--button end-->
+    </form><!--form end-->
+    </div> <!--modal body  end-->
+</div><!--add modal emulation end-->
+
+
+<!--apply list detail-->
+<div id="apply_detail" class="modal hide fade">
+     <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">申请详情</h4>
+      </div><!--modal-header end-->
+   
+    <div class="modal-body">
+    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+    <form class="form-horizontal" id="addForm">
+        <div class="form-grop">
+            <label class="control-label">项目名</label>
+            <div class="controls">
+                <input id='project_id' type='text' name='project_id'>
+            </div>
+        </div>
+
+        <div class="form-grop">
+            <label class="control-label">发布简介</label>
+            <div class="controls">
+                <input id='info' type='text' name='info'>
+            </div>
+        </div>
+        
+        <div class="form-grop">
+            <label class="control-label">发布详情</label>
+            <div class="controls">
+                <input id='detail' type='text' name='detail'>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">代码最新版本</label>
+            <div class="controls">
+                <input id='commit' type='text' name='commit'>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">申请者</label>
+            <div class="controls">
+                <input id='applicant' type='text' name='applicant'>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="modal-footer">
+                <button class="btn btn-warning" data-dismiss="modal">退出</button>
+            </div>
+      </div><!--button end-->
+    </form><!--form end-->
+    </div> <!--modal body  end-->
+</div>
+
 
 <div class="widget-content">
    <table id ="datatable"  class="table table-bordered table-striped">
@@ -61,13 +141,16 @@ function list(){
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
            console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['name']+'</td>'+  
-           '<td>'+v['interface_user']+'</td>'+  
-           '<td>'+v['user_phone']+'</td>'+  
-           '<td>'+v['address']+'</td>'+ 
+           '<td>'+v['project_name']+'</td>'+  
+           '<td>'+v['commit']+'</td>'+  
+           '<td>'+v['applicant_name']+'</td>'+  
+           '<td>'+v['apply_date']+'</td>'+ 
+           '<td>'+v['apply_status']+'</td>'+ 
            '<td>'+
-           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
+           '<button class="btn btn-info btn-sm emulation-btn" project_id="'+v['project_id']+'"  data-id="'+v['id']+'">仿真</button>'+
+           '<button class="btn btn-success btn-sm product-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">正式</button>'+
+           '<button class="btn btn-danger btn-sm cancel-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">取消</button>'+
+           '<button class="btn btn-primary btn-sm detail-btn" project_id="'+v['project_id']+'" data-id="'+v['id']+'">详情</button>'+
            '</td>'+ 
            '</tr>'          
        })       
@@ -96,111 +179,48 @@ $('#datatable').DataTable({
     }
 });
 }
-/*  add data */
-/*click show modal*/
-$('#addBtn').on('click',function(){
-		$('#addModal').modal('show')
-})
-/* add data for ajax */ 
-$('#addForm').on('submit',function(){
-	   var str = $('#addForm').serialize()
-       var data = {"method":name,"formdata":str}
-	   $.post("/addapi",data,function(data){
-	     //console.log(data)    //string
-         data = JSON.parse(data)  //object
-         data = JSON.parse(data['result']) //object
-         if (data['code']==0){
-			  swal({
-						title:"添加成功",
-						type: "success",
-						confirmButtonText: "Cool"
-					},function(){                    
-						$('#addModal').modal('hide')
-						list()
-						location.reload()
-					})  //end swal
-         }else{
-		    $('#errorMsg').html('Failed:'+data['errmsg']).show()
-         }
-       }) //end post
-	   return false
-})  //submit form
 
-/*get one data from id for update*/
-$('tbody').on('click','.update-btn',function(){
-	var id = $(this).attr('data-id')
-    var url = "/getapi?method="+name+"&id="+id
-	$.getJSON(url,function(data){
-	  console.log(data)  
-      data = JSON.parse(data['result'])
-      if (data['code']==0){
-          $('#upid').val(data['result']['id'])
-          $('#up_idc_name').val(data['result']['idc_name'])
-		  $('#up_name').val(data['result']['name'])
-		  $('#up_address').val(data['result']['address'])
-		  $('#up_email').val(data['result']['email'])
-		  $('#up_interface_user').val(data['result']['interface_user'])
-		  $('#up_user_phone').val(data['result']['user_phone'])
-		  $('#up_pact_cabinet_num').val(data['result']['pact_cabinet_num'])
-		  $('#up_rel_cabinet_num').val(data['result']['rel_cabinet_num'])
-		  $('#up_remark').val(data['result']['remark'])
-		$('#updateModal').modal('show')  //show modal
-      }else{
-          swal("OMG!",data['errmsg'], "error"); 
-      }
-	})
+//弹出仿真模态串口
+$('tbody').on('click','.emulation-btn', function(){
+    var project_id = $(this).attr('project_id')
+    var id = $(this).attr('data-id')
+    alert(id)
+    var  url = "/getapi?method=apply&id="+id
+    $.getJSON(url,function(data){
+        console.log(data)
+        data = JSON.parse(data['result'])
+        if (data['code']==0){
+            $('#project_id').val(data['result']['project_id'])
+        }else{
+            swal("OMG",data['errmsg'],"error");
+        }
+    })
+    $('#add_emulation').modal('show')
 })
 
-/*update data*/
-$('#updateForm').on('submit',function(){
-var str = $('#updateForm').serialize()
-var data = {'method':name,'formdata':str}
-$.post('/updateapi',data, function(data){  // data is string
-    data = JSON.parse(data)    //object
-    data = JSON.parse(data['result']) //object
-    if (data['code']==0){   
-		swal({ 
-			 title: "更新成功!", 
-			 text: data['result'],   
-			 type: "success",   
-			 confirmButtonText: "Cool"
-		 },function(){               
-			$('#updateModal').modal('hide')
-			list()
-			location.reload()
-		});
-    }else{
-		$('#uperrorMsg').html('Failed: '+data['errmsg']).show()
-    }
-})  //end post 
-    return false   //get data and end
-})  //submit form
-
-/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
-$("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
-        var that = this;
-		var id = $(this).attr('data-id')
-        var url = "/deleteapi?method="+name+"&id="+id
-		$.getJSON(url,function(data){
-      		data = JSON.parse(data['result'])
-			if (data['code']== 0 ){
-                 swal({ 
-                          title: "删除成功", 
-                          text: data['result'],   
-                          type: "success",   
-                          confirmButtonText: "Cool"    
-                      },function(){               
-                         $(that).parents('tr').remove();
-                        list()
-                        location.reload()
-                });
-            }else{
-                swal("OMG!", data['errmsg'], "error"); 	
+//弹出详细按钮页面
+$("tbody").on('click','.detail-btn',function(){
+    var id = $(this).attr('data-id')
+    detail(id)
+})
+//详情按钮信息页面
+function detail(id){
+    var url = "/getapi?method=apply&id="+id
+    var str = ''
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result)
+        console.log(data.result)
+        $.each(data,function(k,v){
+            if (v!=0){
+            str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
+                '     发布版本: ' + v['version'] + '     代码最新版本: '+v['commit']+
+                '     申请者: '+v['applicant_name'] + '    申请时间: '+v['apply_date']+
+                '     发布状态: '+v['apply_status']+'     发布详情: '+v['detail']
             }
-    	}) //end getJSON
-    }  // end confirm
-    return false   //get data and end
-})   
+        })
+        swal(str)
+    })
+    
+}
 </script>
 {% endblock %}

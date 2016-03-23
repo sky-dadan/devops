@@ -39,7 +39,6 @@ def emulation():
     headers['authorization'] = session['author']
     version = request.form.get('version')
     id = request.form.get('id')
-    print version,id
     data['params'] = {'version':version,'id':id}
     data['method'] = 'apply.emulation'
     r = requests.post(get_url(),headers=headers,json=data)

@@ -84,11 +84,9 @@ function list(){
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
        var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['project_name']+'</td>'+  
            '<td>'+v['commit']+'</td>'+  
@@ -132,7 +130,6 @@ $('#datatable').DataTable({
 //弹出仿真
 $('tbody').on('click','.emulation-btn', function(){
     var id = $(this).attr('data-id')
-    alert(id)
     var  url = "/getapi?method=apply&id="+id
     $.getJSON(url,function(data){
         console.log(data)
@@ -150,11 +147,9 @@ $('#Emulation_btn').on('click',function(){
     var str=$('#addForm_emulation').serialize()
     $.post('/apply/emulation', str,function(data){
         data = JSON.parse(data)
-        console.log(data)
         data = JSON.parse(data['result'])
         if (data['code']==0){
-            swal("success")
-            location.reload()
+            swal("Good~","仿真上线完成!","info")
         } 
     })
 })
@@ -183,7 +178,6 @@ function detail(id){
     var str = ''
     $.getJSON(url,function(data){
         data = JSON.parse(data.result)
-        console.log(data.result)
         $.each(data,function(k,v){
             if (v!=0){
             str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
@@ -203,10 +197,9 @@ function product(id){
         data = JSON.parse(data.result)
         console.log(data)
         if(data['code']==0){
-            swal("正式发布成功")
-            location.reload()
+            swal('Good! Job!',"正式发布成功","success")
         }else{
-            swal("正式发布错误")
+            swal("ERROR!","正式发布错误","error")
         }
     })
 }
@@ -217,11 +210,9 @@ function cancel(id){
     $.getJSON(url,function(data){
         data = JSON.parse(data.result)
         if(data['code']==0){
-            swal("取消发布成功,请提醒开发继续调试Bug!")
-            location.reload()
+            swal("Execute!","取消发布成功,请提醒开发继续调试Bug!","warning")
         }else{
-            swal("网站后端出现错误!")
-            location.reload()
+            swal("No!","网站后端出现错误!","error")
         }
     })
 }

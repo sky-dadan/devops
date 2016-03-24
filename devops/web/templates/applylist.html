@@ -182,18 +182,19 @@ function detail(id){
     var url = "/getapi?method=apply&id="+id
     var str = ''
     $.getJSON(url,function(data){
-        data = JSON.parse(data.result)
-        $.each(data,function(k,v){
-            if (v!=0){
-            str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
-                '     发布版本: ' + v['version'] + '     代码最新版本: '+v['commit']+
-                '     申请者: '+v['applicant'] + '    申请时间: '+v['apply_date']+
-                '     发布状态: '+v['status']+'     发布详情: '+v['detail']
-            }
-        })
-        swal(str)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        if (data['code']==0){  
+            str = '项目名: ' + data['result']['project_name']+'\n'+
+                '发布简介: '+data['result']['info']+'\n'+
+                '发布详情: '+data['result']['detail']
+            swal(str)
+        }else{
+            swal("OMG", data['errmsg'],"error")
+        }
     })
 }
+
 
 //正式发布
 function product(id){

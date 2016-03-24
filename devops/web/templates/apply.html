@@ -122,10 +122,13 @@ function list(){
                      parent.find("."+i).html(v[i]);  //将第一组数据根据对应的class名渲染数据
                 }
                 if(v.status=='2'){
-                     statusDom.html('审核中').css('color','gray')
+                     statusDom.html('审核中....').css('color','gray')
                      parent.find('.applybtn').attr('disabled',true);  
                 }else if(v.status=='1'){
-                    statusDom.html('申请中')
+                    parent.find('.applybtn').attr('disabled',true);  
+                    statusDom.html('申请中....')
+                }else if(v.status=='0'){
+                    statusDom.html('新项目').css('color','Magenta')
                 }else if(v.status=='3'){
                     statusDom.html('发布完成').css('color','blue');
                 }else{

@@ -84,10 +84,10 @@ function replace(id){
        var parent=$("[data-id="+id+"]").parents('tr');
        var statusDom=parent.find('.status');
        if (statusDom.html()==1){
-           parent.find('.product-btn').attr('disabled',true); 
+           parent.find('.product-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
            statusDom.html('申请中....')
        }else{
-           parent.find('.emulation-btn').attr('disabled',true); 
+           parent.find('.emulation-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
            statusDom.html("审核中....").css('color','red')
        }
 }

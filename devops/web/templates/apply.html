@@ -125,9 +125,9 @@ function list(){
                 }
                 if(v.status=='2'){
                      statusDom.html('审核中....').css('color','gray')
-                     parent.find('.applybtn').attr('disabled',true);  
+                     parent.find('.applybtn').attr('disabled',true).css('cursor', 'not-allowed');  
                 }else if(v.status=='1'){
-                    parent.find('.applybtn').attr('disabled',true);  
+                    parent.find('.applybtn').attr('disabled',true).css('cursor', 'not-allowed');  
                     statusDom.html('申请中....')
                 }else if(v.status=='0'){
                     statusDom.html('新项目').css('color','Magenta')

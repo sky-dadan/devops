@@ -168,3 +168,62 @@ def annly_success(auth_info,**kwargs):
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())
         return json.dumps({'code':1})
+
+def project_attr(result):
+    ret = []
+    status2name = {1: '申请上线', 2: '上线审核', 3: '上线完成', 4: '上线取消'}
+    #id转换成名字
+    id2name_project = util.getinfo('project',['id','name'])
+    for res in result:
+        if str(res['project_id']) not in id2name_project:
+            continue
+        res['project_name'] = id2name_project[str(res['project_id'])]
+        res['status_name'] = status2name.get(res['status'], '未知状态')
+        ret.append(res)
+    return ret
+
+#上线历史记录查询
+@jsonrpc.method("deploy.getlist")
+@auth_login
+def deploy_list(auth_info,**kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        fields = ['project_id','applicant','version','commit','apply_date','status']
+        sql = 'SELECT %s FROM (SELECT %s FROM project_deploy ORDER BY apply_date DESC) AS tbl GROUP BY commit, project_id' % (','.join(fields), ','.join(fields))
+        app.config['cursor'].execute(sql)
+        result_sets = app.config['cursor'].fetchall()
+        deploy_result = [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+
+        result = project_attr(deploy_result)
+
+        util.write_log(username, 'get deploy list success!')
+        return  json.dumps({'code':0, 'result':result, 'count':len(result)},cls = MyEncoder)
+    except:
+        logging.getLogger().error("select deploy list error:%s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '获取上线历史记录失败'})
+
+@jsonrpc.method("deploy.get")
+@auth_login
+def deploy_get(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    try:
+        fields = ['id', 'project_id','info','applicant','version','commit','apply_date','status','detail']
+        if 'ver' in kwargs.get('args', {}):
+            where = {'project_id': kwargs.get('where', {}).get('id'), 'commit': kwargs.get('args', {}).get('ver')}
+            deploy_result = app.config['cursor'].get_results('project_deploy', fields, where)
+            result = project_attr(deploy_result)
+            util.write_log(username, "get deploy '%s' success!" % where['commit'])
+            return json.dumps({'code':0, 'result':result, 'count':len(result)},cls = MyEncoder)
+        else:
+            where = {'id': kwargs.get('where', {}).get('id')}
+            deploy_result = app.config['cursor'].get_results('project_deploy', fields, where)
+            result = project_attr(deploy_result)[0]
+            util.write_log(username, "get deploy '%s' success!" % result['commit'])
+            return json.dumps({'code':0, 'result':result},cls = MyEncoder)
+    except:
+        logging.getLogger().error("get deploy error:%s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': "获取版本上线历史记录失败"})

@@ -136,7 +136,7 @@ $('#datalist').DataTable({
 }
 /* list all data */
 function list(){
-    var name=window.location.pathname.split('/').pop()
+    var name="project_test"
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
       // data = data['result']  //string
@@ -168,7 +168,7 @@ function list(){
          datatable()
     })
 }
-list()
+//list()
 /*  add data */
 /*click show modal*/
 $('#addBtn').on('click',function(){

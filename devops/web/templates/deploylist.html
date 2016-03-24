@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}上线历史列表{% endblock %}
+{% block breadcrumb %}<a href="/project/deploylist">上线历史列表</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>上线历史列表</h5>
+  </div> <!--end widget-title-->
+</div>  
+
+
+<!--add modal emulation-->
+<div id="detail_message" class="modal hide fade">
+     <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">上线发布详情</h4>
+      </div><!--modal-header end-->
+   
+    <div class="modal-body">
+    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+        <div class="form-grop">
+            <label class="control-label">项目名</label>
+            <div class="controls">
+                <span id="project_name" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">发布简介</label>
+            <div class="controls">
+                <span id="project_info" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">项目发布版本</label>
+            <div class="controls">
+                <span id="project_version" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">代码版本</label>
+            <div class="controls">
+                <span id="project_commit" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">操作人</label>
+            <div class="controls">
+                <span id="project_applicant" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">操作时间</label>
+            <div class="controls">
+                <span id="project_date" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">发布状态</label>
+            <div class="controls">
+                <span id="project_status" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-grop">
+            <label class="control-label">发布详情</label>
+            <div class="controls">
+                <span id="project_detail" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="modal-footer">
+                <button class="btn btn-warning" data-dismiss="modal">退出</button>
+            </div>
+      </div><!--button end-->
+    </div> <!--modal body  end-->
+</div><!--add modal emulation end-->
+
+
+
+<div class="widget-content">
+   <table id ="datatable"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">项目名</th>
+            <th scope="col">发布版本</th>
+            <th scope="col">最新版本</th>
+            <th scope="col">操作人</th>
+            <th scope="col">操作时间</th>
+            <th scope="col">发布状态</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+/* list all data */
+function list(){
+    {% if 'id' in qs and 'ver' in qs %}
+    var url = "/getapi?method=deploy&id={{ qs.id }}&ver={{ qs.ver }}"
+    {% else %}
+    var url = "/listapi?method=deploy"
+    {% endif %}
+    $.getJSON(url,function(data){
+      // data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       var count =  data['count']     
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+           str +='<tr class="odd gradeX">'+ 
+           '<td>'+v['project_name']+'</td>'+  
+           '<td>'+v['version']+'</td>'+  
+           '<td>'+v['commit']+'</td>'+  
+           '<td>'+v['applicant']+'</td>'+  
+           '<td>'+v['apply_date']+'</td>'+ 
+           '<td>'+v['status_name']+'</td>'+ 
+           '<td>'+
+           {% if 'id' in qs and 'ver' in qs %}
+           '<button class="btn btn-primary btn-sm detail-btn" data-id="'+v['id']+'">详情</button>'+
+           {% else %}
+           '<a class="btn btn-primary btn-sm detail-btn" href="/project/uplist?id='+v['project_id']+'&ver='+v['commit']+'">详情</button>'+
+           {% endif %}
+           '</td>'+
+           '</tr>'
+       })
+         $("tbody").html(str)
+		datatable()
+    })
+}
+list()
+/* DataTable */
+function datatable(){
+$('#datatable').DataTable({
+	"bDestroy":true,
+    "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+        }
+    },
+    "order": [[4, 'desc'], [0, 'asc']]
+});
+}
+
+{% if 'id' in qs and 'ver' in qs %}
+//弹出详细按钮页面
+$("tbody").on('click','.detail-btn',function(){
+    var id = $(this).attr('data-id')
+    var url = "/getapi?method=deploy&id="+id
+
+    var str = ""
+    $.getJSON(url,function(data){
+        data = JSON.parse(data.result);
+        data = data.result;
+        $('#project_name').html(data.project_name);
+        $('#project_info').html(data.info);
+        $('#project_version').html(data.version);
+        $('#project_commit').html(data.commit);
+        $('#project_applicant').html(data.applicant);
+        $('#project_date').html(data.apply_date);
+        $('#project_status').html(data.status_name);
+        $('#project_detail').html(data.detail);
+    })
+    $('#detail_message').modal('show')
+})
+{% endif %}
+
+</script>
+{% endblock %}

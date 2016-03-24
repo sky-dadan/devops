@@ -63,4 +63,15 @@ def success():
     r = requests.post(get_url(),headers=headers, json=data)
     return r.text   
 
+@app.route('/project/uplist')
+def deploy_list():
+    if session.get('username')  == None:
+       return redirect('/login')
+    headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+    name = session['username']
+    if int(validate_result['code']) == 0:
+        return render_template('deploylist.html',info=session,qs=request.args)
+    else:
+        return render_template('deploylist.html',errmsg=validate_result['errmsg'])
 

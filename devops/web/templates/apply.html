@@ -54,7 +54,7 @@
 
 <div class="widget-content">
    <table id ="datatable"  class="table table-bordered table-striped">
- 	<thead>
+  	<thead>
  		<tr>
             <th scope="col">项目名</th>
             <th scope="col">最新版本</th>
@@ -65,7 +65,7 @@
         </tr>
 	</thead>
 	<tbody>
-         {% if result %}
+          {% if result %}
         {% for p_id,p_name in result.iteritems() %}
         <tr>
             <td class="p_name" style="text-align: center;">{{ p_name }}</td>
@@ -90,23 +90,25 @@
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
 name = "apply"
-$('#datatable').DataTable({
-        "language": {
-            "lengthMenu": "每页 _MENU_ 条记录",
-            "zeroRecords": "没有找到记录",
-            "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
-            "infoEmpty": "无记录",
-            "infoFiltered": "(从 _MAX_ 条记录过滤)",
-            "sSearch": "搜索:",
-            "oPaginate": {
-                "sFirst": "首页",
-                "sPrevious": "上一页",
-                "sNext": "下一页",
-                "sLast": "末页"
+/*datatable function*/
+function datatable(){
+    $('#datatable').DataTable({
+            "language": {
+                "lengthMenu": "每页 _MENU_ 条记录",
+                "zeroRecords": "没有找到记录",
+                "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+                "infoEmpty": "无记录",
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",
+                "sSearch": "搜索:",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                }
             }
-        }
-});
-
+    });
+}
 /*负责人项目列表*/
 function list(){
    var url = "/listapi?method="+name
@@ -135,8 +137,8 @@ function list(){
                     statusDom.html('发布失败').css('color','red')
                 
                 }
-
              })<!--end each -->
+             datatable()
     }else{
                 swal("error", data['errmsg'],"error")
     } <!--end if -->

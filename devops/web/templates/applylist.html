@@ -78,21 +78,26 @@ position:static;
 
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
+name = "apply"
 /* list all data */
 function list(){
-    var url = "/listapi?method=apply"
+    var url = "/listapi?method="+name
     $.getJSON(url,function(data){
-      // data = data['result']  //string
-       data=JSON.parse(data['result']); //object 
-       var count =  data['count']     
        var str = ''
+       data=JSON.parse(data['result']); //object 
+       console.log(data)
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+           if (v['status']==1){
+               v['status']="申请中"
+           }else{
+               v['status']="审核中"
+           }
            str +='<tr class="odd gradeX">'+ 
            '<td>'+v['project_name']+'</td>'+  
            '<td>'+v['commit']+'</td>'+  
-           '<td>'+v['applicant_name']+'</td>'+  
+           '<td>'+v['applicant']+'</td>'+  
            '<td>'+v['apply_date']+'</td>'+ 
-           '<td>'+v['apply_status']+'</td>'+ 
+           '<td style="color:#5EDF47;">'+v['status']+'</td>'+ 
            '<td>'+
            '<button class="btn btn-info btn-sm emulation-btn"  data-id="'+v['id']+'">仿真</button>'+
            '<button class="btn btn-success btn-sm product-btn"  data-id="'+v['id']+'">正式</button>'+
@@ -182,8 +187,8 @@ function detail(id){
             if (v!=0){
             str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
                 '     发布版本: ' + v['version'] + '     代码最新版本: '+v['commit']+
-                '     申请者: '+v['applicant_name'] + '    申请时间: '+v['apply_date']+
-                '     发布状态: '+v['apply_status']+'     发布详情: '+v['detail']
+                '     申请者: '+v['applicant'] + '    申请时间: '+v['apply_date']+
+                '     发布状态: '+v['status']+'     发布详情: '+v['detail']
             }
         })
         swal(str)

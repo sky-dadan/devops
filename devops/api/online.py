@@ -98,8 +98,8 @@ def apply_emulation(auth_info,**kwargs):
     username = auth_info['username']
     try:
         version = kwargs.get('version')
-        id = kwargs.get('id')                   #web端 传递过来测试打上的version，申请项目的ID
-        data, where = {'version':version,'status':'2'},{'id':id}
+        pid = kwargs.get('id')                   #web端 传递过来测试打上的version，申请项目的ID
+        data, where = {'version':version,'status':'2'},{'id':pid}
         logging.getLogger().info(data)
         app.config['cursor'].execute_update_sql('project_apply',data,where)
         util.write_log(username," emulation update  project_apply status 2")
@@ -124,9 +124,9 @@ def apply_cancel(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        id = kwargs.get('where')
-        id = id['id']
-        where,data = {'id':id},{'status':'4'}
+        pid = kwargs.get('where')
+        pid = pid['id']
+        where,data = {'id':pid},{'status':'4'}
         app.config['cursor'].execute_update_sql('project_apply',data,where)
         util.write_log(username,"cancel update project_apply status 4")
         
@@ -151,9 +151,9 @@ def annly_success(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        id = kwargs.get('where')
-        id = id['id']
-        where,data = {'id':id},{'status':'3'}
+        pid = kwargs.get('where')
+        pid = pid['id']
+        where,data = {'id':pid},{'status':'3'}
         app.config['cursor'].execute_update_sql('project_apply',data,where)
         util.write_log(username,"apply success update project_apply status 3")
 

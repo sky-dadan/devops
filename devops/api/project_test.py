@@ -34,35 +34,6 @@ def project_test_create(auth_info, **kwargs):
         logging.getLogger().error('add project_test error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'add project_test error'})
 
-#获取某个项目最近上线的那一条记录
-@jsonrpc.method('project_test.get')
-@auth_login
-def project_test_get(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    role = int(auth_info['role'])
-    try:
-        
-        fields = ['project_id','host','commit','pusher','push_date']
-        result = []
-#        data = request.get_json()['params']
-#        where = kwargs.get('where',None)
-#        result = app.config['cursor'].get_results('project_test',fields,where,'push_date',False,(0,1))
-#        print "result = ",result
-        sql = 'select project_id, host, commit, pusher, push_date from (select project_id, host, commit, pusher, push_date from project_test order by push_date desc) as sort_project_test group by project_id'
-        app.config['cursor'].execute(sql)
-        for row in  app.config['cursor'].fetchall():
-            res = {}
-            for i,k in enumerate(fields):
-                res[k] = row[i]
-            result.append(res)
-        print "result =",result
-        util.write_log(username, '查询项目成功') 
-        return json.dumps({'code':0,'result':result},cls=MyEncoder)
-    except:
-        logging.getLogger().error("select project error: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
 
 #获取所有项目的上线的所有上线的历史记录或者某个项目的所有上线的历史记录
 @jsonrpc.method('project_test.getlist')
@@ -78,6 +49,32 @@ def project_test_getlist(auth_info, **kwargs):
         data = request.get_json()['params']
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_results('project_test',fields,where)
+        util.write_log(username, '查询项目成功') 
+        return json.dumps({'code':0,'result':result},cls=MyEncoder)
+    except:
+        logging.getLogger().error("select project error: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
+
+#获取所有项目最近上线的那一条记录
+@jsonrpc.method('lastest_record.getlist')
+@auth_login
+def project_test_get(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    role = int(auth_info['role'])
+    try:
+        
+        fields = ['project_id','commit','pusher','push_date','comment']
+        result = []
+        sql = 'select project_id,commit, pusher, push_date,comment from (select project_id, commit, pusher, push_date,comment from project_test order by push_date desc) as sort_project_test group by project_id'
+        app.config['cursor'].execute(sql)
+        for row in  app.config['cursor'].fetchall():
+            res = {}
+            for i,k in enumerate(fields):
+                res[k] = row[i]
+            result.append(res)
+        print "result =",result
         util.write_log(username, '查询项目成功') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:

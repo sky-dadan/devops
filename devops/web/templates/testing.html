@@ -89,16 +89,16 @@ position:static;
     </thead> 
     <tbody>
         {% if result %}
-        {% for res in result %}
+        {% for p_id,p_name in result.iteritems() %}
         <tr>
-            <td>{{ res }}</td>
-            <td>{{ resip[res] }}</td>
-            <td>zhangxunan</td>
-            <td>2016-03-23 10:16:10</td>
-            <td>测试</td>
+            <td class="p_name">{{ p_name }}</td>
+            <td class="host">{{ resip[p_name] }}</td>
+            <td class="pusher">zhangxunan</td>
+            <td class="push_date">2016-03-23 10:16:10</td>
+            <td class="comment">测试</td>
             <td>
-                <button class="btn btn-primary btn-sm online-btn" >上线</button>
-                <button class="btn btn-primary btn-sm details-btn">上线记录</button>
+                <button class="btn btn-primary btn-sm online-btn" data-id='{{ p_id }}' data='{{ p_name }}' >上线</button>
+                <button class="btn btn-primary btn-sm details-btn" data-id='{{ p_id }}' data='{{ p_name }}'>上线记录</button>
             </td>
         </tr>
         {% endfor %}
@@ -136,147 +136,42 @@ $('#datalist').DataTable({
 }
 /* list all data */
 function list(){
-    var name="project_test"
+    var name="lastest_record"
     var url = "/listapi?method="+name
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
-       var count =  data['count']     
-       var str = ''
+       console.log("data =",data)   //Object {count: 3, code: 0, result: Array[3]}
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
-           if (v['warning'] == 1) {
-               str += '<tr class="odd gradeX warning">';
-           } else if (v['warning'] == 2) {
-               str += '<tr class="odd gradeX error">';
-           } else {
-               str += '<tr class="odd gradeX">';
-           }
-           str += '<td>'+v['type']+'</td>'+  
-           '<td>'+v['manufacturer']+'</td>'+  
-           '<td>'+v['store_date']+'</td>'+  
-           '<td>'+v['expire']+'</td>'+ 
-           '<td>'+v['remark']+'</td>'+ 
-           '<td>'+
-           '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
-           '<button class="btn btn-danger btn-sm delete-btn" data-id="'+v['id']+'">删除</button>'+
-           '</td>'+ 
-           '</tr>'          
+            console.log(v)
+            var parent=$("[data-id="+v.project_id+"]").parents('tr');  //找到project_id 对应的列 
+            for(var i in v){
+                parent.find("."+i).html(v[i]);  //将第一组数据根据对应的class名渲染数据
+            }
        })       
-         $("tbody").html(str)
-         datatable()
     })
 }
-//list()
-/*  add data */
-/*click show modal*/
-$('#addBtn').on('click',function(){
-		$('#addModal').modal('show')
-})
-/* add data for ajax */ 
-$('#addForm').on('submit',function(){
-	   var str = $('#addForm').serialize()
-       str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
-       str = decodeURIComponent(str)  //对serialize后的内容进行解码
-       var data = {"method":name,"formdata":str}
-	   $.post("/addapi",data,function(data){
-	     //console.log(data)    //string
-         data = JSON.parse(data)  //object
-         data = JSON.parse(data['result']) //object
-         if (data['code']==0){
-			  swal({
-						title:"添加成功",
-						type: "success",
-						confirmButtonText: "Cool"
-					},function(){                    
-						$('#addModal').modal('hide')
-						list()
-						location.reload()
-					})  //end swal
-         }else{
+list()
+$("tbody").on('click','.online-btn',function(){
+   var  project_id = $(this).attr('data-id')
+   var parent = $("[data-id="+project_id+"]").parents('tr');
+   var host = parent.find(".host").html();
+   var pusher = '{{ info.username }}'
+   var comment = parent.find(".comment").html();
+   str = "project_id="+project_id+"&host="+host+"&pusher="+pusher+"&comment="+comment
+   var data = {"method":"project_test","formdata":str}
+   $.post("/addapi",data,function(data){
+       data = JSON.parse(data)
+       data = JSON.parse(data['result'])
+       if (data['code']==0){
+           console.log("添加记录成功")
+            list()
+            location.reload()
+       }else{
 		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
-         }
- }) //end post
-	   return false
-})  //submit form
-
-/*get one data from id for update*/
-$('tbody').on('click','.update-btn',function(){
-	var id = $(this).attr('data-id')
-    var url = "/getapi?method="+name+"&id="+id
-    console.log(url)
-	$.getJSON(url,function(data){
-      data = JSON.parse(data['result'])
-      if (data['code']==0){
-          $('#upid').val(data['result']['id'])
-          $('#uptype').val(data['result']['type'])
-          $('#upmanu').val(data['result']['manufacturer'])
-          $('#upstore_date').val(data['result']['store_date'])
-          $('#upexpire').val(data['result']['expire'])
-          $('#upremark').val(data['result']['remark'])
-      }else{
-          swal("OMG!",data['errmsg'], "error"); 
-      }
-	})
-	$('#updateModal').modal('show')  //show modal
+       }
+   })
 })
 
-/*update data*/
-$('#updateForm').on('submit',function(){
-    var str = $('#updateForm').serialize()
-    str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
-    str = decodeURIComponent(str)  //对serialize后的内容进行解码
-    console.log(str)
-    var data = {'method':name,'formdata':str}
-    console.log(data)
-$.post('/updateapi',data, function(data){  // data is string
-    data = JSON.parse(data)    //object
-    data = JSON.parse(data['result']) //object
-    console.log(data)
-    if (data['code']==0){   
-		swal({ 
-			 title: "更新成功!", 
-			 text: data['result'],   
-			 type: "success",   
-			 confirmButtonText: "Cool"
-		 },function(){               
-			$('#updateModal').modal('hide')
-			list()
-			location.reload()
-		});
-    }else{
-		$('#uperrorMsg').html('Failed:'+data['errmsg']).show()
-    }
-}) //end post
-    return false   //get data and end
-})  //submit form
-
-/*delete cmdb 删除的操作几乎没有，web界面不提供删除接口，真需要删除走api*/
-$("tbody").on('click','.delete-btn',function(){
-	if(confirm("Are you sure delete")){
-        var that = this;
-		var id = $(this).attr('data-id')
-        var url = "/deleteapi?method="+name+"&id="+id
-		$.getJSON(url,function(data){
-      		data = JSON.parse(data['result'])
-			if (data['code']== 0 ){
-                 swal({ 
-                          title: "删除成功", 
-                          text: data['result'],   
-                          type: "success",   
-                          confirmButtonText: "Cool"    
-                      },function(){               
-                         $(that).parents('tr').remove();
-                        list()
-                        location.reload()
-                });
-            }else{
-                swal("OMG!", data['errmsg'], "error"); 	
-            }
-    })  //end getJSON
-  }  // end confirm
-    return false   //get data and end
-})   
 </script>
 {% endblock %}

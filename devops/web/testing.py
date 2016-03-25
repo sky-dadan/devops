@@ -22,7 +22,7 @@ def testing():
         url = "http://%s/api/userproject" % app.config['api_host']
         r = requests.post(url, headers=headers)
         result = json.loads(r.text)
-        result['result'] = result['result'].values()
+#        result['result'] = result['result'].values()
         url = "http://%s/api/testhost" % app.config['api_host']
         r = requests.post(url,headers=headers)
         resip = json.loads(r.text)

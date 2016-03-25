@@ -146,6 +146,7 @@ function list(){
            '</tr>'
        })
          $("tbody").html(str)
+        style()
 		datatable()
     })
 }
@@ -171,6 +172,12 @@ $('#datatable').DataTable({
     "order": [[4, 'desc'], [0, 'asc']]
 });
 }
+function style(){
+    $('td:contains("上线完成")').css('color','Lime')
+    $('td:contains("申请上线")').css('color','blue')
+    $('td:contains("上线取消")').css('color','red')
+}
+
 
 {% if 'id' in qs and 'ver' in qs %}
 //弹出详细按钮页面

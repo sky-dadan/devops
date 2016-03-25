@@ -5,10 +5,22 @@ from flask import Flask, request
 from flask_jsonrpc import JSONRPC
 from . import app, jsonrpc
 import logging, util,time
-import json, traceback,datetime
+import json, traceback,time
 from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
+
+
+def apply_pub(username,data,where):
+    app.config['cursor'].execute_update_sql('project_apply',data,where)
+    util.write_log(username,"success and update project_apply status %s" % data['status'])
+    fields = ['project_id','info','applicant','version','commit','detail']  #为project_deplpy 准备数据
+    result=app.config['cursor'].get_one_result('project_apply',fields,where)
+    local_time = time.strftime("%Y-%m-%d %H:%M:%S")
+    result['apply_date'] = local_time
+    result['status'] = str(data['status'])
+    app.config['cursor'].execute_insert_sql('project_deploy',result)
+    util.write_log(username,"success and insert project_deploy status  %s"  % data['status'])
 
 #创建申请任务列表
 @jsonrpc.method('apply.create') 
@@ -65,7 +77,7 @@ def apply_list(auth_info,**kwargs):
         return  json.dumps({'code':0,'data':loginer, 'result':result,'count':len(result)},cls = MyEncoder)
     except:
         logging.getLogger().error("select apply list error:%s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'apply.getlist error  : %s'  %  traceback.format_exc()})
+        return json.dumps({'code':1,'errmsg':'任务列表获取失败!'})
 
 #任务列表，详情按钮
 @jsonrpc.method('apply.get')
@@ -87,7 +99,7 @@ def apply_one(auth_info,**kwargs):
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
         logging.getLogger().error("get apply detail faild : %s"  %  traceback.format_exc())
-        return json.dumps({'code':1,'err msg':'get apply detail error:%s' % traceback.format_exc()})
+        return json.dumps({'code':1,'errmsg':'任务详情获取失败!'})
 
 
 #仿真发布 脚本打上version版本号,触发仿真测试代码脚本, 返回执行结果 更新project_apply为2  灰度发布中,插入一条记录到project_deploy,状态为2
@@ -102,20 +114,11 @@ def apply_emulation(auth_info,**kwargs):
         pid = kwargs.get('id')                   #web端 传递过来测试打上的version，申请项目的ID
         data, where = {'version':version,'status':'2'},{'id':pid}
         logging.getLogger().info(data)
-        app.config['cursor'].execute_update_sql('project_apply',data,where)
-        util.write_log(username," emulation update  project_apply status 2")
-
-        fields = ['project_id','info','applicant','version','commit','detail']  #为project_deplpy 准备数据
-        result=app.config['cursor'].get_one_result('project_apply',fields,where)
-        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        result['apply_date'] = time
-        result['status'] = '2'                                                #将project_deploy status改为2 并且插入记录
-        app.config['cursor'].execute_insert_sql('project_deploy',result)  
-        util.write_log(username,"insert into project_deploy  status 2 ")
+        apply_pub(username,data,where)
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply.emulation get failed : %s" %  traceback.format_exc())
-        return json.dumps({'code':1, 'errmsg':'apply.emulation get failed'})
+        return json.dumps({'code':1, 'errmsg':'仿真发布失败~!'})
 
 #仿真失败，取消
 @jsonrpc.method('apply.cancel')
@@ -128,26 +131,17 @@ def apply_cancel(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'4'}
-        app.config['cursor'].execute_update_sql('project_apply',data,where)
-        util.write_log(username,"cancel update project_apply status 4")
-        
-        fields = ['project_id','info','applicant','version','commit','detail']  #为project_deplpy 准备数据
-        result=app.config['cursor'].get_one_result('project_apply',fields,where)
-        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        result['apply_date'] = time
-        result['status'] = '4'                                               
-        app.config['cursor'].execute_insert_sql('project_deploy',result)
-        util.write_log(username,"cancel insert project_deploy status  4")
+        apply_pub(username,data,where)
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply.cancel get failed : %s" % traceback.format_exc())
-        return json.dumps({'code':1})
+        return json.dumps({'code':1,'errmsg':'取消仿真发布失败'})
 
 
 #仿真测试成功，正式上线
 @jsonrpc.method("apply.success")
 @auth_login
-def annly_success(auth_info,**kwargs):
+def apply_success(auth_info,**kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
@@ -155,20 +149,11 @@ def annly_success(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'3'}
-        app.config['cursor'].execute_update_sql('project_apply',data,where)
-        util.write_log(username,"apply success update project_apply status 3")
-
-        fields = ['project_id','info','applicant','version','commit','detail']  #为project_deplpy 准备数据
-        result=app.config['cursor'].get_one_result('project_apply',fields,where)
-        time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        result['apply_date'] = time
-        result['status'] = '3'                                               
-        app.config['cursor'].execute_insert_sql('project_deploy',result)
-        util.write_log(username,"apply success insert project_deploy status  3")
+        apply_pub(username,data,where)
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())
-        return json.dumps({'code':1})
+        return json.dumps({'code':1,'errmsg':'正式上线失败,请联系运维人员!'})
 
 def project_attr(result):
     ret = []

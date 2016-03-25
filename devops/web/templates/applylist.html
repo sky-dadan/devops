@@ -79,6 +79,18 @@ position:static;
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
 name = "apply"
+
+function replace(id){
+       var parent=$("[data-id="+id+"]").parents('tr');
+       var statusDom=parent.find('.status');
+       if (statusDom.html()==1){
+           parent.find('.product-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
+           statusDom.html('申请中....')
+       }else{
+           parent.find('.emulation-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
+           statusDom.html("审核中....").css('color','red')
+       }
+}
 /* list all data */
 function list(){
     var url = "/listapi?method="+name
@@ -86,30 +98,33 @@ function list(){
        var str = ''
        data=JSON.parse(data['result']); //object 
        console.log(data)
-       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-           if (v['status']==1){
-               v['status']="申请中"
-           }else{
-               v['status']="审核中"
-           }
-           str +='<tr class="odd gradeX">'+ 
-           '<td>'+v['project_name']+'</td>'+  
-           '<td>'+v['commit']+'</td>'+  
-           '<td>'+v['applicant']+'</td>'+  
-           '<td>'+v['apply_date']+'</td>'+ 
-           '<td style="color:#5EDF47;">'+v['status']+'</td>'+ 
-           '<td>'+
-           '<button class="btn btn-info btn-sm emulation-btn"  data-id="'+v['id']+'">仿真</button>'+
-           '<button class="btn btn-success btn-sm product-btn"  data-id="'+v['id']+'">正式</button>'+
-           '<button class="btn btn-danger btn-sm cancel-btn" data-id="'+v['id']+'">取消</button>'+
-           '<button class="btn btn-primary btn-sm detail-btn"  data-id="'+v['id']+'">详情</button>'+
-           '</td>'+ 
-           '</tr>'          
-       })       
-         $("tbody").html(str)
-		datatable()
-    })
-}
+       if (data['code']==0){
+           $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+                str +='<tr class="odd gradeX">'+
+                    '<td class="project_name">'+v['project_name']+'</td>'+  
+                    '<td class="commit">'+v['commit']+'</td>'+ 
+                    '<td class="applicant">'+v['applicant']+'</td>'+  
+                    '<td class="apply_date">'+v['apply_date']+'</td>'+
+                    '<td class="status" style="color:#5EDF47;">'+v['status']+'</td>'+
+                    '<td>'+
+                    '<button class="btn btn-info btn-sm emulation-btn" data-id="'+v['id']+'">仿真</button>'+
+                    '<button class="btn btn-success btn-sm product-btn" data-id="'+v['id']+'" >正式</button>'+
+                    '<button class="btn btn-danger btn-sm cancel-btn" data-id="'+v['id']+'">取消</button>'+
+                    '<button class="btn btn-primary btn-sm detail-btn" data-id="'+v['id']+'">详情</button>'+
+                    '</td>'+
+                    '</tr>'          
+           })   //each end    
+           $("tbody").html(str)
+           $.each(data.result,function(k,v){ 
+                replace(v['id'])	
+           })  //each end
+           datatable()
+    }else{
+                swal("error", data['errmsg'],"error")
+    
+    }  //end if 
+  })  //getJSON end 
+}    //function end 
 list()
 /* DataTable */
 function datatable(){
@@ -154,7 +169,17 @@ $('#Emulation_btn').on('click',function(){
         data = JSON.parse(data)
         data = JSON.parse(data['result'])
         if (data['code']==0){
-            swal("Good~","仿真上线完成!","info")
+            swal({
+                title:"success",
+                text:"仿真发布成功",
+                type:"success",
+                confirmButtonText:'确定'
+                },function(){
+                    $('#add_emulation').modal('hide')
+                    location.reload()
+                })
+        }else{
+            swal("OMG",data['errmsg'],"error");
         } 
     })
 })
@@ -168,12 +193,12 @@ $("tbody").on('click','.detail-btn',function(){
 //点击正式发布按钮
 $('tbody').on('click','.product-btn',function(){
     var id = $(this).attr('data-id')
-    product(id)
+     product(id)
 })
 
 //点击取消按钮
 $('tbody').on('click','.cancel-btn',function(){
-    var id = $(this).attr('data-id')
+     var id = $(this).attr('data-id')
     cancel(id)
 })
 
@@ -182,30 +207,38 @@ function detail(id){
     var url = "/getapi?method=apply&id="+id
     var str = ''
     $.getJSON(url,function(data){
-        data = JSON.parse(data.result)
-        $.each(data,function(k,v){
-            if (v!=0){
-            str += '项目名: ' + v['project_name']+'      发布简介: '+v['info']+
-                '     发布版本: ' + v['version'] + '     代码最新版本: '+v['commit']+
-                '     申请者: '+v['applicant'] + '    申请时间: '+v['apply_date']+
-                '     发布状态: '+v['status']+'     发布详情: '+v['detail']
-            }
-        })
-        swal(str)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        if (data['code']==0){  
+            str = '项目名: ' + data['result']['project_name']+'\n'+
+                '发布简介: '+data['result']['info']+'\n'+
+                '发布详情: '+data['result']['detail']
+            swal(str)
+        }else{
+            swal("OMG", data['errmsg'],"error")
+        }
     })
 }
 
+
 //正式发布
 function product(id){
-    var url = "/apply/success?id="+id
+     var url = "/apply/success?id="+id
     $.getJSON(url,function(data){
         data = JSON.parse(data.result)
         console.log(data)
         if(data['code']==0){
-            swal('Good! Job!',"正式发布成功","success")
+            swal({
+                title:"success",
+                text:"正式发布成功",
+                type:"success",
+                confirmButtonText:'确定'
+                },function(){
+                    location.reload()
+                })
         }else{
             swal("ERROR!","正式发布错误","error")
-        }
+         }
     })
 }
 
@@ -215,7 +248,14 @@ function cancel(id){
     $.getJSON(url,function(data){
         data = JSON.parse(data.result)
         if(data['code']==0){
-            swal("Execute!","取消发布成功,请提醒开发继续调试Bug!","warning")
+            swal({
+                title:"success",
+                text:"取消发表成功",
+                type:"success",
+                confirmButtonText:'确定'
+                },function(){
+                    location.reload()
+                })
         }else{
             swal("No!","网站后端出现错误!","error")
         }

@@ -32,11 +32,11 @@ def apply_create(auth_info, **kwargs):
         else:
             app.config['cursor'].execute_update_sql('project_apply',data,where)
         app.config['cursor'].execute_insert_sql('project_deploy',data)  
-        util.write_log(username,{'code':0,'result':'project apply success'})
-        return json.dumps({'code':0,'result':'project apply  success'})    
+        util.write_log(username,{'code':0,'result':'项目申请成功'})
+        return json.dumps({'code':0,'result':'项目申请成功'})    
     except:
         logging.getLogger().error('project apply error: %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'project apply error'})
+        return json.dumps({'code':1,'errmsg':'项目申请失败'})
 
 
 #申请列表，任务列表
@@ -49,9 +49,10 @@ def apply_list(auth_info,**kwargs):
     try:
         output = ['id','project_id','info','applicant','version','commit','apply_date','status','detail']
         fields = kwargs.get('output', output)
-        loginname = app.config['cursor'].get_one_result('user',['name'],{'username':username})
-        print loginname  #{'name': u'\u5218\u5b50\u5e73'} 
-        loginer = app.config['cursor'].get_results('project_apply',fields,{'applicant':loginname['name']})
+        #loginname = app.config['cursor'].get_one_result('user',['name'],{'username':username})
+        #print loginname  #{'name': u'\u5218\u5b50\u5e73'} 
+        #loginer = app.config['cursor'].get_results('project_apply',fields,{'applicant':loginname['name']})
+        loginer = app.config['cursor'].get_results('project_apply',fields)
 
         where = {'status':['1','2']}
         result = app.config['cursor'].get_results('project_apply',fields,where)

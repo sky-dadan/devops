@@ -87,8 +87,8 @@ def project_test_get(auth_info, **kwargs):
         return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
 
 #获取每个项目所对应的测试主机
-#@jsonrpc.method('test_host.getlist')
-@app.route('/api/testhost',methods=['GET','POST'])
+#@app.route('/api/testhost',methods=['GET','POST'])
+@jsonrpc.method('test_host.getlist')
 @auth_login
 def project_test_getlist(auth_info, **kwargs):
     if auth_info['code'] == 1:
@@ -97,6 +97,7 @@ def project_test_getlist(auth_info, **kwargs):
     try:
         work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
         conf_name = os.path.join(work_dir, 'testhost.conf')
+#        conf_name = app.config['test_host']
         conf = util.ProjectConfig(conf_name)
         projects = util.userproject(username)
         result = conf.gets(projects.values())

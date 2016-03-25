@@ -48,7 +48,7 @@ def project_test_getlist(auth_info, **kwargs):
         fields = ['project_id','host','commit','pusher','push_date','comment']
         data = request.get_json()['params']
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_results('project_test',fields,where)
+        result = app.config['cursor'].get_results('project_test',fields,where,'push_date',False)
         util.write_log(username, '查询项目成功') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:

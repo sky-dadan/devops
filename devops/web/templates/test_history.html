@@ -27,6 +27,18 @@ position:static;
         </tr>
     </thead> 
     <tbody>
+        {% if result %}
+        {% for res in result %}
+        <tr>
+            <td>{{ res['project_id'] }}</td>
+            <td>{{ res['host'] }}</td>
+            <td>{{ res['commit'] }}</td>
+            <td>{{ res['pusher'] }}</td>
+            <td>{{ res['push_date'] }}</td>
+            <td>{{ res['comment'] }}</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
     </tbody>
    </table>
 </div> <!--widget-content-->
@@ -58,32 +70,6 @@ $('#datalist').DataTable({
         }  
     })
 }
-/* list all data */
-function list(){
-    var name=project_test
-    var url = "/listapi?method="+name
-    $.getJSON(url,function(data){
-      // data = data['result']  //string
-       data=JSON.parse(data['result']); //object 
-       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
-       var count =  data['count']     
-       var str = ''
-       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-        //   console.log(v)   //Object {idc_id: 1, u_num: 32, id: 1, power: "20A", name: "O04"} 
-            str += '<tr class="odd gradeX">'+
-           '<td>'+v['host']+'</td>'+  
-           '<td>'+v['commit']+'</td>'+  
-           '<td>'+v['pusher']+'</td>'+  
-           '<td>'+v['push_date']+'</td>'+ 
-           '<td>'+v['comment']+'</td>'+ 
-           '</tr>'          
-       })       
-         $("tbody").html(str)
-         datatable()
-    })
-}
-list()
-
-
+datatable()
 </script>
 {% endblock %}

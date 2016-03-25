@@ -16,65 +16,6 @@ position:static;
 <!--主体内容-->
 {% block row %}
 
-<div class="widget-box">
-  <div class="widget-title">
-	  <span class="icon"> <i class="icon-th"></i></span>
-      <h5>测试发布</h5>
-      <!--      <button style='float:right;' class="btn btn-primary btn-sm" id="addBtn">添加软资产</button>-->
-    </div> 
-
-<!--add modal-->                                                                                 
-<div id="addModal" class="modal hide fade">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title">添加软资产</h4>
-	  </div><!--modal-header end-->
-
-      <div class="modal-body">
-     <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
-     <form class="form-horizontal" id="addForm">
-     	<div class="form-group">
-            <label class="control-label">资产类型</label>
-     		 <div class="controls">
-       		 	<input id="type"  type="text"  name="type" >
-      		</div> 
-       	</div> <!--add type end-->
-     	<div class="form-group">
-            <label class="control-label">厂商</label>
-     		 <div class="controls">
-       		 	<input id="manufacturer"  type="text"  name="manufacturer" >
-      		</div> 
-       	</div> <!--add manufacturer end-->
-             <div class="form-group">
-            <label class="control-label">采购时间</label>
-      		<div class="controls">
-       			<input id="store_date" type="date"  name="store_date" >
-      		</div> 
-		</div><!--add store_date end -->
-        <div class="form-group">
-            <label class="control-label">过期时间</label>
-      		<div class="controls">
-       			<input id="expire"  type="date"  name="expire" >
-      		</div> 
-		</div><!--add expire end -->
-        <div class="form-group">
-            <label class="control-label">备注</label>
-      		<div class="controls">
-                <textarea class="form-control" rows="3" id="remark" name="remark"></textarea>
-                <!--	<input id="remark" type="text"  name="remark" >-->
-      		</div> 
-		</div><!--add remark end -->
-    	<div class="form-group">
-     		<div class="modal-footer">
-                <button class="btn btn-primary" >添加</button>
-				<button class="btn btn-warning" data-dismiss="modal">退出</button>
-         	</div>
-      </div><!--button end-->
-    </form><!--form end-->
-
-   </div> <!--modal body end-->
-</div><!-- /.modal -->
-
 <div class="widget-content">
    <table id ="datalist"  class="table table-bordered table-striped">
 	<thead>
@@ -97,8 +38,8 @@ position:static;
             <td class="push_date">2016-03-23 10:16:10</td>
             <td class="comment">测试</td>
             <td>
-                <button class="btn btn-primary btn-sm online-btn" data-id='{{ p_id }}' data='{{ p_name }}' >上线</button>
-                <a class="btn btn-primary btn-sm detail-btn" href="/project/testhistory?id='{{ p_id }}'">上线记录</button>
+                <button class="btn btn-primary btn-sm online-btn" data-id='{{ p_id }}' data='{{ p_name }}'>测试上线</button>
+                <a class="btn btn-primary btn-sm detail-btn" href="/project/testhistory?id={{ p_id }}">上线记录</button>
             </td>
         </tr>
         {% endfor %}
@@ -134,6 +75,7 @@ $('#datalist').DataTable({
         }  
     })
 }
+
 /* list all data */
 function list(){
     var name="lastest_record"
@@ -152,6 +94,7 @@ function list(){
     })
 }
 list()
+datatable()
 $("tbody").on('click','.online-btn',function(){
    var  project_id = $(this).attr('data-id')
    var parent = $("[data-id="+project_id+"]").parents('tr');

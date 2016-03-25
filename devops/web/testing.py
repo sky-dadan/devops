@@ -4,7 +4,7 @@ from flask import Flask, render_template,session,redirect,request
 from  . import app
 import requests,json
 import util,urllib
-
+import public
 headers = {"Content-Type": "application/json"}
 data = {
         "jsonrpc": "2.0",
@@ -39,8 +39,16 @@ def testhistory():
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
+    project_id = request.args.get('id')
+    project_id = urllib.unquote(project_id).encode('iso-8859-1')
+    project_id = int(project_id) 
     if int(validate_result['code']) == 0:
-        project_id = request.args.get('id')
-    print "project_id = ",project_id
-    return render_template('test_history.html',info=session)
-
+        data['method'] ="project_test.getlist"
+        data['params'] = {'where':{'project_id':project_id}}
+        r = requests.post(public.get_url(),headers=headers,json=data)
+        result = json.loads(r.text)
+        result = json.loads(result['result'])
+        if int(result['code']) == 0:
+            return render_template('test_history.html',info=session,result=result['result'])
+        else:
+            return render_template('testhistory.html',errmsg=validate_result['errmsg'])

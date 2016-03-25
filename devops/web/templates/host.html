@@ -367,6 +367,155 @@ position:static;
    </div> <!--modal body end-->
 </div><!-- /.modal -->
 
+<!--detail modal-->                                                                                 
+<div id="detailModel" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">主机详情</h4>
+	  </div><!--modal-header end-->
+
+      <div class="modal-body">
+     	<div class="form-group">
+            <label class="control-label">主机名</label>
+     		 <div class="controls">
+                        <span id="detail_hostname" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail hostname end-->
+     	<div class="form-group">
+            <label class="control-label">SN</label>
+     		 <div class="controls">
+                        <span id="detail_sn" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail sn end-->
+     	<div class="form-group">
+            <label class="control-label">主机编号</label>
+     		 <div class="controls">
+                        <span id="detail_no" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail no end-->
+     	    <div class="form-group">
+            <label class="control-label">内网IP</label>
+     		 <div class="controls">
+                        <span id="detail_ip" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail inner_ip end-->
+        <div class="form-group">
+            <label class="control-label">内网MAC</label>
+     		 <div class="controls">
+                        <span id="detail_address" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div> <!--detail inner_mac end-->
+         <div class="form-group">
+             <label class="control-label">外网IP</label>
+     		 <div class="controls">
+                        <span id="detail_wip" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail wan_ip end-->
+     	<div class="form-group">
+            <label class="control-label">远程控制卡IP</label>
+      		<div class="controls">
+                        <span id="detail_rip" class="input-xlarge uneditable-input"></span>
+      		</div> 
+		</div><!--detail remote_ip end -->
+        <div class="form-group">
+            <label class="control-label">系统类型</label>
+      		<div class="controls">
+                        <span id="detail_info" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail os_info end -->
+        <div class="form-group">
+            <label class="control-label">CPU核数</label>
+      		<div class="controls">
+                        <span id="detail_ncpu" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail cpu_info end -->
+        <div class="form-group">
+            <label class="control-label">磁盘大小</label>
+      		<div class="controls">
+                        <span id="detail_disk" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail disk_info end -->
+        <div class="form-group">
+            <label class="control-label">内存大小</label>
+      		<div class="controls">
+                        <span id="detail_mem" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail mem_info end -->
+        <div class="form-group">
+            <label class="control-label">服务器类型</label>
+      		<div class="controls">
+                        <span id="detail_type" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail server_info end -->
+        <div class="form-group">
+            <label class="control-label">生产商</label>
+      		<div class="controls">
+                        <span id="detail_manufacturer" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail manufacturer_info end -->
+        <div class="form-group">
+            <label class="control-label">供应商</label>
+      		<div class="controls">
+                        <span id="detail_supplier" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail supplier end -->
+        <div class="form-group">
+            <label class="control-label">入库时间</label>
+      		<div class="controls">
+                        <span id="detail_date" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail buy_date end -->
+        <div class="form-group">
+            <label class="control-label">质保时间</label>
+      		<div class="controls">
+                        <span id="detail_expire" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail expire end -->
+        <div class="form-group">
+            <label class="control-label">机房</label>
+      		<div class="controls">
+                        <span id="detail_idc" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail idc_info end -->
+        <div class="form-group">
+            <label class="control-label">机柜</label>
+      		<div class="controls">
+                        <span id="detail_cabinet" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail cabinet_id end -->
+     	<div class="form-group">
+            <label class="control-label">所属服务</label>
+     		 <div class="controls">
+                        <span id="detail_service" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail service end-->
+     	<div class="form-group">
+            <label class="control-label">状态</label>
+     		 <div class="controls">
+                        <span id="detail_status" class="input-xlarge uneditable-input"></span>
+      		</div> 
+       	</div> <!--detail status end-->
+        <div class="form-group">
+            <label class="control-label">是否为虚拟机</label>
+      		<div class="controls">
+                        <span id="detail_vm" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail vm end -->
+        <div class="form-group">
+            <label class="control-label">备注</label>
+      		<div class="controls">
+                        <span id="detail_remark" class="input-xlarge uneditable-input"></span>
+      		</div> 
+        </div><!--detail remark end -->
+    	<div class="form-group">
+     		<div class="modal-footer">
+				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+         	</div>
+      </div><!--button end-->
+
+   </div> <!--modal body end-->
+</div><!-- /.modal -->
+
 <div class="widget-content">
    <table id ="datalist"  class="table table-bordered table-striped">
 	<thead>
@@ -421,7 +570,9 @@ var cabinet_array = {}
 var cabinet_select = ''
 var services_array = {}
 var services_select = ''
+var manufact_array = {}
 var manufact_select = ''
+var supplier_array = {}
 var supplier_select = ''
 var idc_url="/listapi?method=idc"
 var cabinet_url="/listapi?method=cabinet"
@@ -452,7 +603,9 @@ $.getJSON(services_url,function(data){
 $.getJSON(manufact_url,function(data){
         data = JSON.parse(data['result'])
         $.each(data.result,function(k,v){
+        manufact_array[v['id']]=v['name']
         manufact_select +='<option value="'+v['id']+'">'+v['name']+'</option>' 
+        supplier_array[v['id']]=v['name']
         supplier_select += '<option value="'+v['id']+'">'+v['supplier_name']+'</option>'
         })
 })
@@ -539,6 +692,55 @@ $('#addForm').on('submit',function(){
     })  //end post
 	   return false
 })  //submit form
+
+/*get one data from id for detail*/
+$('tbody').on('click','.more-btn',function(){
+	$('#detailModel').modal('show')  //show modal
+	var id = $(this).attr('data-id')
+    var url = "/getapi?method="+name+"&id="+id
+    console.log(url)
+	$.getJSON(url,function(data){
+      data = JSON.parse(data['result'])
+      if (data['code']==0){
+          if (data['result']['status'] == 0){
+              data['result']['status']="在线";
+          }
+          else 
+          {
+               data['result']['status']="离线";
+          }
+          if (data['result']['vm_status'] == 0){
+              data['result']['vm_status']="是";
+          }
+          else 
+          {
+               data['result']['vm_status']="否";
+          }
+          $('#detail_hostname').html(data['result']['hostname'])
+          $('#detail_sn').html(data['result']['sn'])
+          $('#detail_no').html(data['result']['host_no'])
+          $('#detail_ip').html(data['result']['inner_ip'])
+          $('#detail_address').html(data['result']['mac_address'])
+          $('#detail_wip').html(data['result']['wan_ip'])
+          $('#detail_rip').html(data['result']['remote_ip'])
+          $('#detail_info').html(data['result']['os_info'])
+          $('#detail_ncpu').html(data['result']['cpu_num'])
+          $('#detail_disk').html(data['result']['disk_num'])
+          $('#detail_mem').html(data['result']['mem_num'])
+          $('#detail_type').html(data['result']['host_type'])
+          $('#detail_manufacturer').html(manufact_array[data['result']['manufacturer_id']])
+          $('#detail_supplier').html(supplier_array[data['result']['supplier_id']])
+          $('#detail_date').html(data['result']['store_date'])
+          $('#detail_expire').html(data['result']['expire'])
+          $('#detail_idc').html(idc_array[data['result']['idc_id']])
+          $('#detail_cabinet').html(cabinet_array[data['result']['cabinet_id']])
+          $('#detail_service').html(services_array[data['result']['service_id']])
+          $('#detail_status').html(data['result']['status'])
+          $('#detail_vm').html(data['result']['vm_status'])
+          $('#detail_remark').html(data['result']['remark'])
+      }
+    })
+})
 
 /*get one data from id for update*/
 $('tbody').on('click','.update-btn',function(){

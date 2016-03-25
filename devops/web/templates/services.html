@@ -93,7 +93,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>开发对接人</label>
 			<div class='controls'>
-				<select name='dev_interface' class='user_list'>
+				<select id='up_dev_interface' name='dev_interface' class='user_list'>
 				</select>
 			</div>
 		</div>
@@ -101,7 +101,7 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>运维对接人</label>
 			<div class='controls'>
-				<select name='sa_interface' class='user_list'>
+				<select id='up_sa_interface' name='sa_interface' class='user_list'>
 				</select>
 			</div>
 		</div>
@@ -232,8 +232,8 @@ $('tbody').on('click','.update-btn',function(){
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
 		  $('#up_name').val(data['result']['name'])
-//		  $('#up_dev_interface').val(data['result']['dev_interface'])
-//		  $('#up_sa_interface').val(data['result']['sa_interface'])
+		  $('#up_dev_interface').val(data['result']['dev_interface'])
+		  $('#up_sa_interface').val(data['result']['sa_interface'])
 		  $('#up_remark').val(data['result']['remark'])
       }else{
           swal("OMG!",data['errmsg'], "error"); 

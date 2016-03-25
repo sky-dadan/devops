@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_jsonrpc import JSONRPC
 from . import app, jsonrpc
 import logging, util
-import json, traceback,os
+import json, traceback,os,sys
 from auth import auth_login
 import time,requests
 from jsondate import MyEncoder
@@ -90,20 +90,13 @@ def project_test_getlist(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        fields = ['project_id','host','commit','pusher','push_date','comment']
-        conf = util.ProjectConfig('../ip.conf')
+        work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        conf_name = os.path.join(work_dir, 'testhost.conf')
+        conf = util.ProjectConfig(conf_name)
         projects = util.userproject(username)
-        print "projects",projects
-        print "projects.values():",projects.values()
-        print "projects.keys()",projects.keys()
         result = conf.gets(projects.values())
         for res in result:
             result[res] = ','.join(list(result[res]))
-#        for pro_id in projects.keys():
-#            where = {'project_id':int(pro_id)}
-#            print where
-#            res_latest = app.config['cursor'].get_results('project_test',fields,where,'push_date',False,(0,1))
-#            print "res_latest",res_latest
         return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error("/api/testhost: %s" % traceback.format_exc())

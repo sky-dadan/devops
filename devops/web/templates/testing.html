@@ -98,7 +98,7 @@ position:static;
             <td class="comment">测试</td>
             <td>
                 <button class="btn btn-primary btn-sm online-btn" data-id='{{ p_id }}' data='{{ p_name }}' >上线</button>
-                <button class="btn btn-primary btn-sm details-btn" data-id='{{ p_id }}' data='{{ p_name }}'>上线记录</button>
+                <a class="btn btn-primary btn-sm detail-btn" href="/project/testhistory?id='{{ p_id }}'">上线记录</button>
             </td>
         </tr>
         {% endfor %}

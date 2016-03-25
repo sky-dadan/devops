@@ -31,15 +31,16 @@ def testing():
         else:
             return render_template('testing.html',errmsg=validate_result['errmsg'])
 
-#@app.route('/project/getapi')
-#def getapi():
-#    headers['authorization'] = session['author']
-#    name = session['username']
-#    method = request.args.get('method')
-#    data['params'] = {'where': {'project_id':username}}
-#    data['method'] = method+".get"
-#    print data 
-#    r = requests.post(get_url(),headers=headers,json=data)
-#    print r.text
-#    return r.text
+
+@app.route('/project/testhistory')
+def testhistory():
+    if  session.get('author','nologin') == 'nologin':
+        return redirect('/login')
+    headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+    name = session['username']
+    if int(validate_result['code']) == 0:
+        project_id = request.args.get('id')
+    print "project_id = ",project_id
+    return render_template('test_history.html',info=session)
 

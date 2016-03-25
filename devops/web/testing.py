@@ -22,10 +22,13 @@ def testing():
         url = "http://%s/api/userproject" % app.config['api_host']
         r = requests.post(url, headers=headers)
         result = json.loads(r.text)
-#        result['result'] = result['result'].values()
-        url = "http://%s/api/testhost" % app.config['api_host']
-        r = requests.post(url,headers=headers)
+
+        data['method'] ="test_host.getlist"
+        data['params'] = {}
+        r = requests.post(public.get_url(),headers=headers,json=data)
         resip = json.loads(r.text)
+        resip = json.loads(resip['result'])
+
         if int(result['code']) == 0 and int(resip['code']) == 0:
             return render_template('testing.html',info=session,result=result['result'],resip=resip['result'])
         else:

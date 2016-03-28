@@ -24,9 +24,16 @@ def project_test_create(auth_info, **kwargs):
     role = int(auth_info['role'])
     field = ['project_id','host','commit','pusher','push_date','comment']
     try:
+
         data = request.get_json()['params']
-        #项目上线时间
+        data['commit'] = ''
+        data['pusher'] = username
         data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
+        projects = util.userproject(username)
+        work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+        script_dir = os.path.join(work_dir,'script')
+        script_result = util.run_script_with_timeout("sh %s/test.sh %s %s" % (script_dir,data['host'],projects[int(data['project_id'])]))
+        print script_result
         print data        
         app.config['cursor'].execute_insert_sql('project_test', data)
         util.write_log(username,{'code':0,'result':'add project_test success'})

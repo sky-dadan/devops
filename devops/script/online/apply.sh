@@ -21,7 +21,7 @@ echo "$tag"
 # cat test.py 
 # import subprocess
 #
-# p = subprocess.Popen(['sh','apply.sh','liuziping'],stdout=subprocess.PIPE)
+# p = subprocess.Popen(['sh','apply.sh','%s' % project-name],stdout=subprocess.PIPE)
 # commit = p.stdout.readline().rstrip('\n')    #获取commit
 # tag = p.stdout.readline().rstrip('\n')       #获取tag
  

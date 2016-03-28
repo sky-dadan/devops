@@ -26,15 +26,18 @@ def project_test_create(auth_info, **kwargs):
     try:
 
         data = request.get_json()['params']
-        data['commit'] = ''
-        data['pusher'] = username
-        data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
+        #执行上线脚本
         projects = util.userproject(username)
         work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-        script_dir = os.path.join(work_dir,'script')
-        script_result = util.run_script_with_timeout("sh %s/test.sh %s %s" % (script_dir,data['host'],projects[int(data['project_id'])]))
-        print script_result
-        print data        
+        script_dir = os.path.join(work_dir,'script/online')
+        script_result = util.run_script_with_timeout("sh %s/online_test_dev.sh %s %s" % (script_dir,projects[int(data['project_id'])],data['host']))
+
+        #获取上线上，上线时间，commit号，上线说明
+        data['pusher'] = username
+        data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
+        data['commit'] = script_result[:7]
+        data['comment'] = script_result[8:]
+
         app.config['cursor'].execute_insert_sql('project_test', data)
         util.write_log(username,{'code':0,'result':'add project_test success'})
         return json.dumps({'code':0,'result':'add project_test success'})    

@@ -13,7 +13,7 @@ fi
 cd $1
 git pull>/dev/null
 commit=`git log |awk  'NR==1{ print substr($2,1,6)}'`
-tag=`git log |awk  'NR==11{for(i=1;i<=NF;i++) printf $i " "}'`
+tag=`git log |awk  'NR==5{for(i=1;i<=NF;i++) printf $i " "}'`
 echo "$commit"
 echo "$tag"
 

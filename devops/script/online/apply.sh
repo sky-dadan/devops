@@ -12,8 +12,8 @@ fi
 
 cd $1
 git pull>/dev/null
-commit=`git log |awk  'NR==1{ print substr($2,1,6)}'`
-tag=`git log |awk  'NR==5{for(i=1;i<=NF;i++) printf $i " "}'`
+commit=`git log  --oneline -1 --pretty=format:"%h"`
+tag=`git log --oneline -1 --pretty=format:"%s"`
 echo "$commit"
 echo "$tag"
 
@@ -22,7 +22,7 @@ echo "$tag"
 # import subprocess
 #
 # p = subprocess.Popen(['sh','apply.sh','%s' % project-name],stdout=subprocess.PIPE)
-# commit = p.stdout.readline().rstrip('\n')    #获取commit
-# tag = p.stdout.readline().rstrip('\n')       #获取tag
+# commit = p.stdout.readline()    #获取commit
+# tag = p.stdout.readline()       #获取tag
  
 

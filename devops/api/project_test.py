@@ -32,7 +32,7 @@ def project_test_create(auth_info, **kwargs):
         script_dir = os.path.join(work_dir,'script/online')
         script_result = util.run_script_with_timeout("sh %s/online_test_dev.sh %s %s" % (script_dir,projects[int(data['project_id'])],data['host']))
 
-        #获取上线上，上线时间，commit号，上线说明
+        #获取上线上，上线时间，commit号，上线说明,然后插入到数据库里
         data['pusher'] = username
         data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
         data['commit'] = script_result[:7]
@@ -115,5 +115,5 @@ def project_test_getlist(auth_info, **kwargs):
             result[res] = ','.join(list(result[res]))
         return json.dumps({'code':0,'result':result})
     except:
-        logging.getLogger().error("/api/testhost: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': '调用/api/testhost错误'})
+        logging.getLogger().error("获取测试主机失败: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '获取测试主机失败'})

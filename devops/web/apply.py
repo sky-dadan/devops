@@ -51,8 +51,8 @@ def emulation():
        return redirect('/login')
     headers['authorization'] = session['author']
     version = request.form.get('version')
-    id = request.form.get('id')
-    data['params'] = {'version':version,'id':id}
+    p_id = request.form.get('id')
+    data['params'] = {'version':version,'id':p_id}
     data['method'] = 'apply.emulation'
     r = requests.post(get_url(),headers=headers,json=data)
     return r.text
@@ -62,8 +62,8 @@ def cancel():
     if  session.get('author','nologin') == 'nologin':
        return redirect('/login')
     headers['authorization'] = session['author']
-    id = request.args.get('id')
-    data['params'] = {'where':{'id':id}}
+    p_id = request.args.get('id')
+    data['params'] = {'where':{'id':p_id}}
     data['method'] = 'apply.cancel'
     r = requests.post(get_url(),headers=headers,json=data)
     return r.text
@@ -74,8 +74,8 @@ def success():
     if  session.get('author','nologin') == 'nologin':
        return redirect('/login')
     headers['authorization'] = session['author']
-    id = request.args.get('id')
-    data['params'] = {'where':{'id':id}}
+    p_id = request.args.get('id')
+    data['params'] = {'where':{'id':p_id}}
     data['method'] = 'apply.success'
     r = requests.post(get_url(),headers=headers, json=data)
     return r.text   

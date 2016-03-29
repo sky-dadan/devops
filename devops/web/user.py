@@ -34,7 +34,7 @@ def index():
 ##管理员添加用户web页面
 @app.route("/user/add",methods=['GET','POST'])
 def useradd():
-    if session.get('username') == None:
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
@@ -46,7 +46,7 @@ def useradd():
 #管理员查看用户列表web页面，
 @app.route("/user/list",methods=['GET','POST'])
 def user_list():
-    if session.get('username') == None:
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
@@ -59,7 +59,7 @@ def user_list():
 #角色列表web页面
 @app.route("/role/list",methods=['GET','POST'])
 def role_list():
-    if session.get('username') == None :
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
@@ -71,7 +71,7 @@ def role_list():
 #权限列表web页面
 @app.route('/power/list')
 def power_list():
-    if session.get('username') == None:
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
@@ -83,7 +83,7 @@ def power_list():
 #管理员修改用户密码
 @app.route("/user/changepasswd",methods=['GET','POST'])
 def changepasswd():
-    if session.get('username') == None :
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     if request.method == 'POST':
@@ -98,7 +98,7 @@ def changepasswd():
 #用户修改个人密码
 @app.route("/user/chpwdoneself",methods=['GET','POST'])
 def chpwdoneself():
-    if session.get('username') == None:
+    if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
     headers['authorization'] = session['author']
     if request.method == 'POST':

@@ -35,7 +35,7 @@ def Handleformdata(formdata):
 
 @app.route('/cmdb/<template>')
 def render(template):
-    if session.get('username')  == None:
+    if session.get('author','nologin')  == 'nologin':
        return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))

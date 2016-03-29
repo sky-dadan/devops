@@ -99,8 +99,7 @@ $("tbody").on('click','.online-btn',function(){
    var  project_id = $(this).attr('data-id')
    var parent = $("[data-id="+project_id+"]").parents('tr');
    var host = parent.find(".host").html();
-   var comment = parent.find(".comment").html();
-   str = "project_id="+project_id+"&host="+host+"&comment="+comment
+   str = "project_id="+project_id+"&host="+host
    var data = {"method":"project_test","formdata":str}
    $.post("/addapi",data,function(data){
        data = JSON.parse(data)

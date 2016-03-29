@@ -19,9 +19,15 @@ def testing():
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']
     if int(validate_result['code']) == 0:
-        url = "http://%s/api/userproject" % app.config['api_host']
-        r = requests.post(url, headers=headers)
+#        url = "http://%s/api/userproject" % app.config['api_host']
+#        r = requests.post(url, headers=headers)
+#        result = json.loads(r.text)
+        data['method'] = "userproject.getlist"
+        data['params'] = {}
+        r = requests.post(public.get_url(),headers=headers,json=data)
         result = json.loads(r.text)
+        result = json.loads(result['result'])
+        print "testing result = ",result
 
         data['method'] ="test_host.getlist"
         data['params'] = {}

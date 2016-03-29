@@ -40,10 +40,10 @@ def project_test_create(auth_info, **kwargs):
 
         app.config['cursor'].execute_insert_sql('project_test', data)
         util.write_log(username,{'code':0,'result':'add project_test success'})
-        return json.dumps({'code':0,'result':'add project_test success'})    
+        return json.dumps({'code':0,'result':'测试发布完成'})    
     except:
         logging.getLogger().error('add project_test error: %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'add project_test error'})
+        return json.dumps({'code':1,'errmsg':'测试发布失败'})
 
 
 #获取所有项目的上线的所有上线的历史记录或者某个项目的所有上线的历史记录

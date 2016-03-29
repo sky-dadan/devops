@@ -223,19 +223,15 @@ def get_git():
 
 #普通用户返回他所拥有权限的项目
 def partOfTheProject(result,projects,pro_all_users,username):
-    project_list = []
-    for key in projects.keys():
-        #获取每个项目中拥有权限的人的列表,做个并集存到perm_users列表里
-        perm_users = list(set(pro_all_users[key]))
-        #判断登录用户是否在perm_users列表里，如果存在把这个项目名称存到project_list列表里
-        if username in perm_users:
-            project_list.append(key)
-        #把上面已经查出来result再做一个判断，判断项目名字是否存在project_list列表里，如果存在则把结果存到res列表里
+    #取出username所在项目的列表
+    project_list = [key for key in projects if username in pro_all_users[key]]
+
     res = []
     for pro in result:
         if pro['name'] in project_list:
             res.append(pro)
     return res
+
 #用户返回他所拥有权限的项目,后期替换掉上面的partOfTheProject的方法
 def userproject(username):
     res = get_git()

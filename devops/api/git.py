@@ -22,7 +22,7 @@ def git_create(auth_info, **kwargs):
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
-        return json.dumps({'code':1,'errmsg':'you are not admin'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     p_data, p_perm_data = {},{}     # p_data是project表的相关数据，p_perm_data是project_perm表的相关数据
     pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
     try:
@@ -39,7 +39,6 @@ def git_create(auth_info, **kwargs):
         app.config['cursor'].execute_insert_sql('project_perm',p_perm_data)
         project = util.get_git()    #获取当前项目的所有人  为下面发邮件准备数据
         project = project['p_all_users'][p_data['name']]
-        project_name = list(set(project))                       #去掉重复的用户名 
 
         r = gitolite()
         t = json.loads(r)
@@ -47,11 +46,11 @@ def git_create(auth_info, **kwargs):
             return r
 
         '''sendemail'''
-        smtp_to = [(x+'@yuanxin-inc.com') for x in project_name]
+        smtp_to = [(x+'@yuanxin-inc.com') for x in project]
         send_info = '创建%s项目成功,工作愉快..............'   % p_data['name']
         util.sendmail(app.config, smtp_to, send_info,send_info)
 
-        util.write_log(username,{'code':0,'result':'create  %s success'  %  data['name']})
+        util.write_log(username,{'code':0,'result':'create project %s success'  %  data['name']})
         return json.dumps({'code':0,'result':'创建项目%s成功'  %  data['name']})    
     except:
         logging.getLogger().error('create project error: %s' % traceback.format_exc())
@@ -66,7 +65,7 @@ def git_update(auth_info,**kwargs):
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
-        return json.dumps({'code':1,'errmsg':'you are not admin'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     p_data = {}
     p_perm_data = {'user_all_perm': '', 'group_all_perm': '', 'user_rw_perm': '', 'group_rw_perm': ''}
     pro_field = ['name','path','principal','tag','create_date','is_lock','comment']
@@ -81,7 +80,7 @@ def git_update(auth_info,**kwargs):
         result = app.config['cursor'].execute_update_sql('project',p_data,where)
         result2 = app.config['cursor'].execute_update_sql('project_perm',p_perm_data,where)
         if result == '' or result2 == '':
-            return json.dumps({'code':1,'errmsg':'you must give an id!'})
+            return json.dumps({'code':1,'errmsg':'需要指定一个项目'})
         else:
             r = gitolite()
             t = json.loads(r)
@@ -90,7 +89,7 @@ def git_update(auth_info,**kwargs):
         util.write_log(username,'update project %s success' % data['name'])
         return json.dumps({'code':0,'result':'更新项目%s成功' % data['name']})
     except:
-        logging.getLogger().error("update project error : %s" % traceback.format_exc())
+        logging.getLogger().error("update project error: %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'更新项目失败'})
 
 
@@ -102,7 +101,7 @@ def git_get(auth_info, **kwargs):
     username = auth_info['username']
     role = int(auth_info['role'])
     if role != 0:
-        return json.dumps({'code':1,'errmsg':'you are not admin'})
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try:
         pro_fields = ['id','name','path','principal','tag','create_date','is_lock','comment']
         pro_perm_fields = ['user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
@@ -129,7 +128,7 @@ def git_get(auth_info, **kwargs):
         #将权限表的数据追加到result字典里
         result.update(projects[result['name']])
 
-        util.write_log(username, '查询项目成功') 
+        util.write_log(username, 'get project success') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
         logging.getLogger().error("select project error: %s" % traceback.format_exc())
@@ -252,10 +251,10 @@ def gitolite():
             #git add/commit/push生效.路径暂时写死，定版前修改
             stdout=util.run_script_with_timeout("sh %s/git.sh" % script_dir)
             print stdout
-            return  json.dumps({'code':0,'result':"git操作成功"})
+            return json.dumps({'code':0,'result':"git操作成功"})
         except:
             logging.getLogger().error("get config error: %s" % traceback.format_exc())
             return json.dumps({'code':1,'errmsg':"写配置文件报错"})
     else:
-         return json.dumps({'code':1,'errmsg':"获取用户，组或者仓库出错"})
+         return json.dumps(result)
 

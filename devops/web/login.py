@@ -27,5 +27,8 @@ def login():
 
 @app.route("/logout",methods=['GET','POST'])
 def logout():
-    session.pop('author')
-    return redirect('/login')  
+    try:
+        session.pop('author')
+        return redirect('/login')  
+    except:
+        return redirect('/login')  

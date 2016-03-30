@@ -42,8 +42,11 @@ function emulation(){
     
     #rsync 推送代码
     #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
-    
-    echo "finish"
+    if [ $? -ne 0 ];then
+       echo "rsync error!" 
+    else
+        echo "emulation finish"
+    fi
 }
 
 
@@ -54,8 +57,10 @@ function cancel(){
     fi
     rm -rf $WORK_DIR$1
     tar zxf $BACK_UP$1.tar.gz -C $WORK_DIR
+    #rsync 推送代码
+    #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
     if [ $? -ne 0 ]; then
-        echo "tar $1.tar.gz error!"
+        echo "rsync  error!"
         exit 2
     else
         echo "cancel finish"

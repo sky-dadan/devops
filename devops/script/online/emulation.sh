@@ -1,81 +1,91 @@
 #!/bin/bash
+#####################################################################################
+#脚本提供三个功能
+#仿真发布: Usage   sh $0 emulation tag commit project_name
+#取消    : Usage   sh $0 cancel  cancel_flag project_name
+#正式发布: Usage   sh $0 product project_name
+#
+#####################################################################################
+
 BACK_UP='/data/backup/'
 WORK_DIR='/data/gitclone/'
 GITSERVER='git@localhost'
-HOST='192.168.1.243'
+SA_HOST='192.168.1.243'
 
 mkdir -p $WORK_DIR
 mkdir -p $BACK_UP
 
 function emulation(){
-    cd  $WORK_DIR
     if [ $# != 3 ];then
-        echo "传入参数错误, sh $0 tag,tag_name,project_name"
+        echo "传入参数错误, sh $0 emulation tag,commit,project_name"
         exit 2
     fi
-    
-    if [  ! -d $WORK_DIR$3 ];then
-        git clone $gitserver:/$3.git >/dev/null 2>&1
-        if [ $? -ne 0 ];then
-            echo "git clone error!"; 
-            exit 2
-        fi
-    else 
-        cd $WORK_DIR$3
-    fi
-    
-    #备份代码
-    tar czf $BACK_UP$3.tar.gz  $BACK_UP$3
-    
-    git pull >/dev/null 2>&1
-    if [ $? -ne 0 ];then
-        echo "git pull error!"
-        exit 2
-    fi
-    
-    git tag -a $1 -m $2 >/dev/null 2>&1
+    cd $WORK_DIR$3
+    git tag -a $1  $2 >/dev/null 2>&1
     git push origin $1  > /dev/null 2>&1
     if [ $? -ne 0 ];then
         echo "git push tag error!"
         exit 2
     fi
     
-    #rsync 推送代码
+    #通过ssh执行sa上面的脚本 备份sa代码
+    # ssh root@sa -e "sh  script.name function  commit project_name"
+
+    #rsync 推送代码到SA_HOST
     #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
-    if [ $? -ne 0 ];then
-       echo "rsync error!" 
-    else
-        echo "emulation finish"
-    fi
+
+
+    #sa上面代码推送到灰度
+    #ssh  root@sa -e  "sh script rsync project_name"  
 }
 
 
 function cancel(){
-    if [ $# != 1 ];then
-        echo "Usage sh $0 cancel project name"
+    if [ $# != 2 ];then
+        echo "Usage sh $0 cancel status project_name"
         exit
     fi
-    rm -rf $WORK_DIR$1
-    tar zxf $BACK_UP$1.tar.gz -C $WORK_DIR
-    #rsync 推送代码
-    #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
-    if [ $? -ne 0 ]; then
-        echo "rsync  error!"
-        exit 2
-    else
-        echo "cancel finish"
+
+    # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
+}
+
+function product(){
+    #ssh root@sa -e "sh script_name project_name"    远程调用sa上面的上线脚本   
+    echo "aa"
+}
+
+
+function apply(){
+    if  [ $# != 1 ];then
+        echo -e  "\033[31musage:\n sh apply.sh project-name \033[0m"
+        exit  2
     fi
+    mkdir -p  $DIR_PROJECT$1
+    cd $DIR_PROJECT$1
+    git pull > /dev/null 2>&1
+    commit=`git log  --oneline -1 --pretty=format:"%h"`
+    tag=`git log --oneline -1 --pretty=format:"%s"`
+    echo "$commit"
+    echo "$tag"
 }
 
 case $1 in
     cancel)
-        cancel $2;
+        cancel $2 $3;         #$2=cancel_flag  $3=project_name
         ;;
     emulation)
-        emulation $2 $3 $4
+        emulation $2 $3 $4;       #$2=tag $3=commit  $4=project_name
+        ;;
+    product)
+        product $2;
+        ;;
+    apply)
+        apply  $2;               #$2=project_name
         ;;
     *)
-        echo "Usage: sh $0 cancel project_name
-       sh $0 emulation tag tag_infomation project_name
+        echo "Usage: sh $0 cancel cancel_flag project_name
+       sh $0 emulation tag commit project_name  
+       sh $0 product project_name
+       sh $0 apply project_name
 "
 esac

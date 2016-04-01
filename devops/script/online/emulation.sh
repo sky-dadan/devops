@@ -4,7 +4,7 @@
 #仿真发布: Usage   sh $0 emulation tag commit project_name
 #取消    : Usage   sh $0 cancel  cancel_flag project_name
 #正式发布: Usage   sh $0 product project_name
-#
+#申请发布: Usage   sh $0 apply   project_name
 #####################################################################################
 
 BACK_UP='/data/backup/'

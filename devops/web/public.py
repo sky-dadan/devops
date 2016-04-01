@@ -4,7 +4,10 @@ from flask import Flask, render_template,session,redirect,request
 from  . import app  
 import requests,json 
 import util,urllib
+import sys 
 
+reload(sys)
+sys.setdefaultencoding("utf-8") 
 headers = {"Content-Type": "application/json"}
 data = {
         "jsonrpc": "2.0",

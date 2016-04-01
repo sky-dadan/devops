@@ -54,6 +54,21 @@ function product(){
     echo "aa"
 }
 
+
+function apply(){
+    if  [ $# != 1 ];then
+        echo -e  "\033[31musage:\n sh apply.sh project-name \033[0m"
+        exit  2
+    fi
+    mkdir -p  $DIR_PROJECT$1
+    cd $DIR_PROJECT$1
+    git pull > /dev/null 2>&1
+    commit=`git log  --oneline -1 --pretty=format:"%h"`
+    tag=`git log --oneline -1 --pretty=format:"%s"`
+    echo "$commit"
+    echo "$tag"
+}
+
 case $1 in
     cancel)
         cancel $2 $3;         #$2=cancel_flag  $3=project_name
@@ -64,9 +79,13 @@ case $1 in
     product)
         product $2;
         ;;
+    apply)
+        apply  $2;               #$2=project_name
+        ;;
     *)
         echo "Usage: sh $0 cancel cancel_flag project_name
        sh $0 emulation tag commit project_name  
        sh $0 product project_name
+       sh $0 apply project_name
 "
 esac

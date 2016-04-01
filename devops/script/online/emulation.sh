@@ -6,6 +6,7 @@
 #正式发布: Usage   sh $0 product project_name
 #
 #####################################################################################
+
 BACK_UP='/data/backup/'
 WORK_DIR='/data/gitclone/'
 GITSERVER='git@localhost'
@@ -49,7 +50,7 @@ function cancel(){
 }
 
 function product(){
-    #ssh root@sa -e "sh "    #project 
+    #ssh root@sa -e "sh script_name project_name"    远程调用sa上面的上线脚本   
     echo "aa"
 }
 

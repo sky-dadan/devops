@@ -21,7 +21,7 @@ function emulation(){
         exit 2
     fi
     cd $WORK_DIR$3
-    git tag -a $1  $2 >/dev/null 2>&1
+    git tag -a $1  $2 -m  $1 >/dev/null 2>&1
     git push origin $1  > /dev/null 2>&1
     if [ $? -ne 0 ];then
         echo "git push tag error!"

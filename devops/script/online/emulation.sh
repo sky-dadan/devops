@@ -62,13 +62,15 @@ function apply(){
         echo -e  "\033[31musage:\n sh apply.sh project-name \033[0m"
         exit  2
     fi
-    mkdir -p  $DIR_PROJECT$1
-    cd $DIR_PROJECT$1
+    cd /data/gitclone
+    if [ ! -d $1 ]; then
+        git clone  git@192.168.1.231:$1 &>/dev/null
+    fi
+     
+    cd $1
     git pull > /dev/null 2>&1
     commit=`git log  --oneline -1 --pretty=format:"%h"`
-    tag=`git log --oneline -1 --pretty=format:"%s"`
     echo "$commit"
-    echo "$tag"
 }
 
 case $1 in

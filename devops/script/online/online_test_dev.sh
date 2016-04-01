@@ -14,29 +14,30 @@ if [ $# != 2 ];then    #执行输入不正确会提示
    exit
 fi
 #将ip地址以逗号分隔(192.168.1.253,182.18.40.230)改为空格分隔（192.168.1.253 182.168.40.230）
-ips=$(echo $a  | awk -F',' '{for(i=1;i<=NF;i++){printf("%s ",$i) } printf("\n")}')
+ips=$(echo $2  | awk -F ',' '{for(i=1;i<=NF;i++){printf("%s ",$i) } printf("\n")}')
+mkdir -p /data/gitclone_dev
 cd /data/gitclone_dev   
 if  [ ! -d $1 ];then    #判断gitclone中项目是否存在，不存在就gitclone一份，如果存在了，就直接git pull
-    git clone -b dev http://192.168.1.251:8000/git/$1 &>/dev/null
+    git clone -b dev git@192.168.1.231:$1 &>/dev/null
     cd /data/gitclone_dev/$1
     git pull &>/dev/null
     commit=$(git log  --oneline -1 --pretty=format:"%h,%s")
     echo $commit
-#    chown www:www -R /data/gitclone_dev/$1
-#    for ip in $ips
-#    do
+    chown www:www -R /data/gitclone_dev/$1
+    for ip in $ips
+    do
 #将新项目整个目录rsync到远程主机目录
-#    /usr/bin/rsync -avz --timeout=20  -e ssh  --exclude=.git --exclude=.svn   /data/gitclone_dev/$1 root@$ip:/data/wwwroot/ 
-#    done
+    /usr/bin/rsync -avz --timeout=20  -e ssh  --exclude=.git --exclude=.svn   /data/gitclone_dev/$1 root@$ip:/data/wwwroot/ &>/dev/null
+    done
 else
     cd /data/gitclone_dev/$1  
     git pull &>/dev/null
-#    chown www:www -R /data/gitclone_dev/$1 
+    chown www:www -R /data/gitclone_dev/$1 
     commit=$(git log  --oneline -1 --pretty=format:"%h,%s")
     echo $commit
-#    for ip in $ips
-#    do
+    for ip in $ips
+    do
 #将项目目录的内容rsync到远程主机目录下
-#    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  /data/gitclone_dev/$1/ root@$ip:/data/wwwroot/$1/   
-#    done
+    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  /data/gitclone_dev/$1/ root@$ip:/data/wwwroot/$1/  &>/dev/null 
+    done
 fi    

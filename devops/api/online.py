@@ -10,6 +10,7 @@ from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
 
+script_name='/root/devops.aiyuanxin.com/devops/script/online/emulation.sh'
 
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
@@ -19,7 +20,11 @@ def apply_pub(username,data,where):
     result['applicant'] = username
     result['apply_date'] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config['cursor'].execute_insert_sql('project_deploy',result)
+    #id转换成名字
+    id2name_project=util.getinfo('project',['id','name'])
+    result['project_name'] = id2name_project[str(result['project_id'])]
     util.write_log(username,"success and insert project_deploy status  %s"  % data['status'])
+    return result
 
 #创建申请任务列表
 @jsonrpc.method('apply.create') 
@@ -116,7 +121,10 @@ def apply_emulation(auth_info,**kwargs):
         pid = kwargs.get('id')                   #web端 传递过来测试打上的version，申请项目的ID
         data, where = {'version':version,'status':'2'},{'id':pid}
         logging.getLogger().info(data)
-        apply_pub(username,data,where)
+        pub_result=apply_pub(username,data,where)
+#调用脚本  sh script_name emultion tag commit project_name
+        util.run_script_with_timeout("sh %s emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name']))
+        print "sh %s  emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name'])
         return json.dumps({'code':0, 'result': '仿真发布成功'})
     except:
         logging.getLogger().error("apply.emulation get failed : %s" %  traceback.format_exc())
@@ -133,7 +141,13 @@ def apply_cancel(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'4'}
-        apply_pub(username,data,where)
+        cancel_flag=app.config['cursor'].get_one_result('project_apply',['status'],where) #判断申请之后，测试有没有进行仿真测试
+        cancel_flag=cancel_flag['status']                           #1 没有经过仿真测试,取消   2 经过仿真测试之后,取消
+        print cancel_flag
+        pub_result=apply_pub(username,data,where)
+#调用脚本  sh script_name  cancel_flag project_name 
+        util.run_script_with_timeout("sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name']))
+        print "sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name'])
         return json.dumps({'code':0, 'result': '取消发布成功'})
     except:
         logging.getLogger().error("apply.cancel get failed : %s" % traceback.format_exc())
@@ -151,7 +165,10 @@ def apply_success(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'3'}
-        apply_pub(username,data,where)
+        pub_result=apply_pub(username,data,where)
+#调用脚本  sh script_name product_name
+        util.run_script_with_timeout("sh %s product %s" % (script_name,pub_result['project_name']))
+        print "sh %s product %s "  % (script_name,pub_result['project_name'])
         return json.dumps({'code':0, 'result': '正式发布成功'})
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())

@@ -10,7 +10,7 @@ from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
 
-script_name='/root/devops.aiyuanxin.com/devops/script/online/emulation.sh'
+script_name='/usr/local/devops/devops/script/online/emulation.sh'
 
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
@@ -37,14 +37,14 @@ def apply_create(auth_info, **kwargs):
     try:
         data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
         data['version']=''               #脚本获取
-        data['commit']='11111'               #脚本获取
+        data['commit']=util.run_script_with_timeout("sh %s apply %s " % (script_name,data['project_username']))    
         data['applicant'] = username
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] = 1
         where = {"project_id":int(data['project_id'])}
         data.pop('project_username')  
         res = app.config['cursor'].get_one_result('project_apply',['status'],where)
-        if res['status'] in (1, 2):
+        if res and res['status'] in (1, 2):
             return json.dumps({'code': 1, 'errmsg': '目前项目状态不可申请'})
         if res: 
             app.config['cursor'].execute_update_sql('project_apply', data, where)

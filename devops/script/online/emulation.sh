@@ -6,6 +6,7 @@
 #正式发布: Usage   sh $0 product project_name
 #
 #####################################################################################
+
 BACK_UP='/data/backup/'
 WORK_DIR='/data/gitclone/'
 GITSERVER='git@localhost'
@@ -51,8 +52,23 @@ function cancel(){
 }
 
 function product(){
-    #ssh root@sa -e "sh "    #project 
     echo "prouct function"
+    #ssh root@sa -e "sh script_name project_name"    远程调用sa上面的上线脚本   
+}
+
+
+function apply(){
+    if  [ $# != 1 ];then
+        echo -e  "\033[31musage:\n sh apply.sh project-name \033[0m"
+        exit  2
+    fi
+    mkdir -p  $DIR_PROJECT$1
+    cd $DIR_PROJECT$1
+    git pull > /dev/null 2>&1
+    commit=`git log  --oneline -1 --pretty=format:"%h"`
+    tag=`git log --oneline -1 --pretty=format:"%s"`
+    echo "$commit"
+    echo "$tag"
 }
 
 case $1 in
@@ -65,9 +81,13 @@ case $1 in
     product)
         product $2;
         ;;
+    apply)
+        apply  $2;               #$2=project_name
+        ;;
     *)
         echo "Usage: sh $0 cancel cancel_flag project_name
        sh $0 emulation tag commit project_name  
        sh $0 product project_name
+       sh $0 apply project_name
 "
 esac

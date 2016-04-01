@@ -20,9 +20,8 @@ if  [ ! -d $1 ];then    #判断gitclone中项目是否存在，不存在就gitcl
     git clone -b dev http://192.168.1.251:8000/git/$1 &>/dev/null
     cd /data/gitclone_dev/$1
     git pull &>/dev/null
-    commit=$(git log  --oneline -1 --pretty=format:"%h")
-    info=$(git log --oneline -1 --pretty=format:"%s")
-    echo $commit,$info
+    commit=$(git log  --oneline -1 --pretty=format:"%h,%s")
+    echo $commit
 #    chown www:www -R /data/gitclone_dev/$1
 #    for ip in $ips
 #    do
@@ -33,9 +32,8 @@ else
     cd /data/gitclone_dev/$1  
     git pull &>/dev/null
 #    chown www:www -R /data/gitclone_dev/$1 
-    commit=$(git log  --oneline -1 --pretty=format:"%h")
-    info=$(git log --oneline -1 --pretty=format:"%s")
-    echo $commit,$info
+    commit=$(git log  --oneline -1 --pretty=format:"%h,%s")
+    echo $commit
 #    for ip in $ips
 #    do
 #将项目目录的内容rsync到远程主机目录下

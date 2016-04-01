@@ -85,6 +85,7 @@ def sendmail(config, rcpt, subject, content):
 
         smtp.sendmail(smtp_user, rcpt, msg.as_string())
         smtp.quit()
+        logging.getLogger().error("SendMail to '%s' success" % ','.join(rcpt))
         return True
     except:
         logging.getLogger().error("SendMail fail: %s" % traceback.format_exc())
@@ -194,8 +195,8 @@ def project_perm_id2name(project_perms=None, projects=None, users=None, groups=N
 def project_members(project_perms=None, group_users=None, db=None):
     if db:
         users = db.users
-        groups = db.users
-        user_groups = db.users
+        groups = db.groups
+        user_groups = db.user_groups
         projects = db.projects
         project_perms = db.project_perms
         project_perms = project_perm_id2name(project_perms, projects, users, groups)

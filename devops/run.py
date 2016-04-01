@@ -15,6 +15,9 @@ if __name__ == '__main__':
         print "Usage: %s [api|web]" % sys.argv[0]
         sys.exit()
 
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
     module_name = sys.argv[1]
     work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
 

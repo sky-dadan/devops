@@ -9,6 +9,8 @@ from api import app
 import db
 import util
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 work_dir = os.path.dirname(os.path.realpath('service.conf'))
 app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'

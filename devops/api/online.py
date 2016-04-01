@@ -14,11 +14,10 @@ from user_perm import getid_list
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
     util.write_log(username,"success and update project_apply status %s" % data['status'])
-    fields = ['project_id','info','applicant','version','commit','detail']  #为project_deplpy 准备数据
+    fields = ['project_id','info','version','commit','status','detail']  #为project_deplpy 准备数据
     result=app.config['cursor'].get_one_result('project_apply',fields,where)
-    local_time = time.strftime("%Y-%m-%d %H:%M:%S")
-    result['apply_date'] = local_time
-    result['status'] = str(data['status'])
+    result['applicant'] = username
+    result['apply_date'] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config['cursor'].execute_insert_sql('project_deploy',result)
     util.write_log(username,"success and insert project_deploy status  %s"  % data['status'])
 
@@ -30,19 +29,22 @@ def apply_create(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     role = int(auth_info['role'])
-    field = ['project_id','info','applicant','commit','apply_date','status','detail']
     try:
         data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
+        data['version']=''               #脚本获取
         data['commit']='11111'               #脚本获取
+        data['applicant'] = username
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] = 1
         where = {"project_id":int(data['project_id'])}
         data.pop('project_username')  
-        res = app.config['cursor'].get_one_result('project_apply',field,where)
-        if not res: 
-            app.config['cursor'].execute_insert_sql('project_apply', data)
+        res = app.config['cursor'].get_one_result('project_apply',['status'],where)
+        if res['status'] in (1, 2):
+            return json.dumps({'code': 1, 'errmsg': '目前项目状态不可申请'})
+        if res: 
+            app.config['cursor'].execute_update_sql('project_apply', data, where)
         else:
-            app.config['cursor'].execute_update_sql('project_apply',data,where)
+            app.config['cursor'].execute_insert_sql('project_apply', data)
         app.config['cursor'].execute_insert_sql('project_deploy',data)  
         util.write_log(username,{'code':0,'result':'项目申请成功'})
         return json.dumps({'code':0,'result':'项目申请成功'})    
@@ -69,7 +71,7 @@ def apply_list(auth_info,**kwargs):
         where = {'status':['1','2']}
         result = app.config['cursor'].get_results('project_apply',fields,where)
         #id转换成名字
-        id2name_project=util.getinfo('project',['id','name'])
+        id2name_project = app.config['cursor'].projects
         for res in result:
             res['project_name'] = id2name_project[str(res['project_id'])]           
 
@@ -92,7 +94,7 @@ def apply_one(auth_info,**kwargs):
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('project_apply',fields,where)
         #id转换成名字
-        id2name_project=util.getinfo('project',['id','name'])
+        id2name_project = app.config['cursor'].projects
         result['project_name'] = id2name_project[str(result['project_id'])] 
 
         util.write_log(username, 'get one apply detail success')
@@ -115,7 +117,7 @@ def apply_emulation(auth_info,**kwargs):
         data, where = {'version':version,'status':'2'},{'id':pid}
         logging.getLogger().info(data)
         apply_pub(username,data,where)
-        return json.dumps({'code':0})
+        return json.dumps({'code':0, 'result': '仿真发布成功'})
     except:
         logging.getLogger().error("apply.emulation get failed : %s" %  traceback.format_exc())
         return json.dumps({'code':1, 'errmsg':'仿真发布失败~!'})
@@ -132,10 +134,10 @@ def apply_cancel(auth_info,**kwargs):
         pid = pid['id']
         where,data = {'id':pid},{'status':'4'}
         apply_pub(username,data,where)
-        return json.dumps({'code':0})
+        return json.dumps({'code':0, 'result': '取消发布成功'})
     except:
         logging.getLogger().error("apply.cancel get failed : %s" % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'取消仿真发布失败'})
+        return json.dumps({'code':1,'errmsg':'取消发布失败'})
 
 
 #仿真测试成功，正式上线
@@ -150,7 +152,7 @@ def apply_success(auth_info,**kwargs):
         pid = pid['id']
         where,data = {'id':pid},{'status':'3'}
         apply_pub(username,data,where)
-        return json.dumps({'code':0})
+        return json.dumps({'code':0, 'result': '正式发布成功'})
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'正式上线失败,请联系运维人员!'})
@@ -159,7 +161,7 @@ def project_attr(result):
     ret = []
     status2name = {1: '申请上线', 2: '上线审核', 3: '上线完成', 4: '上线取消'}
     #id转换成名字
-    id2name_project = util.getinfo('project',['id','name'])
+    id2name_project = app.config['cursor'].projects
     for res in result:
         if str(res['project_id']) not in id2name_project:
             continue

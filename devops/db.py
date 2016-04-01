@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import logging
 import MySQLdb as mysql
 
@@ -134,3 +135,46 @@ class Cursor():
         else:
             logging.getLogger().error("group '%s' is not exist" % group_id)
             return False
+
+    def getinfo(self, table_name, fields):
+        '''
+        查询单个数据表内容，fields首字段为key
+        fields为两个字段，返回{v1: v2, ...}，格式为 ['field1','field2'], 例如['id','name'],['name','r_id']
+        返回结果一，两列都是字符串如：用户id2name {'1':'tom','2','jerry'}; 组信息id2name {'1':'sa','2':'ask'}
+        返回结果二，第二列是个列表如：用户权限信息：{u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
+
+        fields为多于两个字段，返回{v1: {k2: v2, k3: v3, ...}, ...}，格式为 ['field1', 'field2', 'field3', ...]
+        返回结果，从第二列的内容保存在字典中，如：项目权限表：{'1': {'group_all_perm': [u'3', u'4'], 'user_all_perm': [u'2', u'4', u'5']}, '3': {'group_all_perm': [u'1'], 'user_all_perm': [u'2', u'5']}}
+        '''
+        def val(k, v):
+            special_fields = ('r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm')
+            return v.split(',') if k in special_fields else v
+
+        if len(fields) < 2:
+            return None
+        result = self.get_results(table_name,fields)
+        if len(fields) == 2:
+            return dict([(str(x[fields[0]]), val(fields[1], x[fields[1]])) for x in result])
+        else:
+            return dict([(str(x[fields[0]]), dict([(k, val(k, x[k])) for k in fields[1:]])) for x in result])
+
+    @property
+    def users(self):
+        return self.getinfo('user', ['id', 'username'])
+
+    @property
+    def groups(self):
+        return self.getinfo('user_group', ['id', 'name'])
+
+    @property
+    def user_groups(self):
+        return self.getinfo('user', ['id', 'r_id'])
+
+    @property
+    def projects(self):
+        return self.getinfo('project', ['id', 'name'])
+
+    @property
+    def project_perms(self):
+        return self.getinfo('project_perm', ['id', 'group_all_perm', 'group_rw_perm', 'user_all_perm', 'user_rw_perm'])
+

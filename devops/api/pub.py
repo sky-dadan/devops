@@ -18,7 +18,7 @@ color_selected= {'u_all_sel':{'t1':'project_perm','c1':['user_all_perm'],'t2':'u
                  'g_all_sel':{'t1':'project_perm','c1':['group_all_perm'],'t2':'user_group','c2':['id','name']},
                  'g_rw_sel':{'t1':'project_perm','c1':['group_rw_perm'],'t2':'user_group','c2':['id','name']},
                  'u_rw_sel':{'t1':'project_perm','c1':['user_rw_perm'],'t2':'user','c2':['id','name']},
-                 'principal_sel':{'t1':'project','c1':['principal'],'t2':'user','c2':['id','name']},
+                 'principal_sel':{'t1':'project','c1':['principal'],'t2':'user','c2':['id','username']},
                  'power_sel':{'t1':'user_group','c1':['p_id'],'t2':'permission','c2':['id','name']},
                  'groups_sel':{'t1':'user','c1':['r_id'],'t2':'user_group','c2':['id','name']}
                 }
@@ -38,6 +38,8 @@ def selected(auth_info, **kwargs):
         result = app.config['cursor'].get_results(color_selected[sel]['t2'],color_selected[sel]['c2'])
         ids = set([str(x['id']) for x in result])  & set(tmp_list)
         for x in result:
+            if 'name' not in x and 'username' in x:
+                x['name'] = x['username']
             x['selected'] = 'selected="selected"' if str(x['id'])  in ids else ''
         util.write_log(username,'selected  %s, %s  successfully' % (color_selected[sel]['t1'],color_selected[sel]['c1']))
         return json.dumps({'code':0,'result':result})

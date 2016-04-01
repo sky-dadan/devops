@@ -30,16 +30,16 @@ position:static;
     </thead> 
     <tbody>
         {% if result %}
-        {% for p_id,p_name in result.iteritems() %}
+        {% for project in result %}
         <tr>
-            <td class="p_name">{{ p_name }}</td>
-            <td class="host">{{ resip[p_name] }}</td>
-            <td class="pusher">zhangxunan</td>
-            <td class="push_date">2016-03-23 10:16:10</td>
-            <td class="comment">测试</td>
+            <td class="p_name">{{ project.name }}</td>
+            <td class="host">{{ project.host }}</td>
+            <td class="pusher"></td>
+            <td class="push_date"></td>
+            <td class="comment"></td>
             <td>
-                <button class="btn btn-primary btn-sm online-btn" data-id='{{ p_id }}' data='{{ p_name }}'>测试上线</button>
-                <a class="btn btn-primary btn-sm detail-btn" href="/project/testhistory?id={{ p_id }}">上线记录</button>
+                <button class="btn btn-primary btn-sm online-btn" data-id='{{ project.id }}' data='{{ project.name }}'>测试上线</button>
+                <a class="btn btn-primary btn-sm detail-btn" href="/project/testhistory?id={{ project.id }}">上线记录</button>
             </td>
         </tr>
         {% endfor %}

@@ -21,9 +21,12 @@ def project_apply():
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
-        url = "http://%s/api/userproject" % app.config['api_host']
-        r = requests.post(url, headers=headers)
+        data['method'] = 'userproject.getlist'
+        data['params'] = {}
+        r = requests.post(get_url(),headers=headers,json=data)
         result = json.loads(r.text)
+        result = json.loads(result['result'])
+
         if int(result['code']) == 0:
             return render_template('apply.html',info=session,result=result['result'])
         else:
@@ -38,7 +41,6 @@ def apply_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
         return render_template('applylist.html',info=session)
     else:
@@ -86,7 +88,6 @@ def deploy_list():
        return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
         return render_template('deploylist.html',info=session,qs=request.args)
     else:

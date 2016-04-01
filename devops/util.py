@@ -16,7 +16,8 @@ import subprocess
 import multiprocessing 
 from email.mime.text import MIMEText
 from email.header import Header
-from api import app
+
+reverse_dict = lambda d: dict([(v, k) for k, v in d.items()])
 
 def get_config(config_filename, section=''):
     config = ConfigParser.ConfigParser()
@@ -157,90 +158,64 @@ def run_script_with_timeout(cmd, timeout=30):
     finally:
         queue.close()
 
-def getinfo(table_name,fields):
-    '''
-    查询单个数据表任意两列的内容，然后将结果拼接成字 
-    fields 格式为 ['field1','field2'], 例如['id','name'],['name','r_id']
-    返回结果一，两列都是字符串如：用户id2name {'1':'tom','2','jerry'}; 组信息id2name {'1':'sa','2':'ask'}
-    返回结果二，第二列是个列表如：用户权限信息：{u'songpeng': [u'1', u'2'], u'admin': [u'1', u'2', u'4', u'3']}
-    '''
-    result = app.config['cursor'].get_results(table_name,fields)
-    if fields[1] in ['r_id','p_id','group_all_perm','group_rw_perm','user_all_perm','user_rw_perm']:  #第二列的结果为列表的字段拼接为字符串
-        result = dict((str(x[fields[0]]), x[fields[1]].split(',')) for x in result)
-    else:
-        result = dict((str(x[fields[0]]), x[fields[1]]) for x in result)
-    return result
-
 #获取一个组里面所有的用户列表
-#需要传入用户信息users=getinfo(user,['username','r_id'])和组信息groups=getinfo(group,['id','name'])
-def group_users(users,groups):
-    group = dict([(g_name, []) for g_name in groups.values()])
-    for u_name, r_id in users.items():
-        for g_id, g_name in groups.items():
-            if g_id in r_id:
-                group[g_name].append(u_name)
-    return group
+#需要传入用户信息users=getinfo(user,['id', 'username'])、组信息groups=getinfo(group,['id','name'])和user_groups=getinfo(user,['id','r_id'])
+def group_members(users=None, groups=None, user_groups=None, db=None):
+    if db:
+        users = db.users
+        groups = db.groups
+        user_groups = db.user_groups
+
+    g = {}
+    for u, r_id in user_groups.items():
+        for x in r_id:
+            if u not in users or x not in groups:
+                continue
+            if groups[x] not in g:
+                g[groups[x]] = []
+            g[groups[x]].append(users[u])
+    return g
     #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']} 
-    
 
-#获取项目对应权限的人员和组，
-def get_git():
-    try:  
-        #获取项目，用户，组表中对应的两个字段返回字典
-        projects = getinfo('project',['id','name'])
-        users = getinfo('user',['username','r_id'])
-        groups = getinfo('user_group',['id','name'])
-        group = group_users(users,groups) 
-        #获取每个项目的权限列表,取出来的是id
-        perm_fields = ['id','user_all_perm','group_all_perm','user_rw_perm','group_rw_perm']
-        result = app.config['cursor'].get_results('project_perm', perm_fields)
-        #[{'id':'1','user_all_perm':'1,2','user_rw_perm':'1,3',.....},.......]
+def project_perm_id2name(project_perms=None, projects=None, users=None, groups=None, db=None):
+    if db:
+        users = db.users
+        groups = db.groups
+        projects = db.projects
+        project_perms = db.project_perms
 
-        #将每个项目的权限id列表匹配为对应的username  gname,projectname
-        user_git = getinfo('user',['id','username'])
-        p,p_users = {},{}
-        for project in result:
-            name=projects[str(project['id'])]  #通过id匹配对应的project name
-            p[name]={}
-            for k, v in [('user_all_perm', user_git), ('user_rw_perm', user_git), ('group_all_perm', groups), ('group_rw_perm', groups)]:
-                p[name][k] = [v[x] for x in project[k].split(',') if x in v]
-        #p中一条数据  {u'it.miaoshou.com': {'group_rw_perm': [u'sa'], 'group_all_perm': [u'sa'], 'user_rw_perm': [u'admin'], 'user_all_perm': [u'zhangxunan']}
+    prj = {}
+    for prj_id, perms in project_perms.items():
+        prj[projects[prj_id]] = {}
+        for k, v in [('user_all_perm', users), ('user_rw_perm', users), ('group_all_perm', groups), ('group_rw_perm', groups)]:
+            prj[projects[prj_id]][k] = [v[x] for x in perms[k] if x in v]
+    return prj
 
-        #进一步查询每个项目都有哪些人参与，即将p里组的成员都都替换为具体的人
-        for key,values in p.items():
-            p_users[key] = set([])
-            for k,v in values.items():
-                if k.startswith('group'):
-                    for x in v:
-                        p_users[key] |= set(group[x])
-                elif k.startswith('user'):
-                    p_users[key] |= set(v)
-        #print p_users
-        return {'code':'0','group':group,'project':p,'p_all_users':p_users}
-    except:
-        logging.getLogger().error("get config error: %s" % traceback.format_exc())
-        return {'code':1,'errmsg':"获取用户，组及项目报错"}
+def project_members(project_perms=None, group_users=None, db=None):
+    if db:
+        users = db.users
+        groups = db.users
+        user_groups = db.users
+        projects = db.projects
+        project_perms = db.project_perms
+        project_perms = project_perm_id2name(project_perms, projects, users, groups)
+        group_users = group_members(users, groups, user_groups)
+
+    prj = {}
+    for name, perms in project_perms.items():
+        prj[name] = set([])
+        for k in ('user_all_perm', 'user_rw_perm'):
+            prj[name] |= set(perms[k])
+        for k in ('group_all_perm', 'group_rw_perm'):
+            for x in perms[k]:
+                prj[name] |= set(group_users[x])
+    return prj
 
 #普通用户返回他所拥有权限的项目
-def partOfTheProject(result,projects,pro_all_users,username):
-    #取出username所在项目的列表
-    project_list = [key for key in projects if username in pro_all_users[key]]
-
-    res = []
-    for pro in result:
-        if pro['name'] in project_list:
-            res.append(pro)
-    return res
-
-#用户返回他所拥有权限的项目,后期替换掉上面的partOfTheProject的方法
-def userproject(username):
-    res = get_git()
-    p_users = res['p_all_users']
-    projects = getinfo('project',['name','id']) #由于发布和申请表中存的都是project_id, 将项目的id 和 name
-    #print username
-    myproject = [p_name for p_name,p_user in p_users.items() if username in p_user] #用户所有项目名的列表
-    result = dict((projects[p_name],p_name) for p_name in myproject)  #返回用户所有项目字典{p_id:p_name,...}
-    return result  
+def user_projects(name, db):
+    members = project_members(db=db)
+    projects = reverse_dict(db.projects)
+    return dict([(projects[x], x) for x in members if name in members[x]])
 
 class ProjectConfig:
     def __init__(self, config_filename):

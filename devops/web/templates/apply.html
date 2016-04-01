@@ -158,7 +158,8 @@ $("tbody").on('click','.applybtn',function(){
 })
 /*提交表单*/
 $('#applyform').on('submit',function(){
-     var str = $('#applyform').serialize()
+    var str = $('#applyform').serialize()
+    str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
     var data = {'method':name,'formdata':str}
     $.post('/addapi',data,function(result){
         console.log(result)

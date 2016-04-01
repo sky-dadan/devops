@@ -17,28 +17,19 @@ def testing():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     if int(validate_result['code']) == 0:
-#        url = "http://%s/api/userproject" % app.config['api_host']
-#        r = requests.post(url, headers=headers)
-#        result = json.loads(r.text)
-        data['method'] = "userproject.getlist"
+        data['method'] ="test_host.getlist"
         data['params'] = {}
         r = requests.post(public.get_url(),headers=headers,json=data)
         result = json.loads(r.text)
         result = json.loads(result['result'])
-        print "testing result = ",result
 
-        data['method'] ="test_host.getlist"
-        data['params'] = {}
-        r = requests.post(public.get_url(),headers=headers,json=data)
-        resip = json.loads(r.text)
-        resip = json.loads(resip['result'])
-
-        if int(result['code']) == 0 and int(resip['code']) == 0:
-            return render_template('testing.html',info=session,result=result['result'],resip=resip['result'])
+        if int(result['code']) == 0:
+            return render_template('testing.html',info=session,result=result['result'])
         else:
             return render_template('testing.html',errmsg=validate_result['errmsg'])
+    else:
+        return render_template('testing.html',errmsg=validate_result['errmsg'])
 
 
 @app.route('/project/testhistory')
@@ -47,7 +38,6 @@ def testhistory():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
-    name = session['username']
     project_id = request.args.get('id')
     project_id = urllib.unquote(project_id).encode('iso-8859-1')
     project_id = int(project_id) 
@@ -60,4 +50,6 @@ def testhistory():
         if int(result['code']) == 0:
             return render_template('test_history.html',info=session,result=result['result'])
         else:
-            return render_template('testhistory.html',errmsg=validate_result['errmsg'])
+            return render_template('test_history.html',errmsg=validate_result['errmsg'])
+    else:
+        return render_template('test_history.html',errmsg=validate_result['errmsg'])

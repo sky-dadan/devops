@@ -21,16 +21,17 @@ def project_test_create(auth_info, **kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    role = int(auth_info['role'])
     field = ['project_id','host','commit','pusher','push_date','comment']
     try:
 
         data = request.get_json()['params']
         #执行上线脚本
-        projects = util.userproject(username)
+        result = app.config['cursor'].get_one_result('project', ['name'], {'id': data['project_id']})
+        if not result:
+            return json.dumps({'code': 1, 'errmsg': '发布的项目不存在'})
         work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
         script_dir = os.path.join(work_dir,'script/online')
-        script_result = util.run_script_with_timeout("sh %s/online_test_dev.sh %s %s" % (script_dir,projects[int(data['project_id'])],data['host']))
+        script_result = util.run_script_with_timeout("sh %s/online_test_dev.sh %s %s" % (script_dir,result['name'],data['host']))
 
         #获取上线上，上线时间，commit号，上线说明,然后插入到数据库里
         data['pusher'] = username
@@ -59,12 +60,10 @@ def project_test_getlist(auth_info, **kwargs):
         fields = ['project_id','host','commit','pusher','push_date','comment']
         data = request.get_json()['params']
         where = kwargs.get('where',None)
-        result = app.config['cursor'].get_results('project_test',fields,where,'push_date',False)
-        print "result =",result
-        projects = util.userproject(username)
-        print "projects =",projects
+        result = app.config['cursor'].get_results('project_test',fields,where)
+        projects = util.user_projects(username, app.config['cursor'])
         for res in result:
-            res['project_id'] = projects[res['project_id']]
+            res['project_id'] = projects[str(res['project_id'])]
         util.write_log(username, '查询项目成功') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
@@ -80,7 +79,6 @@ def project_test_get(auth_info, **kwargs):
     username = auth_info['username']
     role = int(auth_info['role'])
     try:
-        
         fields = ['project_id','commit','pusher','push_date','comment']
         result = []
         sql = 'SELECT %s FROM (SELECT %s FROM project_test ORDER BY push_date DESC) AS sort_project_test GROUP BY project_id' %(','.join(fields),','.join(fields))
@@ -109,10 +107,10 @@ def project_test_getlist(auth_info, **kwargs):
         conf_name = os.path.join(work_dir, 'testhost.conf')
 #        conf_name = app.config['test_host']
         conf = util.ProjectConfig(conf_name)
-        projects = util.userproject(username)
-        result = conf.gets(projects.values())
-        for res in result:
-            result[res] = ','.join(list(result[res]))
+        projects = util.user_projects(username, app.config['cursor'])
+        result = []
+        for k in projects:
+            result.append({'id': k, 'name': projects[k], 'host': ','.join(list(conf.get(projects[k])))})
         return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error("获取测试主机失败: %s" % traceback.format_exc())

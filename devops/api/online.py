@@ -21,7 +21,7 @@ def apply_pub(username,data,where):
     result['apply_date'] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config['cursor'].execute_insert_sql('project_deploy',result)
     #id转换成名字
-    id2name_project=app.config['cusror'].projects
+    id2name_project=app.config['cursor'].projects
     result['project_name'] = id2name_project[str(result['project_id'])]
     util.write_log(username,"success and insert project_deploy status  %s"  % data['status'])
     return result

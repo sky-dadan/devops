@@ -10,6 +10,7 @@ from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
 
+script_name='/root/devops.aiyuanxin.com/devops/script/online/emulation.sh'
 
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
@@ -121,8 +122,8 @@ def apply_emulation(auth_info,**kwargs):
         logging.getLogger().info(data)
         pub_result=apply_pub(username,data,where)
 #调用脚本  sh script_name emultion tag commit project_name
-#       util.run_script_with_timeout("sh script_name emulation %s %s %s" % (pub_result['version'],pub_result['commit'],pub_result['project_name']))
-        print "sh script_name emulation %s %s %s" % (pub_result['version'],pub_result['commit'],pub_result['project_name'])
+        util.run_script_with_timeout("sh %s emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name']))
+        print "sh %s  emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name'])
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply.emulation get failed : %s" %  traceback.format_exc())
@@ -144,8 +145,8 @@ def apply_cancel(auth_info,**kwargs):
         print cancel_flag
         pub_result=apply_pub(username,data,where)
 #调用脚本  sh script_name  cancel_flag project_name 
-#        util.run_script_with_timeout("sh script_name %s %s" % (cancel_flag,pub_result['project_name']))
-        print "sh script_name %s %s %s" % (cancel_flag,pub_result['project_name'],pub_result['commit'])
+        util.run_script_with_timeout("sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name']))
+        print "sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name'])
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply.cancel get failed : %s" % traceback.format_exc())
@@ -165,8 +166,8 @@ def apply_success(auth_info,**kwargs):
         where,data = {'id':pid},{'status':'3'}
         pub_result=apply_pub(username,data,where)
 #调用脚本  sh script_name product_name
-#       util.run_script_with_timeout("sh script_name %s")
-        print "sh script_name product %s "  % pub_result['project_name']
+        util.run_script_with_timeout("sh %s product %s" % (script_name,pub_result['project_name']))
+        print "sh %s product %s "  % (script_name,pub_result['project_name'])
         return json.dumps({'code':0})
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())

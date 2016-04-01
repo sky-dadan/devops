@@ -19,6 +19,7 @@ function emulation(){
         echo "传入参数错误, sh $0 emulation tag,commit,project_name"
         exit 2
     fi
+    mkdir -p $WORK_DIR$3
     cd $WORK_DIR$3
     git tag -a $1  $2 >/dev/null 2>&1
     git push origin $1  > /dev/null 2>&1
@@ -44,13 +45,14 @@ function cancel(){
         echo "Usage sh $0 cancel status project_name"
         exit
     fi
+    echo "cancel function"
 
     # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
 }
 
 function product(){
     #ssh root@sa -e "sh "    #project 
-    echo "aa"
+    echo "prouct function"
 }
 
 case $1 in

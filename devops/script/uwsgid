@@ -38,7 +38,6 @@ function stop(){
     if [ $? -eq 0 ];then
         rm -rf $lock_file_path
         echo -e "\033[34mSTOP UWSGI WEB ADN API SUCCESS!!!\033[0m"
-        exit
     elif [ $? -eq 1 ];then
         echo -e "\033[34mUWSGI IS NOT RUNNING\033[0m"
     fi
@@ -53,7 +52,6 @@ function status(){
     if [ ! -e $lock_file_path ]
     then
         echo "UWSGI IS NOT RUNNING....."
-        exit 
     else
         ps -ef | grep uwsgi | grep -v "grep"
     fi

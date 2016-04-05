@@ -146,7 +146,7 @@ def apply_cancel(auth_info,**kwargs):
         print cancel_flag
         pub_result=apply_pub(username,data,where)
 #调用脚本  sh script_name  cancel_flag project_name 
-        util.run_script_with_timeout("sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name']))
+        util.run_script_with_timeout("sh %s cancel %s  %s %s" % (script_name,cancel_flag,pub_result['version'],pub_result['project_name']))
         print "sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name'])
         return json.dumps({'code':0, 'result': '取消发布成功'})
     except:

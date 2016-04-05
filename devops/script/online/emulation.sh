@@ -42,16 +42,18 @@ function emulation(){
 
 function cancel(){
     if [ $# != 2 ];then
-        echo "Usage sh $0 cancel status project_name"
+        echo "Usage sh $0 cancel status tag project_name"
         exit
     fi
     echo "cancel function"
     if [ $1 -eq 1 ];then
-        echo "cancel successful"
+        echo "cancel successful,didn't pass emulation situation"
         exit 2
+    elif [ $1 -eq 2 ];then
+        git push origin --delete tag $2
+        # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
     fi
 
-    # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
 }
 
 function product(){
@@ -78,7 +80,7 @@ function apply(){
 
 case $1 in
     cancel)
-        cancel $2 $3;         #$2=cancel_flag  $3=project_name
+        cancel $2 $3;         #$2=cancel_flag  $3=tag  $4=project_name
         ;;
     emulation)
         emulation $2 $3 $4;       #$2=tag $3=commit  $4=project_name

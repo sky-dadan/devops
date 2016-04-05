@@ -23,8 +23,8 @@ cd /data/gitclone_dev
 
 #判断gitclone中项目是否存在，不存在就gitclone一份，如果存在了，就直接git pull
 if  [ ! -d $1 ];then    
-#    git clone -b dev git@192.168.1.231:$1 &>/dev/null
-    git clone http://192.168.1.251:8000/git/$1 &>/dev/null
+    git clone -b dev git@192.168.1.231:$1 &>/dev/null
+#    git clone http://192.168.1.251:8000/git/$1 &>/dev/null
     if [ $? -ne 0 ];then
         echo "ERROR -- 克隆失败，请检查Git仓库是否存在此项目!"
         exit 1

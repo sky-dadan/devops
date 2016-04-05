@@ -206,10 +206,10 @@ def project_members(project_perms=None, group_users=None, db=None):
     for name, perms in project_perms.items():
         prj[name] = set([])
         for k in ('user_all_perm', 'user_rw_perm'):
-            prj[name] |= set(perms[k])
+            prj[name] |= set(perms.get(k, [])
         for k in ('group_all_perm', 'group_rw_perm'):
             for x in perms[k]:
-                prj[name] |= set(group_users[x])
+                prj[name] |= set(group_users.get(x, []))
     return prj
 
 #普通用户返回他所拥有权限的项目

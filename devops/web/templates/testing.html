@@ -107,9 +107,24 @@ $("tbody").on('click','.online-btn',function(){
        if (data['code']==0){
            console.log("添加记录成功")
             list()
-            location.reload()
+            swal({  title:"Success",
+                    text:data['result'],
+                    type:"success",
+                    confirmButtonText:'确定'
+                    })
+
+//            alert(data['result'])
+//            location.reload()
+
        }else{
-		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+//		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+//           alert(data['errmsg'])
+            swal({  title:"Failed",
+                    text:data['errmsg'],
+                    type:"error",
+                    confirmButtonText:'确定'
+                })
+            
        }
    })
 })

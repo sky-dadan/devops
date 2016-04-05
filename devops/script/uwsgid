@@ -5,7 +5,7 @@ logpath='/data/devops/log'
 lockdir='/var/lock/subsys'
 lock_file_path=$lockdir/uwsgi
 
-[ -d $pidfile ] || mkdir -pv $pidfile
+mkdir -pv $pidfile
 
 
 function start(){
@@ -34,7 +34,7 @@ function start(){
 
 function stop(){
 #    echo "STOP UWSGI web and api........"
-    killall uwsgi
+    killall uwsgi  >/dev/null 2>&1
     if [ $? -eq 0 ];then
         rm -rf $lock_file_path
         echo -e "\033[34mSTOP UWSGI WEB ADN API SUCCESS!!!\033[0m"
@@ -43,15 +43,12 @@ function stop(){
     fi
 }
 
-function restart(){
-    stop
-    start
-}
 
 function status(){
     if [ ! -e $lock_file_path ]
     then
         echo "UWSGI IS NOT RUNNING....."
+        exit 
     else
         ps -ef | grep uwsgi | grep -v "grep"
     fi
@@ -66,9 +63,6 @@ case "$1" in
     ;;
     stop)
     stop
-    ;;
-    restart)
-    restart
     ;;
     status)
     status

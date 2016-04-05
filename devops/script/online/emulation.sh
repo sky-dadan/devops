@@ -20,9 +20,8 @@ function emulation(){
         echo "传入参数错误, sh $0 emulation tag,commit,project_name"
         exit 2
     fi
-    mkdir -p $WORK_DIR$3
     cd $WORK_DIR$3
-    git tag -a $1  $2 >/dev/null 2>&1
+    git tag -a $1  $2 -m  $1 >/dev/null 2>&1
     git push origin $1  > /dev/null 2>&1
     if [ $? -ne 0 ];then
         echo "git push tag error!"
@@ -43,12 +42,18 @@ function emulation(){
 
 function cancel(){
     if [ $# != 2 ];then
-        echo "Usage sh $0 cancel status project_name"
+        echo "Usage sh $0 cancel status tag project_name"
         exit
     fi
     echo "cancel function"
+    if [ $1 -eq 1 ];then
+        echo "cancel successful,didn't pass emulation situation"
+        exit 2
+    elif [ $1 -eq 2 ];then
+        git push origin --delete tag $2
+        # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
+    fi
 
-    # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
 }
 
 function product(){
@@ -62,18 +67,20 @@ function apply(){
         echo -e  "\033[31musage:\n sh apply.sh project-name \033[0m"
         exit  2
     fi
-    mkdir -p  $DIR_PROJECT$1
-    cd $DIR_PROJECT$1
+    cd /data/gitclone
+    if [ ! -d $1 ]; then
+        git clone  git@192.168.1.231:$1 &>/dev/null
+    fi
+     
+    cd $1
     git pull > /dev/null 2>&1
     commit=`git log  --oneline -1 --pretty=format:"%h"`
-    tag=`git log --oneline -1 --pretty=format:"%s"`
     echo "$commit"
-    echo "$tag"
 }
 
 case $1 in
     cancel)
-        cancel $2 $3;         #$2=cancel_flag  $3=project_name
+        cancel $2 $3;         #$2=cancel_flag  $3=tag  $4=project_name
         ;;
     emulation)
         emulation $2 $3 $4;       #$2=tag $3=commit  $4=project_name

@@ -5,11 +5,15 @@ logpath='/data/devops/log'
 lockdir='/var/lock/subsys'
 lock_file_path=$lockdir/uwsgi
 
-[ -d $pidfile ] || mkdir -pv $pidfile
+mkdir -pv $pidfile
 
 
 function start(){
-    echo "start uwsgi web and api.........."
+#    echo "start uwsgi web and api.........."
+    if [ -e $lock_file_path ];then
+        echo -e "\033[31mUWSGI IS ALREADY START.......\033[0m"
+        exit
+    fi
     cd $pythonpath
     source $pythonpath/../.venv/bin/activate
     if [ $? -eq 0 ]
@@ -19,7 +23,7 @@ function start(){
         if test -w "$lockdir"
         then
             touch $lock_file_path
-            echo "start SUCCESS"
+            echo -e "\033[34mSTART SUCCESS!!!\033[0m"
         fi
         exit $return_value
     else
@@ -29,21 +33,27 @@ function start(){
 }
 
 function stop(){
-    echo "stop uwsgi web, api"
-    killall uwsgi
-    [ $? -eq 0 ] && rm -rf $lockfile
-    echo "STOP  all uwsgi   SUCCESS"
+#    echo "STOP UWSGI web and api........"
+    killall uwsgi  >/dev/null 2>&1
+    if [ $? -eq 0 ];then
+        rm -rf $lock_file_path
+        echo -e "\033[34mSTOP UWSGI WEB ADN API SUCCESS!!!\033[0m"
+    elif [ $? -eq 1 ];then
+        echo -e "\033[34mUWSGI IS NOT RUNNING\033[0m"
+    fi
 }
 
-function restart(){
-    stop
-    start
-}
 
 function status(){
-    [ ! -e $lockfile ] || echo "uwsgi is running........."
-    ps aux | grep 'uwsgi'  | grep -v 'grep'   || echo "uwsgi not running........"
+    if [ ! -e $lock_file_path ]
+    then
+        echo "UWSGI IS NOT RUNNING....."
+        exit 
+    else
+        ps -ef | grep uwsgi | grep -v "grep"
+    fi
 }
+
 
 
 
@@ -53,9 +63,6 @@ case "$1" in
     ;;
     stop)
     stop
-    ;;
-    restart)
-    restart
     ;;
     status)
     status

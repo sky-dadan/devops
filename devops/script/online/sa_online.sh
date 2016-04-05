@@ -26,10 +26,7 @@ function sa_rsync_product(){
 
 #sa_cancel  $1=cancel_flag  $2=project
 function sa_cancel(){
-    if [ $1 -eq 1 ];then
-        echo "no emulation test, cancel successful"
-        exit 0
-    elif [ $1 -eq 2];then
+    if [ $1 -eq 2];then
         rm -rf $DIR_PROJECT$2
         last_commit=`tail -1 $BACKUP$2/version | awk '{print $1}'`
         tar  zxf $BACKUP$2/$last_commit.tag.gz -C $DIR_PROJECT$2

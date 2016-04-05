@@ -41,12 +41,10 @@ for ip in $ips
 do
 #将新项目整个目录rsync到远程主机目录
     /usr/bin/rsync -avz --timeout=20  -e ssh  --exclude=.git --exclude=.svn   /data/gitclone_dev/$1 root@$ip:/data/wwwroot/ &>/dev/null
- done
-
-if [ $? -eq 0 ];then
-    echo "OK -- 同步代码成功!"
-else
-    echo "ERROR -- 同步代码失败!"
-    exit 2
-fi
-
+    if [ $? -eq 0 ];then
+        echo "OK -- $ip同步代码成功!"
+    else
+        echo "ERROR -- $ip同步代码失败!"
+        exit 2
+    fi
+done

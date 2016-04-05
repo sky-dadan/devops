@@ -59,20 +59,23 @@ var name=window.location.pathname.split('/').pop()
 function datatable(){
 $('#datalist').DataTable({
    "bDestroy":true,
+   "paging": false,
    "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",
-        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+//        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "sInfo": "显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
         "infoEmpty": "无记录",
         "infoFiltered": "(从 _MAX_ 条记录过滤)",
         "sSearch": "搜索:",
-        "oPaginate": {
-            "sFirst": "首页",
-            "sPrevious": "上一页",
-            "sNext": "下一页",
-            "sLast": "末页"
-            }
+//        "oPaginate": {
+//            "sFirst": "首页",
+//            "sPrevious": "上一页",
+//            "sNext": "下一页",
+//            "sLast": "末页"
+//            }
         }  
+
     })
 }
 
@@ -107,18 +110,13 @@ $("tbody").on('click','.online-btn',function(){
        if (data['code']==0){
            console.log("添加记录成功")
             list()
+            datatable()
             swal({  title:"Success",
                     text:data['result'],
                     type:"success",
                     confirmButtonText:'确定'
                     })
-
-//            alert(data['result'])
-//            location.reload()
-
        }else{
-//		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
-//           alert(data['errmsg'])
             swal({  title:"Failed",
                     text:data['errmsg'],
                     type:"error",

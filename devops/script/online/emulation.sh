@@ -29,7 +29,7 @@ function emulation(){
     fi
     
     #通过ssh执行sa上面的脚本 备份sa代码
-    # ssh root@sa -e "sh  script.name function  commit project_name"
+    ansible sa -m shell -udevops  -s -a  "source /root/.bash_profile && sh /usr/local/sbin/sa_online.sh sa_backup  $2 $3"
 
     #rsync 推送代码到SA_HOST
     #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
@@ -41,7 +41,7 @@ function emulation(){
 
 
 function cancel(){
-    if [ $# != 2 ];then
+    if [ $# != 3 ];then
         echo "Usage sh $0 cancel status tag project_name"
         exit
     fi
@@ -50,6 +50,7 @@ function cancel(){
         echo "cancel successful,didn't pass emulation situation"
         exit 2
     elif [ $1 -eq 2 ];then
+        cd  $WORK_DIR$3 
         git push origin --delete tag $2
         # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
     fi
@@ -80,7 +81,7 @@ function apply(){
 
 case $1 in
     cancel)
-        cancel $2 $3;         #$2=cancel_flag  $3=tag  $4=project_name
+        cancel $2 $3  $4;         #$2=cancel_flag  $3=tag  $4=project_name
         ;;
     emulation)
         emulation $2 $3 $4;       #$2=tag $3=commit  $4=project_name

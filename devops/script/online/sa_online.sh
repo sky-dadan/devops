@@ -1,5 +1,5 @@
 #!/bin/bash
-DIR_PROJECT='/data/'
+DIR_PROJECT='/data/wwwwroot/'
 BACKUP='/data/backup/'
 HOST=''
 

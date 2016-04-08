@@ -149,12 +149,18 @@ $("#upinfobtn").on('click',function(){
         data=JSON.parse(data)
         data = JSON.parse(data['result']) //object
         if(data['code'] == 0){   //recevie json object
-             swal("更新信息成功")
-             $('#editModal').modal('hide')
-             window.location.reload();
+                swal({
+                    title:"success",
+                    text:"个人资料更新成功",
+                    type:"success",
+                    confirmButtonText:'个人资料更新成功'
+                    },function(){
+                         $('#editModal').modal('hide')
+                         window.location.reload();
+                    })
              
         }else{
-             swal("更新信息失败")
+                 swal("error", data['errmsg'],"error")
         }
    })
         return false

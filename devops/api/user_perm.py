@@ -168,13 +168,10 @@ def userupdate(auth_info, **kwargs):
     if auth_info['code'] == 1:
         return json.dumps(auth_info)
     username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try:
         data = request.get_json()['params']
         where = data.get('where',None)
         data = data.get('data',None)
-        print data,where
         if int(auth_info['role']) == 0:
             result = app.config['cursor'].execute_update_sql('user', data, where)
         else:

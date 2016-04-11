@@ -200,6 +200,7 @@ def deploy_list(auth_info,**kwargs):
         app.config['cursor'].execute(sql)
         result_sets = app.config['cursor'].fetchall()
         deploy_result = [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+        app.config['cursor'].close_db()
 
         result = project_attr(deploy_result)
 

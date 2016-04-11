@@ -108,6 +108,7 @@ def project_test_get(auth_info, **kwargs):
             for i,k in enumerate(fields):
                 res[k] = row[i]
             result.append(res)
+        app.config['cursor'].close_db()
         util.write_log(username, '查询项目成功') 
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:

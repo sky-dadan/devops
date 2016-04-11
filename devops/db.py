@@ -1,18 +1,19 @@
 # -*- encoding: utf-8 -*-
 import logging
+import traceback
 import MySQLdb as mysql
+from DBUtils.PooledDB import PooledDB
 
 class Cursor():
     def __init__(self, config):
         self.config = dict([(k[6:], config[k]) for k in config if k.startswith('mysql_')])
         if 'port' in self.config:
             self.config['port'] = int(self.config['port'])
-        if self.config:
-            self.connect_db()
+        self.pool = PooledDB(mysql, mincached=4, maxcached=10, **self.config)
 
     def connect_db(self):
-        self.db = mysql.connect(**self.config)
-        self.db.autocommit(True)
+        self.db = self.pool.connection()
+        #self.db.autocommit(True)
         self.cur = self.db.cursor()
 
     def close_db(self):
@@ -20,12 +21,8 @@ class Cursor():
         self.db.close()
 
     def execute(self, sql):
-        try:
-            return self.cur.execute(sql)
-        except:
-            self.close_db()
-            self.connect_db()
-            return self.cur.execute(sql)
+        self.connect_db()
+        return self.cur.execute(sql)
     
     def fetchone(self):
         return self.cur.fetchone()
@@ -43,8 +40,13 @@ class Cursor():
         return sql
 
     def execute_insert_sql(self, table_name, data):
-        sql = self.insert_sql(table_name, data)
-        return self.execute(sql)
+        try:
+            sql = self.insert_sql(table_name, data)
+            return self.execute(sql)
+        except:
+            logging.getLogger().error("Execute '%s' error: %s" % (sql, traceback.format_exc()))
+        finally:
+            self.close_db()
 
     def select_sql(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
         if isinstance(where, dict) and where:
@@ -70,21 +72,33 @@ class Cursor():
         return sql
 
     def get_one_result(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
-        sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
-        if not sql:
-            return None
-        self.execute(sql)
-        result_set = self.fetchone()
-        if result_set:
-            return dict([(k, '' if result_set[i] is None else result_set[i]) for i,k in enumerate(fields)])
-        else:
+        try:
+            sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
+            if not sql:
+                return None
+            self.execute(sql)
+            result_set = self.fetchone()
+            if result_set:
+                return dict([(k, '' if result_set[i] is None else result_set[i]) for i,k in enumerate(fields)])
+            else:
+                return {}
+        except:
+            logging.getLogger().info("Execute '%s' error: %s" % (sql, traceback.format_exc()))
             return {}
+        finally:
+            self.close_db()
 
     def get_results(self, table_name, fields, where=None, order=None, asc_order=True, limit=None):
-        sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
-        self.execute(sql)
-        result_sets = self.fetchall()
-        return [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+        try:
+            sql = self.select_sql(table_name, fields, where, order, asc_order, limit)
+            self.execute(sql)
+            result_sets = self.fetchall()
+            return [dict([(k, '' if row[i] is None else row[i]) for i,k in enumerate(fields)]) for row in result_sets]
+        except:
+            logging.getLogger().info("Execute '%s' error: %s" % (sql, traceback.format_exc()))
+            return []
+        finally:
+            self.close_db()
 
     def update_sql(self, table_name, data, where, fields=None):
         if not (where and isinstance(where, dict)):
@@ -99,11 +113,16 @@ class Cursor():
         return sql
 
     def execute_update_sql(self, table_name, data, where, fields=None):
-        sql = self.update_sql(table_name, data, where, fields)
-        if sql:
-            return self.execute(sql)
-        else:
-            return ""
+        try:
+            sql = self.update_sql(table_name, data, where, fields)
+            if sql:
+                return self.execute(sql)
+            else:
+                return ""
+        except:
+            logging.getLogger().error("Execute '%s' error: %s" % (sql, traceback.format_exc()))
+        finally:
+            self.close_db()
 
     def delete_sql(self, table_name, where):
         if not (where and isinstance(where, dict)):
@@ -114,11 +133,16 @@ class Cursor():
         return sql
 
     def execute_delete_sql(self, table_name, where):
-        sql = self.delete_sql(table_name, where)
-        if sql:
-            return self.execute(sql)
-        else:
-            return ""
+        try:
+            sql = self.delete_sql(table_name, where)
+            if sql:
+                return self.execute(sql)
+            else:
+                return ""
+        except:
+            logging.getLogger().error("Execute '%s' error: %s" % (sql, traceback.format_exc()))
+        finally:
+            self.close_db()
 
     def if_userid_exist(self, user_id):
         result = self.get_one_result('user', ['id'], {'id': user_id})

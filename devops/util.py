@@ -54,7 +54,7 @@ def set_logging(log_path, log_level='error'):
 
     log_name = os.path.join(log_path, 'service.log')
     logger = logging.getLogger()
-    formatter = '%(asctime)s %(levelname)s %(filename)s-%(funcName)s:%(lineno)d %(message)s'
+    formatter = '%(asctime)s %(levelname)s %(process)d %(thread)d %(filename)s-%(funcName)s:%(lineno)d %(message)s'
     add_handler(log_name, formatter, LOG_LEVELS.get(log_level.lower(), logging.ERROR), logger)
 
 def write_log(user, msg):

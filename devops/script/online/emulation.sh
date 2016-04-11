@@ -29,10 +29,11 @@ function emulation(){
     fi
     
     #通过ssh执行sa上面的脚本 备份sa代码
-    ansible sa -m shell -udevops  -s -a  "source /root/.bash_profile && sh /usr/local/sbin/sa_online.sh sa_backup  $2 $3"
+    ansible sa -m shell -udevops  -s -a  " sh /usr/local/sbin/sa_online.sh sa_backup  $2 $3"
 
     #rsync 推送代码到SA_HOST
-    #    /usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
+    ansible sa -m synchronize -udevops -s -a "src=$WORK_DIR$3/ dest=/data/wwwroot/$3/ compress=yes"
+    #/usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $WORK_DIR$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
 
 
     #sa上面代码推送到灰度

@@ -7,3 +7,4 @@ Flask-SQLAlchemy
 Flask-JSONRPC
 Flask-WTF 
 ipython 
+DBUtils

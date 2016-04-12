@@ -1,7 +1,6 @@
 #coding:utf-8
 from flask import Flask,request,session,render_template,redirect
 from  . import app  
-from db  import Cursor    #导入数据库连接模块
 import requests,json 
 import util 
 

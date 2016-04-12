@@ -36,6 +36,7 @@
 <script>
 
 $("#submit").on('click',function(){
+    swal("后台已经开始重置操作，请耐心等候...")
     var data = {'method': 'dbreset', 'formdata': $('#init').serialize()}
     console.log(data)
     $.post("/updateapi",data,function(data){

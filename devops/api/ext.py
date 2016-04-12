@@ -18,7 +18,7 @@ def dbreset(auth_info, **kwargs):
         name = kwargs['data'].get('id', '')
         if name not in ('mall', '100xhs', 'api', 'im', 'all'):
             return json.dumps({'code': 1, 'errmsg': "初始化的数据库不存在"})
-        script_name = os.path.join(app.config['script_path'], 'online', 'init_db.sh')
+        script_name = os.path.join(app.config['script_path'], 'init_db.sh')
         util.run_script_with_timeout('ansible sa -m shell -udevops -s -a "%s %s"' % (script_name, name), 3600)
         util.write_log(username,"Init mysql '%s' success" % name)
         return json.dumps({'code':0,'result':"初始化数据库'%s'完成" % name})

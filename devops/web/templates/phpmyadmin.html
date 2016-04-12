@@ -9,14 +9,14 @@
 <div class="widget-box">
     <div><strong>点击需要访问的数据库</strong> </div>
 <div class="widget-content">
-    <div class="control-group">
+    <div class="well" style="padding: 8px 0; margin-bottom: 0;">
         <label class="control-label"></label>
         {% if result %}
+        <ul class="nav nav-list">
         {% for db in result %}
-        <div class="controls">
-            <a href="{{ db.url }}" class="btn btn-inverse btn-large" target="_blank">{{ db.name }}</a>
-        </div>
+            <li><a href="{{ db.url }}" target="_blank">{{ db.name }}</a></li>
         {% endfor %}
+        </ul>
         {% endif %}
     </div>
 </div> <!--widget-content  end -->

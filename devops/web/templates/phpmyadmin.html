@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}查看仿真环境数据库{% endblock %}
+{% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
+
+{% block h1 %}查看仿真环境数据库{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+    <div><strong>点击需要访问的数据库</strong> </div>
+<div class="widget-content">
+    <div class="control-group">
+        <label class="control-label"></label>
+        {% if result %}
+        {% for db in result %}
+        <div class="controls">
+            <a href="{{ db.url }}" class="btn btn-inverse btn-large" target="_blank">{{ db.name }}</a>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div> <!--widget-content  end -->
+
+</div><!--widget-box end-->
+{% endblock %}
+{% block js %}
+{% endblock %}

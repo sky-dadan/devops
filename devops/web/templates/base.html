@@ -133,6 +133,9 @@
             {% if info and 'dbreset' in info.perm %}
             <li ><a href="/dbreset">仿真数据库初始化</a></li>
             {% endif %}
+            {% if info and 'phpmyadmin' in info.perm %}
+            <li ><a href="/phpmyadmin">访问仿真数据库</a></li>
+            {% endif %}
         </ul>
         </li> <!--end priviage-->
     </ul>

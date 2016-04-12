@@ -68,3 +68,17 @@ def dbreset():
             return render_template('dbreset.html',info=session)
         else:
             return render_template('dbreset.html',errmsg=validate_result['errmsg'])
+
+@app.route("/phpmyadmin", methods=['GET', 'POST'])
+def phpmyadmin():
+    if session.get('author','nologin') == 'nologin':
+        return redirect('/login')
+    headers['authorization'] = session['author']
+    validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+
+    if int(validate_result['code']) == 0:
+        dbs = [(3306, '商城数据库'), (3307, '妙手健康数据库'), (3308, 'Api接口数据库'), (3309, 'IM数据库')]
+        result = [{'url': 'http://182.18.40.252/phpmyadmin/signon.php?auth=%s&port=%s' % (session['author'], x), 'name': y} for x, y in dbs]
+        return render_template('phpmyadmin.html',info=session, result=result)
+    else:
+        return render_template('phpmyadmin.html',errmsg=validate_result['errmsg'])

@@ -144,21 +144,20 @@ class Cursor():
         finally:
             self.close_db()
 
-    def if_userid_exist(self, user_id):
-        result = self.get_one_result('user', ['id'], {'id': user_id})
-        if result:
-            return True
+    def if_id_exist(self,table_name, field_id):  #通过id判断数据是否存在，在创建用户和角色时调用比较多
+        if isinstance(field_id, list):                                                                         
+            id_num=len(field_id)
+            result = self.get_results(table_name, ['id'], {'id': field_id})
+            if id_num !=len(result): 
+                result=False
         else:
-            logging.getLogger().error("user '%s' is not exist" % user_id)
-            return False
+            result = self.get_one_result(table_name, ['id'], {'id': field_id})
+        if result:
+            return True 
+        else:
+            logging.getLogger().error("%s '%s' is not exist" % (table_name,field_id))
+            return False 
 
-    def if_groupid_exist(self, group_id):
-        result = self.get_one_result('group', ['id'], {'id': group_id})
-        if result:
-            return True
-        else:
-            logging.getLogger().error("group '%s' is not exist" % group_id)
-            return False
 
     def getinfo(self, table_name, fields):
         '''

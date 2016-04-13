@@ -21,6 +21,8 @@ def role_create(auth_info, **kwargs):
         data = request.get_json()['params']
         if not data.has_key('p_id'):
             return json.dumps({'code':1,'errmsg':'必须选择一个权限!'})
+        if not app.config['cursor'].if_id_exist('permission',data['p_id'].split(',')):
+            return json.dumps({'code': 1, 'errmsg': "提供的权限不存在!"})
         if not util.check_name(data['name']):
             return json.dumps({'code': 1, 'errmsg': '组名必须为字母和数字!'})
         app.config['cursor'].execute_insert_sql('user_group', data)

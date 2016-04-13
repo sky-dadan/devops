@@ -60,6 +60,8 @@ def createuser(auth_info,**kwargs):
         data = request.get_json()['params']
         if 'r_id' not in data:
             return json.dumps({'code': 1, 'errmsg': "必须选择一个所属组!"})
+        if not app.config['cursor'].if_id_exist('user_group',data['r_id'].split(',')):
+            return json.dumps({'code': 1, 'errmsg': "提供的组不存在!"})
         if not util.check_name(data['username']):
             return json.dumps({'code': 1, 'errmsg': "用户名必须为字母和数字!"})
         if data['password'] != data['repwd']:
@@ -219,7 +221,7 @@ def passwd(auth_info):
         data = request.get_json()
         if role==0 and 'user_id' in data:   # admin no need oldpassword  but need user_id
             user_id = data['user_id']
-            if not app.config['cursor'].if_userid_exist(user_id): 
+            if not app.config['cursor'].if_id_exist('user',user_id): 
                 return json.dumps({'code':1,'errmsg':'需要更改密码的用户不存在'})
             password = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})

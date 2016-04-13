@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}仿真环境数据库初始化{% endblock %}
+{% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
+
+{% block h1 %}仿真环境数据库初始化{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+    <div><strong>请选择要初始化的数据库<br>
+            <span style="color:red">注意：初始化的数据来自于线上真实数据，但受数据量所限，仅导入部分数据。导入过程比较慢，请耐心等待。 </span>
+            </strong> </div>
+<div class="widget-content">
+<form id="init" class="form-horizontal"  accept-charset="UTF-8">
+    <div class="control-group">
+        <label class="control-label">需初始化的数据库：</label>
+        <div class="controls">
+             <select name="id" id="id">
+                 <option value="mall">商城</option>
+                 <option value="100xhs">妙手健康</option>
+                 <option value="api">API</option>
+                 <option value="im">IM</option>
+                 <option value="all">全部</option>
+             </select>
+        </div>
+    </div>
+    <div class="form-actions">
+         <input type="button"  value="确定" class="btn btn-success" id="submit">
+    </div>
+</form> 
+</div> <!--widget-content  end -->
+
+</div><!--widget-box end-->
+{% endblock %}
+{% block js %}
+<script>
+
+$("#submit").on('click',function(){
+    swal("后台已经开始重置操作，请耐心等候...")
+    var data = {'method': 'dbreset', 'formdata': $('#init').serialize()}
+    console.log(data)
+    $.post("/updateapi",data,function(data){
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
+        console.log(data)
+        if(data['code'] == 1){
+            swal(data['errmsg'])      
+        }else{
+            swal(data['result'])
+        }
+    })
+    return false;
+ })
+
+</script>
+{% endblock %}

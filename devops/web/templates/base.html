@@ -123,14 +123,20 @@
         </li> <!--end project-->
         <li class="submenu">
         <a href="javascript:;">
-            <i class="icon icon-wrench"></i><span>第三方接口</span>
+            <i class="icon icon-wrench"></i><span>扩展接口</span>
             <span class="arrow icon-chevron-up"></span>
         </a>
-        {% if info and 'cdn' in info.perm %}
         <ul>
+            {% if info and 'cdn' in info.perm %}
             <li ><a href="/cdn">cdn刷新接口</a></li>
+            {% endif %}
+            {% if info and 'dbreset' in info.perm %}
+            <li ><a href="/dbreset">仿真数据库初始化</a></li>
+            {% endif %}
+            {% if info and 'phpmyadmin' in info.perm %}
+            <li ><a href="/phpmyadmin">访问仿真数据库</a></li>
+            {% endif %}
         </ul>
-        {% endif %}
         </li> <!--end priviage-->
     </ul>
 </div>

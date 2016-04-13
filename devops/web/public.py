@@ -84,9 +84,7 @@ def getapi():
     where = {'username':username} if uid is None else {'id': uid}
     data['params'] = {'selected': selected, 'where': where, 'args': request.args}
     data['method'] = method+".get"
-    print data 
     r = requests.post(get_url(),headers=headers,json=data)
-    print r.text
     return r.text
 
 
@@ -104,10 +102,9 @@ def updateapi():
     data['params'] = {
         "data":formdata,
         "where":{
-            "id":int(formdata['id'])
+            "id":formdata['id']
         }
     }
-    print data
     r = requests.post(get_url(), headers=headers, json=data)
     return r.content
 

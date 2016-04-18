@@ -192,14 +192,34 @@ $("tbody").on('click','.detail-btn',function(){
 
 //点击正式发布按钮
 $('tbody').on('click','.product-btn',function(){
-    var id = $(this).attr('data-id')
-     product(id)
+    var id = $(this).attr('data-id');
+    swal({
+        title: "确定要正式发布吗？",
+        type: "info",
+        showCancelButton: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确定",
+        closeOnConfirm: false
+    },
+    function() {
+        product(id);
+    });
 })
 
 //点击取消按钮
 $('tbody').on('click','.cancel-btn',function(){
-     var id = $(this).attr('data-id')
-    cancel(id)
+    var id = $(this).attr('data-id');
+    swal({
+        title: "确定要取消发布吗？",
+        type: "info",
+        showCancelButton: true,
+        cancelButtonText: "取消",
+        confirmButtonText: "确定",
+        closeOnConfirm: false
+    },
+    function() {
+        cancel(id);
+    });
 })
 
 //详情按钮信息页面

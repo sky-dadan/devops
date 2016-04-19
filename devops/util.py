@@ -130,14 +130,17 @@ def run_script(cmd, queue=None):
 
     try:
         subproc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if queue is not None:
+        if queue:
             queue.put(subproc)
         out = subproc.stdout.read().strip()
-        if queue is not None:
+        if queue:
             queue.put(out)
         logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
         return out
     except:
+        if queue:
+            queue.put(None)
+            queue.put('ERROR: 执行脚本异常')
         logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
         return None
 
@@ -153,11 +156,18 @@ def run_script_with_timeout(cmd, timeout=30):
             process.terminate()
             logging.getLogger().warning("执行命令超时退出")
         else:
-            return queue.get(2)
+            ret = queue.get(2)
+            if ret:
+                last_line = ret.strip().split('\n')[-1].strip()
+                if last_line.startswith('OK:'):
+                    return True, last_line[3:].strip()
+                else:
+                    return False, last_line[6:].strip() if last_line.startswith('ERROR:') else last_line
     except:
         logging.getLogger().warning("执行超时命令[%s]异常: %s" % (cmd, traceback.format_exc()))
     finally:
         queue.close()
+    return False, ''
 
 #获取一个组里面所有的用户列表
 #需要传入用户信息users=getinfo(user,['id', 'username'])、组信息groups=getinfo(group,['id','name'])和user_groups=getinfo(user,['id','r_id'])

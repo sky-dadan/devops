@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}仿真环境数据库初始化{% endblock %}
-{% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
+{% block title %}仿真环境数据库重置{% endblock %}
+{% block breadcrumb %}<a href="/dbreset">数据库重置</a>{% endblock %}
 
-{% block h1 %}仿真环境数据库初始化{% endblock %}
+{% block h1 %}仿真环境数据库重置{% endblock %}
 
 <!--主体内容-->
 {% block row %}
@@ -20,7 +20,6 @@
                  <option value="100xhs">妙手健康</option>
                  <option value="api">API</option>
                  <option value="im">IM</option>
-                 <option value="all">全部</option>
              </select>
         </div>
     </div>
@@ -38,7 +37,6 @@
 $("#submit").on('click',function(){
     swal("后台已经开始重置操作，请耐心等候...")
     var data = {'method': 'dbreset', 'formdata': $('#init').serialize()}
-    console.log(data)
     $.post("/updateapi",data,function(data){
         data = JSON.parse(data)
         data = JSON.parse(data['result'])

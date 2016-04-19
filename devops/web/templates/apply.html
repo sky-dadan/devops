@@ -1,6 +1,17 @@
 {% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet"type="text/css"href="/static/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
 {% block title %}申请发布{% endblock %}
-{% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
+{% block breadcrumb %}<a href="/project/apply">申请发布</a>{% endblock %}
 
 {% block h1 %}申请发布{% endblock %}
 
@@ -93,6 +104,7 @@ name = "apply"
 /*datatable function*/
 function datatable(){
     $('#datatable').DataTable({
+	"bDestroy":true,
             "language": {
                 "lengthMenu": "每页 _MENU_ 条记录",
                 "zeroRecords": "没有找到记录",

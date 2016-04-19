@@ -262,7 +262,7 @@ CREATE TABLE `project_test` (
   `pusher` varchar(128) NOT NULL COMMENT '推送人',
   `push_date` datetime NOT NULL COMMENT '推送时间',
   `comment` varchar(256) COMMENT '备注',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

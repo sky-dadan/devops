@@ -164,5 +164,8 @@ if [[ $# -ge 1 ]]; then
             ;;
         *)
             echo "Usage: $0 [mall|100xhs|api|im]"
+            echo "ERROR: Parameter error"
+            exit;
     esac
+    echo "OK: Reset $1 finish";
 fi

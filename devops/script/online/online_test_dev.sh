@@ -23,10 +23,10 @@ cd /data/gitclone_dev
 
 #判断gitclone中项目是否存在，不存在就gitclone一份，如果存在了，就直接git pull
 if  [ ! -d $1 ];then    
-    git clone -b dev git@192.168.1.231:$1 &>/dev/null
+    git clone -b dev git@api.aiyuanxin.com:$1 &>/dev/null
 #    git clone http://192.168.1.251:8000/git/$1 &>/dev/null
     if [ $? -ne 0 ];then
-        echo "ERROR -- 克隆失败，请检查Git仓库是否存在此项目!"
+        echo "ERROR: 克隆失败，请检查Git仓库是否存在此项目!"
         exit 1
     fi
 fi
@@ -34,17 +34,19 @@ fi
 #进入项目目录，并拉取最新代码，然后获取commit号和commit说明
 cd /data/gitclone_dev/$1
 git pull &>/dev/null
+if [ $? -ne 0 ];then
+    echo "ERROR: 更新Git仓库代码失败!"
+    exit 1
+fi
+
 commit=$(git log  --oneline -1 --pretty=format:"%h,%s")
-echo $commit
 chown www:www -R /data/gitclone_dev/$1
+echo -n "OK: $commit"
 for ip in $ips
 do
 #将新项目整个目录rsync到远程主机目录
     /usr/bin/rsync -avz --timeout=20  -e ssh  --exclude=.git --exclude=.svn   /data/gitclone_dev/$1 root@$ip:/data/wwwroot/ &>/dev/null
-    if [ $? -eq 0 ];then
-        echo "OK -- $ip同步代码成功!"
-    else
-        echo "ERROR -- $ip同步代码失败!"
-        exit 2
+    if [ $? -ne 0 ];then
+        echo -n " $ip同步代码失败!"
     fi
 done

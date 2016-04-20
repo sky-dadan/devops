@@ -30,34 +30,21 @@ def project_test_create(auth_info, **kwargs):
         if not result:
             return json.dumps({'code': 1, 'errmsg': '发布的项目不存在'})
         work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-        script_dir = os.path.join(work_dir,'script/online')
-        script_result = util.run_script_with_timeout("sh %s/online_test_dev.sh %s %s" % (script_dir,result['name'],data['host']))
-        #脚本正常状态下会返回两行或三行结果，如果只返回一行，这说明Clone失败
-        if '\n' not in script_result:
-            return json.dumps({'code':1,'errmsg':script_result})
+        ret, msg = util.run_script_with_timeout("%s/online_test_dev.sh %s %s" % (app.config['script_path'], result['name'], data['host']))
+        if not ret:
+            return json.dumps({'code':1,'errmsg':msg})
 
-        #将脚本获取的两行结果分割，一行是测试机的IP,另一行是同步的结果
-        script_res_split = script_result.split('\n')
+        #从脚本获取的两部分内容，一部分是代码Git信息，另一部分是同步的结果
+        res = msg.split()
 
         #获取上线人，上线时间，commit号，上线说明,然后插入到数据库里
         data['pusher'] = username
         data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
-        data['commit'] = script_res_split[0][:7]
-        data['comment'] = script_res_split[0][8:]
+        data['commit'] = res[0][:7]
+        data['comment'] = res[0][8:]
 
-        #判断同步是否成功，如果没成功，反回脚本给出的错误信息
-        rsync_status1 = script_res_split[1].split(' -- ')[0]
-        rsync_result1 = script_res_split[1].split(' -- ')[1]
-        if len(script_res_split) == 3:
-            rsync_status2 = script_res_split[2].split(' -- ')[0]
-            rsync_result2 = script_res_split[2].split(' -- ')[1]
-            if rsync_status1 == "ERROR" or rsync_status2 == "ERROR":
-                return json.dumps({'code':1,'errmsg':'%s\n%s' % (rsync_result1,rsync_result2)})
-        else:
-            if rsync_status1 == "ERROR":
-                return json.dumps({'code':1,'errmsg':rsync_result1})
-
-        print script_result,script_res_split
+        if len(res) > 1:
+            return json.dumps({'code': 1, 'errmsg': '\n'.join(res[1:])})
 
         app.config['cursor'].execute_insert_sql('project_test', data)
         util.write_log(username,{'code':0,'result':'add project_test success'})
@@ -76,7 +63,6 @@ def project_test_getlist(auth_info, **kwargs):
     username = auth_info['username']
     role = int(auth_info['role'])
     try:
-        
         fields = ['project_id','host','commit','pusher','push_date','comment']
         data = request.get_json()['params']
         where = kwargs.get('where',None)

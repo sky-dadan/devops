@@ -194,10 +194,6 @@ Use:
     curl http://127.0.0.1:1000/api/gitolite
 '''
 def gitolite():
-    git_confile = app.config['git_confile']
-    api_dir = os.path.dirname(os.path.realpath(__file__))
-    script_dir =  os.path.join(api_dir.rstrip('api'),'script')
-
     unlock_project = app.config['cursor'].get_results('project', ['name'], {'is_lock': 0})
     unlock_project = [x['name'] for x in unlock_project]
     group  = util.group_members(db=app.config['cursor'])
@@ -210,6 +206,7 @@ def gitolite():
 
     try:
         #将用户和组信息写入配置文件
+        git_confile = app.config['git_confile']
         with open(git_confile,'w') as f:
             str1 = ""
             for k,v in group.items():
@@ -226,15 +223,16 @@ def gitolite():
                     continue
                 str2 += "repo %s\n" % k
                 if v['group_all_perm'] or v['user_all_perm']:
-                    str2 += "    RW+ = %s %s\n" % (v['group_all_perm'], v['user_all_perm'])
+                    str2 += "    RW = %s %s\n" % (v['group_all_perm'], v['user_all_perm'])
                 if v['group_rw_perm'] or v['user_rw_perm']:
-                    str2 += "    RW = %s %s\n" % (v['group_rw_perm'], v['user_rw_perm'])
+                    str2 += "    - master = %s %s\n" % (v['group_rw_perm'], v['user_rw_perm'])
             f.write(str2)
 
-        #git add/commit/push生效.路径暂时写死，定版前修改
-        stdout=util.run_script_with_timeout("sh %s/git.sh" % script_dir)
-        print stdout
-        return {'code':0,'result':"git操作成功"}
+        res, msg=util.run_script_with_timeout("%s/git.sh" % app.config['script_path'])
+        if res:
+            return {'code':0,'result':"git操作成功"}
+        else:
+            return {'code':1, 'errmsg': "git更新配置文件失败"}
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return {'code':1,'errmsg':"写配置文件报错"}

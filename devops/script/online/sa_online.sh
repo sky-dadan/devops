@@ -1,26 +1,29 @@
 #!/bin/bash
-DIR_PROJECT='/data/wwwwroot/'
+DIR_PROJECT='/data/wwwroot/'
 BACKUP='/data/backup/'
 HOST=''
+
+export PATH=/usr/bin:$PATH
 
 #backup $1 $2     $1=commit  $2=project_name  每次备份保存commit
 function sa_backup(){
     time=`date`
     mkdir -p  $BACKUP$2
-    tar czf $BACKUP$2/$1.tar.gz   $DIR_PROJECT$2    
+    mkdir -p  $DIR_PROJECT$2
+    tar -czf $BACKUP$2/$1.tar.gz  -C  $DIR_PROJECT  $2    
     echo $1 $time  >> $BACKUP$2/version
 }
 
 #sa_rsync_emulation  $1=project_name
 function sa_rsync_emulation(){
-    cd $DIR_PROJECT$1
-    #rsync
+    ansible  test1:test2  -a  "mkdir -p /data/wwwroot/$1"
+    ansible test1:test2  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
 }
 
 #sa_rsync_product   $1=project_name
 function sa_rsync_product(){
-    cd $DIR_PROJECT$1
-    #rsync
+    ansible  web  -a  "mkdir -p /data/wwwroot/$1"
+    ansible web  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
 
 }
 

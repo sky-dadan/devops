@@ -12,6 +12,12 @@ from user_perm import getid_list
 
 script_name='/usr/local/devops/devops/script/online/emulation.sh'
 
+def get_project_info(where):
+    id2name_project = app.config['cursor'].projects
+    res = app.config['cursor'].get_one_result('project_apply', ['project_id', 'version', 'commit', 'status'], where)
+    res['name'] = id2name_project[str(res['project_id'])]
+    return res
+
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
     util.write_log(username,"success and update project_apply status %s" % data['status'])
@@ -20,11 +26,7 @@ def apply_pub(username,data,where):
     result['applicant'] = username
     result['apply_date'] = time.strftime("%Y-%m-%d %H:%M:%S")
     app.config['cursor'].execute_insert_sql('project_deploy',result)
-    #id转换成名字
-    id2name_project=app.config['cursor'].projects
-    result['project_name'] = id2name_project[str(result['project_id'])]
     util.write_log(username,"success and insert project_deploy status  %s"  % data['status'])
-    return result
 
 #创建申请任务列表
 @jsonrpc.method('apply.create') 
@@ -36,8 +38,11 @@ def apply_create(auth_info, **kwargs):
     role = int(auth_info['role'])
     try:
         data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
-        data['version']=''               #脚本获取
-        data['commit']=util.run_script_with_timeout("sh %s apply %s " % (script_name,data['project_username']))    
+        ret, commit = util.run_script_with_timeout("sh %s apply %s " % (script_name,data['project_username']))    
+        if not ret:
+            return json.dumps({'code': 1, 'errmsg': commit})
+        data['version']=''
+        data['commit'] = commit
         data['applicant'] = username
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] = 1
@@ -68,9 +73,6 @@ def apply_list(auth_info,**kwargs):
     try:
         output = ['id','project_id','info','applicant','version','commit','apply_date','status','detail']
         fields = kwargs.get('output', output)
-        #loginname = app.config['cursor'].get_one_result('user',['name'],{'username':username})
-        #print loginname  #{'name': u'\u5218\u5b50\u5e73'} 
-        #loginer = app.config['cursor'].get_results('project_apply',fields,{'applicant':loginname['name']})
         loginer = app.config['cursor'].get_results('project_apply',fields)
 
         where = {'status':['1','2']}
@@ -78,7 +80,7 @@ def apply_list(auth_info,**kwargs):
         #id转换成名字
         id2name_project = app.config['cursor'].projects
         for res in result:
-            res['project_name'] = id2name_project[str(res['project_id'])]           
+            res['project_name'] = id2name_project[str(res['project_id'])] 
 
         util.write_log(username, 'get apply list success!')
         return  json.dumps({'code':0,'data':loginer, 'result':result,'count':len(result)},cls = MyEncoder)
@@ -100,14 +102,13 @@ def apply_one(auth_info,**kwargs):
         result = app.config['cursor'].get_one_result('project_apply',fields,where)
         #id转换成名字
         id2name_project = app.config['cursor'].projects
-        result['project_name'] = id2name_project[str(result['project_id'])] 
+        result['project_name'] = id2name_project[str(result['project_id'])]
 
         util.write_log(username, 'get one apply detail success')
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
         logging.getLogger().error("get apply detail faild : %s"  %  traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'任务详情获取失败!'})
-
 
 #仿真发布 脚本打上version版本号,触发仿真测试代码脚本, 返回执行结果 更新project_apply为2  灰度发布中,插入一条记录到project_deploy,状态为2
 @jsonrpc.method('apply.emulation')
@@ -118,17 +119,19 @@ def apply_emulation(auth_info,**kwargs):
     username = auth_info['username']
     try:
         version = kwargs.get('version')
-        pid = kwargs.get('id')                   #web端 传递过来测试打上的version，申请项目的ID
+        pid = kwargs.get('id')
         data, where = {'version':version,'status':'2'},{'id':pid}
-        logging.getLogger().info(data)
-        pub_result=apply_pub(username,data,where)
-#调用脚本  sh script_name emultion tag commit project_name
-        util.run_script_with_timeout("sh %s emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name']))
-        print "sh %s  emulation %s %s %s" % (script_name,pub_result['version'],pub_result['commit'],pub_result['project_name'])
-        return json.dumps({'code':0, 'result': '仿真发布成功'})
+        result = get_project_info(where)
+        #调用脚本  sh script_name emultion tag commit project_name
+        ret, msg = util.run_script_with_timeout("%s emulation %s %s %s" % (script_name,version,result['commit'],result['name']))
+        if ret:
+            apply_pub(username,data,where)
+            return json.dumps({'code':0, 'result': '仿真发布成功'})
+        else:
+            return json.dumps({'code':1, 'errmsg':'仿真发布失败!'})
     except:
         logging.getLogger().error("apply.emulation get failed : %s" %  traceback.format_exc())
-        return json.dumps({'code':1, 'errmsg':'仿真发布失败~!'})
+        return json.dumps({'code':1, 'errmsg':'仿真发布失败!'})
 
 #仿真失败，取消
 @jsonrpc.method('apply.cancel')
@@ -141,14 +144,14 @@ def apply_cancel(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'4'}
-        cancel_flag=app.config['cursor'].get_one_result('project_apply',['status'],where) #判断申请之后，测试有没有进行仿真测试
-        cancel_flag=cancel_flag['status']                           #1 没有经过仿真测试,取消   2 经过仿真测试之后,取消
-        print cancel_flag
-        pub_result=apply_pub(username,data,where)
+        result = get_project_info(where)
 #调用脚本  sh script_name  cancel_flag project_name 
-        util.run_script_with_timeout("sh %s cancel %s  %s %s" % (script_name,cancel_flag,pub_result['version'],pub_result['project_name']))
-        print "sh %s cancel %s %s" % (script_name,cancel_flag,pub_result['project_name'])
-        return json.dumps({'code':0, 'result': '取消发布成功'})
+        ret, msg = util.run_script_with_timeout("%s cancel %s %s %s" % (script_name,result['status'],result['version'],result['name']))
+        if ret:
+            apply_pub(username,data,where)
+            return json.dumps({'code':0, 'result': '取消发布成功'})
+        else:
+            return json.dumps({'code': 1, 'errmsg': '取消发布失败'})
     except:
         logging.getLogger().error("apply.cancel get failed : %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'取消发布失败'})
@@ -165,11 +168,14 @@ def apply_success(auth_info,**kwargs):
         pid = kwargs.get('where')
         pid = pid['id']
         where,data = {'id':pid},{'status':'3'}
-        pub_result=apply_pub(username,data,where)
+        result = get_project_info(where)
 #调用脚本  sh script_name product_name
-        util.run_script_with_timeout("sh %s product %s" % (script_name,pub_result['project_name']))
-        print "sh %s product %s "  % (script_name,pub_result['project_name'])
-        return json.dumps({'code':0, 'result': '正式发布成功'})
+        ret, msg = util.run_script_with_timeout("%s product %s" % (script_name,result['name']))
+        if ret:
+            apply_pub(username,data,where)
+            return json.dumps({'code':0, 'result': '正式发布成功'})
+        else:
+            return json.dumps({'code':1,'errmsg':'正式上线失败,请联系运维人员!'})
     except:
         logging.getLogger().error("apply success  get failed : %s" % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'正式上线失败,请联系运维人员!'})

@@ -182,6 +182,7 @@ $('#Emulation_btn').on('click',function(){
             swal("OMG",data['errmsg'],"error");
         } 
     })
+    return false;
 })
 
 //弹出详细按钮页面
@@ -238,6 +239,7 @@ function detail(id){
             swal("OMG", data['errmsg'],"error")
         }
     })
+    return false;
 }
 
 
@@ -260,6 +262,7 @@ function product(id){
             swal("ERROR!","正式发布错误","error")
          }
     })
+    return false;
 }
 
 //取消
@@ -280,6 +283,7 @@ function cancel(id){
             swal("No!","网站后端出现错误!","error")
         }
     })
+    return false;
 }
 </script>
 {% endblock %}

@@ -222,10 +222,12 @@ def gitolite():
                 if not any([v['group_all_perm'], v['user_all_perm'], v['group_rw_perm'], v['user_rw_perm']]):
                     continue
                 str2 += "repo %s\n" % k
+                str2 += "    RW+ = admin\n"
                 if v['group_all_perm'] or v['user_all_perm']:
                     str2 += "    RW = %s %s\n" % (v['group_all_perm'], v['user_all_perm'])
                 if v['group_rw_perm'] or v['user_rw_perm']:
                     str2 += "    - master = %s %s\n" % (v['group_rw_perm'], v['user_rw_perm'])
+                    str2 += "    RW = %s %s\n" % (v['group_rw_perm'], v['user_rw_perm'])
             f.write(str2)
 
         res, msg=util.run_script_with_timeout("%s/git.sh" % app.config['script_path'])

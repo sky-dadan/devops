@@ -19,8 +19,8 @@ function emulation(){
         exit 2
     fi
     cd $WORK_DIR$3
-    git tag -a $1  $2 -m  $1 >/dev/null 2>&1
-    git push origin $1  > /dev/null 2>&1
+    git tag -a $1  $2 -m  $1
+    git push origin $1
     if [ $? -ne 0 ];then
         echo "ERROR: 标示版本失败!"
         exit 2
@@ -30,33 +30,37 @@ function emulation(){
     /usr/local/sbin/sa_online.sh sa_backup $2 $3
 
     #rsync 推送代码到灰度
-    /usr/bin/rsync -avz $WORK_DIR$3/ /data/wwwroot/$3/
+    /usr/bin/rsync -avz --exclude=.git $WORK_DIR$3/ /data/wwwroot/$2/
     #/usr/bin/rsync -avz  -e ssh  --exclude=.git --exclude=.svn --exclude=runtime  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  /data/wwwroot/$3  root@$HOST:/data/wwwroot/$3/    #将项目目录的内容rsync到远程主机目录下
     if [ $? -ne 0 ];then
         echo "ERROR: 仿真环境发布失败!"
         exit 2
     fi
 
+    ansible  test1:test2  -a  "mkdir -p /data/wwwroot/$3"
+    ansible test1:test2  -m synchronize -a "src=/data/wwwroot/$3/ dest=/data/wwwroot/$3/ compress=yes"
+
     echo "OK: 仿真环境发布成功!"
 }
 
 
 function cancel(){
-    if [ $# != 3 ];then
-        echo "Usage sh $0 cancel tag project_name"
+    if [ $# -lt 2 ];then
+        echo "Usage sh $0 cancel project_name [tag]"
         exit
     fi
     if [ $1 -eq 1 ];then
         echo "OK: 取消仿真发布成功"
     elif [ $1 -eq 2 ];then
-        cd  $WORK_DIR$3 
-        git push origin --delete tag $2
+        cd  $WORK_DIR$2 
+        git tag -d $3
+        git push origin --delete tag $3
         # ssh root@sa -e "sh script_name status project_name"   sa服务器将代码恢复到上一个版本
         if [ $? -ne 0 ];then
             echo "ERROR: 取消版本失败!"
             exit 2
         fi
-        /usr/local/sbin/sa_online.sh sa_cancel $1 $3
+        #/usr/local/sbin/sa_online.sh sa_cancel $1 $2
         echo "OK: 取消正式发布成功"
     else
         echo "ERROR: 未知发布状态，取消发布失败"
@@ -94,7 +98,7 @@ function apply(){
 
 case $1 in
     cancel)
-        cancel $2 $3 $4;          #$2=cancel_flag  $3=tag  $4=project_name
+        cancel $2 $4 $3;          #$2=cancel_flag  $3=tag  $4=project_name
         ;;
     emulation)
         emulation $2 $3 $4;       #$2=tag $3=commit  $4=project_name

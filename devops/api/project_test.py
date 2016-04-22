@@ -35,16 +35,17 @@ def project_test_create(auth_info, **kwargs):
             return json.dumps({'code':1,'errmsg':msg})
 
         #从脚本获取的两部分内容，一部分是代码Git信息，另一部分是同步的结果
-        res = msg.split()
+        i = msg.find('|ERR:')
+        info, err = (msg[:i], msg[i+1:]) if i > 0 else (msg, '')
 
         #获取上线人，上线时间，commit号，上线说明,然后插入到数据库里
         data['pusher'] = username
         data['push_date'] = time.strftime('%Y-%m-%d %H:%M:%S')
-        data['commit'] = res[0][:7]
-        data['comment'] = res[0][8:]
+        data['commit'] = info[:7]
+        data['comment'] = info[8:]
 
-        if len(res) > 1:
-            return json.dumps({'code': 1, 'errmsg': '\n'.join(res[1:])})
+        if err:
+            return json.dumps({'code': 1, 'errmsg': '\n'.join(err.split('|'))})
 
         app.config['cursor'].execute_insert_sql('project_test', data)
         util.write_log(username,{'code':0,'result':'add project_test success'})

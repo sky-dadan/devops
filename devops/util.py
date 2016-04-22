@@ -121,52 +121,47 @@ def check_name(name):
     else:
         return False
 
-def run_script(cmd, queue=None):
+def run_script(cmd, res=None):
     if isinstance(cmd, str) or isinstance(cmd, unicode):
         cmd = shlex.split(cmd.strip())
     elif not isinstance(cmd, list):
         logging.getLogger().warning("执行命令格式不正确。命令为: %s" % str(cmd))
-        return None
 
     try:
         subproc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        if queue:
-            queue.put(subproc)
+        if res is not None:
+            res['proc'] = subproc
         out = subproc.stdout.read().strip()
-        if queue:
-            queue.put(out)
+        if res is not None:
+            res['output'] = out
         logging.getLogger().info("执行命令[%s]结果: %s" % (' '.join(cmd), out))
         return out
     except:
-        if queue:
-            queue.put(None)
-            queue.put('ERROR: 执行脚本异常')
+        if res is not None:
+            res['output'] = 'ERROR: 执行脚本异常'
         logging.getLogger().warning("执行命令[%s]异常: %s" % (' '.join(cmd), traceback.format_exc()))
-        return None
 
 def run_script_with_timeout(cmd, timeout=30):
-    queue = multiprocessing.Queue()
+    manager = multiprocessing.Manager()
+    res = manager.dict()
     try:
-        process = multiprocessing.Process(target=run_script, args=(cmd, queue))
+        process = multiprocessing.Process(target=run_script, args=(cmd, res))
         process.start()
         process.join(timeout)
-        subproc = queue.get(2)
         if process.is_alive():
-            subproc.terminate()
+            if 'proc' in res:
+                res['proc'].terminate()
             process.terminate()
             logging.getLogger().warning("执行命令超时退出")
         else:
-            ret = queue.get(2)
-            if ret:
-                last_line = ret.strip().split('\n')[-1].strip()
+            if 'output' in res:
+                last_line = res['output'].strip().split('\n')[-1].strip()
                 if last_line.startswith('OK:'):
                     return True, last_line[3:].strip()
                 else:
                     return False, last_line[6:].strip() if last_line.startswith('ERROR:') else last_line
     except:
         logging.getLogger().warning("执行超时命令[%s]异常: %s" % (cmd, traceback.format_exc()))
-    finally:
-        queue.close()
     return False, ''
 
 #获取一个组里面所有的用户列表

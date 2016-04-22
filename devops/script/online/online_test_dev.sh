@@ -47,6 +47,6 @@ do
 #将新项目整个目录rsync到远程主机目录
     /usr/bin/rsync -avz --timeout=20  -e ssh  --exclude=.git --exclude=.svn   /data/gitclone_dev/$1 root@$ip:/data/wwwroot/ &>/dev/null
     if [ $? -ne 0 ];then
-        echo -n " $ip同步代码失败!"
+        echo -n "|ERR:$ip同步代码失败!"
     fi
 done

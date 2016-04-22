@@ -35,6 +35,7 @@ function apply(){
         echo "ERROR: 更新项目失败"
         exit 1
     fi
+    chown -R www:www $CLONE_DIR$1
     commit=`git log  --oneline -1 --pretty=format:"%h"`
     echo "OK: $commit"
 }
@@ -49,9 +50,13 @@ function emulation(){
     #拉取最新的git代码
     cd   $CLONE_DIR$3  
     git tag -a $1  $2 -m  $1
+    if [ $? -ne 0 ];then
+        echo "ERROR: 标示本地版本失败!"
+        exit 2
+    fi
     git push origin $1
     if [ $? -ne 0 ];then
-        echo "ERROR: 标示版本失败!"
+        echo "ERROR: 标示的版本失败!"
         exit 2
     fi
     
@@ -115,7 +120,6 @@ function product(){
     #将$WORK_DIR下面的项目通过ansible批量推送到目标服务器
     ansible  web  -a  "mkdir -p /data/wwwroot/$1" 2>&1 >/dev/null
     ansible web  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes" 2>&1 >/dev/null
-    ansible  web  -a  "chown -R www:www /data/wwwroot/$1" 2>&1 >/dev/null
     echo "OK: 正式发布成功"
 }
 

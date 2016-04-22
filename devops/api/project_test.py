@@ -7,7 +7,6 @@ import logging, util
 import json, traceback,os,sys
 from auth import auth_login
 import time,requests
-from jsondate import MyEncoder
 from user_perm import getid_list
 
 
@@ -70,8 +69,9 @@ def project_test_getlist(auth_info, **kwargs):
         projects = util.user_projects(username, app.config['cursor'])
         for res in result:
             res['project_id'] = projects[str(res['project_id'])]
+            res['push_date'] = str(res['push_date'])
         util.write_log(username, '查询项目成功') 
-        return json.dumps({'code':0,'result':result},cls=MyEncoder)
+        return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error("select project error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目错误'})
@@ -93,10 +93,11 @@ def project_test_get(auth_info, **kwargs):
             res = {}
             for i,k in enumerate(fields):
                 res[k] = row[i]
+            res['push_date'] = str(res['push_date'])
             result.append(res)
         app.config['cursor'].close_db()
         util.write_log(username, '查询项目成功') 
-        return json.dumps({'code':0,'result':result},cls=MyEncoder)
+        return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error("select project error: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询项目错误'})

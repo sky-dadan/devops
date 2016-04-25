@@ -113,7 +113,7 @@ def git_get(auth_info, **kwargs):
         #得到项目id为where条件的结果
         result = app.config['cursor'].get_one_result('project', pro_fields,where) 
         #更新result['principal']的值，将id替换成负责人的用户名
-        result['principal'] = users[str(result['principal'])]
+        result['principal'] = users.get(str(result['principal']),'')
         #将权限表的数据追加到result字典里
         result.update(projects[result['name']])
 
@@ -149,7 +149,7 @@ def git_getlist(auth_info, **kwargs):
         #将负责人id替换成name
         url_prefix = app.config.get('git_url_prefix', '').strip('/')
         for res in result:
-            res['principal'] = users[str(res['principal'])]
+            res['principal'] = users.get(str(res['principal']),'')
             if not res['path'].startswith("http://"):
                 res['path'] = '/'.join([url_prefix, res['path'].strip('/')])
         #将权限信息追加到result字典里

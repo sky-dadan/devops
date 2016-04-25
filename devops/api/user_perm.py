@@ -74,7 +74,7 @@ def createuser(auth_info,**kwargs):
         data['join_date'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         app.config['cursor'].execute_insert_sql('user', data)
 
-        if not git_passwd(username, data['password']):
+        if not git_passwd(data['username'], data['password']):
             return json.dumps({'code': 1, 'errmsg': '创建Git密码失败，请检查配置环境'})
         util.write_log(username, "create_user %s" % data['username'])
         return json.dumps({'code': 0, 'result': '创建用户%s成功' % data['username']})
@@ -225,6 +225,7 @@ def passwd(auth_info):
                 return json.dumps({'code':1,'errmsg':'需要更改密码的用户不存在'})
             password = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_update_sql('user', {'password': password}, {'id': user_id})
+            name = app.config['cursor'].get_one_result('user', ['username'], {'id': user_id}).get('username')
         else:                  #user  need input oldpassword
             if not data.has_key("oldpassword") :
                 return json.dumps({'code':1,'errmsg':'需要提供原密码'})
@@ -234,10 +235,11 @@ def passwd(auth_info):
                 return json.dumps({'code':1,'errmsg':'原密码输入有误'})
             password = hashlib.md5(data['password']).hexdigest()
             app.config['cursor'].execute_update_sql('user', {'password': password}, {'username': username})
+            name = username
 
-        if not git_passwd(username, data['password']):
+        if not git_passwd(name, data['password']):
             return json.dumps({'code': 1, 'errmsg': 'Git密码更新失败，请联系管理员'})
-        util.write_log(username,'update user password')
+        util.write_log(username,"update user '%s' password" % name)
         return json.dumps({'code':0,'result':'更新密码成功'})
     except:
         logging.getLogger().error('update user password error : %s' % traceback.format_exc())

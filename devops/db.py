@@ -34,7 +34,7 @@ class Cursor():
         fields, values = [], []
         for k, v in data.items():
             fields.append(k)
-            values.append("'%s'" % v)
+            values.append("'%s'" % v.replace("'", '"'))
         sql = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(values))
         logging.getLogger().info("Insert sql: %s" % sql)
         return sql
@@ -105,9 +105,9 @@ class Cursor():
             return ""
         where_cond = ["%s='%s'" % (k, v) for k,v in where.items()]
         if fields:
-            conditions = ["%s='%s'" % (k, data[k]) for k in fields]
+            conditions = ["%s='%s'" % (k, data[k].replace("'", '"')) for k in fields]
         else:
-            conditions = ["%s='%s'" % (k, data[k]) for k in data]
+            conditions = ["%s='%s'" % (k, data[k].replace("'", '"')) for k in data]
         sql = "UPDATE %s SET %s WHERE %s" % (table_name, ','.join(conditions), ' AND '.join(where_cond))
         logging.getLogger().info("Update sql: %s" % sql)
         return sql

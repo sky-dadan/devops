@@ -257,17 +257,18 @@ def login():
             if not (username and passwd):
                 return json.dumps({'code': 1, 'errmsg': "需要输入用户名和密码"})
 
-            result = app.config['cursor'].get_one_result('user', ['id', 'username', 'password', 'role', 'is_lock'], {'username': username})
+            result = app.config['cursor'].get_one_result('user', ['id', 'username', 'password', 'role', 'is_lock', 'last_login'], {'username': username})
             if not result:
                 return json.dumps({'code': 1, 'errmsg': "用户不存在"})
             if result['is_lock'] == 1:
                 return json.dumps({'code': 1, 'errmsg': "用户已被锁定"})
 
             if passwd == result['password']:
+                first_login = False if result['last_login'] else True
                 data = {'last_login': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))}
                 app.config['cursor'].execute_update_sql('user', data, {'username': username})
                 s = util.get_validate(result['username'], result['id'], result['role'], app.config['passport_key'])
-                return json.dumps({'code': 0, 'authorization': s})
+                return json.dumps({'code': 0, 'authorization': s, 'first_login': first_login})
             else:
                 return json.dumps({'code': 1, 'errmsg': "输入密码有误"})
         except:

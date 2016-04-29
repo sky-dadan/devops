@@ -11,6 +11,8 @@ headers = {'content-type': 'application/json'}
 def index():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    if session.get('first_login', False):
+        return render_template('reset_pwd.html', info=session)
     headers['authorization'] = session['author']
     url = "http://%s/api" % app.config['api_host']
     data = {'jsonrpc': '2.0', 'id': 1, 'method': 'user.getinfo'}
@@ -101,6 +103,7 @@ def chpwdoneself():
         return redirect('/login')
     headers['authorization'] = session['author']
     if request.method == 'POST':
+        session['first_login'] = False
         oldpasswd = request.form.get('oldpasswd')
         newpasswd = request.form.get('newpasswd')
         data = {'oldpassword':oldpasswd,'password':newpasswd}

@@ -19,6 +19,7 @@ def login():
             res = util.validate(token,app.config['passport_key'])  #返回json对象
             res = json.loads(res)                        #return : dict(username:*,uid:*,role:*)
             session['author'] = token
+            session['first_login'] = result['first_login']
     	    return json.dumps({'code':0})
         else:
             return json.dumps({'code':1,'errmsg':result['errmsg']})

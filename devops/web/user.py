@@ -24,6 +24,7 @@ def index():
         session['group'] = user['r_id']
         session['perm'] = user['p_id'].keys()
         session['username'] = user['name'] if user['name'] else user['username']
+        session['pre_click'] = 'index'
 
         user['groups'] = ','.join(user['r_id'])
         user['perm'] = ','.join(['<a href="%s" style="color:blue">%s</a>' % (x['url'], x['name_cn']) for x in user['p_id'].values()])
@@ -37,6 +38,7 @@ def index():
 def useradd():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'user'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
@@ -49,6 +51,7 @@ def useradd():
 def user_list():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'user'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
@@ -62,6 +65,7 @@ def user_list():
 def role_list():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'user'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
@@ -74,6 +78,7 @@ def role_list():
 def power_list():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'perm'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:

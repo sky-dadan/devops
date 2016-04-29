@@ -49,10 +49,18 @@
 <div id="sidebar">
     <ul>
 		<li class="active"><a href="/"><i class="icon icon-home"></i> <span>控制面板</span></a> </li>
+        {% if 'pre_click' in info and info.pre_click == 'user' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
              <a href="javascript:;">
                  <i class="icon icon-user-md"></i><span>账号中心</span>
+                {% if 'pre_click' in info and info.pre_click == 'user' %}
+                <span class="arrow icon-chevron-up icon-chevron-down"></span>
+                {% else %}
                 <span class="arrow icon-chevron-up"></span>
+                {% endif %}
             </a>
             {% if info and info.role == 0 %}
             <ul>
@@ -62,10 +70,18 @@
             </ul>
             {% endif %}
         </li>  <!--end user-->
+        {% if 'pre_click' in info and info.pre_click == 'perm' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
         <a href="javascript:;">
             <i class="icon icon-bell"></i><span>权限管理</span>
+            {% if 'pre_click' in info and info.pre_click == 'perm' %}
+            <span class="arrow icon-chevron-up icon-chevron-down"></span>
+            {% else %}
             <span class="arrow icon-chevron-up"></span>
+            {% endif %}
         </a>
         {% if info and info.role == 0 %}
         <ul>
@@ -73,10 +89,18 @@
         </ul>
         {% endif %}
         </li> <!--end priviage-->
+        {% if 'pre_click' in info and info.pre_click == 'cmdb' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
         <a href="javascript:;">
             <i class="icon icon-star"></i><span>CMDB系统</span>
+            {% if 'pre_click' in info and info.pre_click == 'cmdb' %}
+            <span class="arrow icon-chevron-up icon-chevron-down"></span>
+            {% else %}
             <span class="arrow icon-chevron-up"></span>
+            {% endif %}
         </a>
         {% if info and info.role == 0 %}
         <ul>
@@ -90,10 +114,18 @@
         </ul>
         {% endif %}
         </li> <!--end cmdb-->
+        {% if 'pre_click' in info and info.pre_click == 'git' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
         <a href="javascript:;">
             <i class="icon icon-file"></i><span>代码管理</span>
+            {% if 'pre_click' in info and info.pre_click == 'git' %}
+            <span class="arrow icon-chevron-up icon-chevron-down"></span>
+            {% else %}
             <span class="arrow icon-chevron-up"></span>
+            {% endif %}
         </a>
         {% if info and 'git' in info.perm %}
         <ul>
@@ -101,10 +133,18 @@
         </ul>
         {% endif %}
         </li> <!--end git-->
+        {% if 'pre_click' in info and info.pre_click == 'deploy' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
         <a href="javascript:;">
             <i class="icon icon-tag"></i><span>发布系统</span>
+            {% if 'pre_click' in info and info.pre_click == 'deploy' %}
+            <span class="arrow icon-chevron-up icon-chevron-down"></span>
+            {% else %}
             <span class="arrow icon-chevron-up"></span>
+            {% endif %}
         </a>
         <ul>
             {% if info and 'testing' in info.perm %}
@@ -121,10 +161,18 @@
             {% endif %}
         </ul>
         </li> <!--end project-->
+        {% if 'pre_click' in info and info.pre_click == 'ext' %}
+        <li class="submenu open">
+        {% else %}
         <li class="submenu">
+        {% endif %}
         <a href="javascript:;">
             <i class="icon icon-wrench"></i><span>扩展接口</span>
+            {% if 'pre_click' in info and info.pre_click == 'ext' %}
+            <span class="arrow icon-chevron-up icon-chevron-down"></span>
+            {% else %}
             <span class="arrow icon-chevron-up"></span>
+            {% endif %}
         </a>
         <ul>
             {% if info and 'cdn' in info.perm %}

@@ -15,6 +15,7 @@ data = {
 def git():
     if session.get('username')  == None:
        return redirect('/login')
+    session['pre_click'] = 'git'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     name = session['username']

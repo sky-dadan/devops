@@ -18,6 +18,7 @@ data = {
 def project_apply():
     if session.get('author',"nologin")  == "nologin":
        return redirect('/login')
+    session['pre_click'] = 'deploy'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
@@ -39,6 +40,7 @@ def project_apply():
 def apply_list():
     if  session.get('author','nologin') == 'nologin':
        return redirect('/login')
+    session['pre_click'] = 'deploy'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
@@ -86,6 +88,7 @@ def success():
 def deploy_list():
     if  session.get('author','nologin') == 'nologin':
        return redirect('/login')
+    session['pre_click'] = 'deploy'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:

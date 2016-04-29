@@ -46,6 +46,7 @@ def post_cdn():
 def cdn():
     if session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'ext'
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
 
     if request.method == 'GET':
@@ -60,6 +61,7 @@ def cdn():
 def dbreset():
     if session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'ext'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
 
@@ -73,6 +75,7 @@ def dbreset():
 def phpmyadmin():
     if session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'ext'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
 

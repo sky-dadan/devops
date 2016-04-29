@@ -15,6 +15,7 @@ data = {
 def testing():
     if  session.get('author','nologin') == 'nologin':
         return redirect('/login')
+    session['pre_click'] = 'deploy'
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:

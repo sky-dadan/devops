@@ -1,7 +1,7 @@
 #coding:utf-8
 from flask import Flask,request,session,render_template,redirect
 from  . import app  
-import requests,json 
+import requests,json,urllib 
 import util 
 
 headers = {'content-type': 'application/json'}
@@ -11,7 +11,7 @@ def login():
     if request.method == 'POST':
         username = request.form.get('user_mail')
         password = request.form.get('user_pwd')
-        url = "http://%s/api/auth?username=%s&passwd=%s" % (app.config['api_host'],username,password)
+        url = "http://%s/api/auth?%s" % (app.config['api_host'],urllib.urlencode({'username': username, 'passwd': password}))
         r = requests.get(url, headers=headers)      #for get all user
         result = json.loads(r.content)
         if result['code'] == 0:

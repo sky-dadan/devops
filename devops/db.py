@@ -106,9 +106,9 @@ class Cursor():
             return ""
         where_cond = ["%s='%s'" % (k, v) for k,v in where.items()]
         if fields:
-            conditions = ["%s='%s'" % (k, (data[k].replace("'", '"') if isinstance(v, str) or isinstance(v, unicode) else v)) for k in fields]
+            conditions = ["%s='%s'" % (k, (data[k].replace("'", '"') if isinstance(data[k], str) or isinstance(data[k], unicode) else data[k])) for k in fields]
         else:
-            conditions = ["%s='%s'" % (k, (data[k].replace("'", '"') if isinstance(v, str) or isinstance(v, unicode) else v)) for k in data]
+            conditions = ["%s='%s'" % (k, (data[k].replace("'", '"') if isinstance(data[k], str) or isinstance(data[k], unicode) else data[k])) for k in data]
         sql = "UPDATE %s SET %s WHERE %s" % (table_name, ','.join(conditions), ' AND '.join(where_cond))
         logging.getLogger().info("Update sql: %s" % sql)
         return sql

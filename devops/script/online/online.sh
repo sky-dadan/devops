@@ -25,12 +25,12 @@ function apply(){
     #如果项目不存在，则clone下来
     cd $CLONE_DIR
     if [ ! -d $1 ]; then
-        git clone  git@127.0.0.1:$1 &>/dev/null
+        git clone  git@127.0.0.1:$1
     fi
      
     #拉取最新的代码，并记录commit
     cd $1
-    git pull > /dev/null 2>&1
+    git pull
     if [ $? -ne 0 ];then
         echo "ERROR: 更新项目失败"
         exit 1
@@ -118,8 +118,8 @@ function product(){
         exit  2
     fi
     #将$WORK_DIR下面的项目通过ansible批量推送到目标服务器
-    ansible  web  -a  "mkdir -p /data/wwwroot/$1" 2>&1 >/dev/null
-    ansible web  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes" 2>&1 >/dev/null
+    ansible  web  -a  "mkdir -p /data/wwwroot/$1"
+    ansible web  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
     echo "OK: 正式发布成功"
 }
 

@@ -118,8 +118,8 @@ function product(){
         exit  2
     fi
     #将$WORK_DIR下面的项目通过ansible批量推送到目标服务器
-    ansible  web  -a  "mkdir -p /data/wwwroot/$1"
-    ansible web  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
+    ansible  web:nginx1  -a  "mkdir -p /data/wwwroot/$1"
+    ansible web:nginx1  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
     echo "OK: 正式发布成功"
 }
 

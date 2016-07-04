@@ -71,6 +71,7 @@ function emulation(){
 
     #将$CLONE_DIR里面的代码rsync到$WORK_DIR下面
     /usr/bin/rsync -avz    --exclude=.git  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $CLONE_DIR$3/ $WORK_DIR$3 
+  #  /usr/bin/rsync -avz    --exclude=.git  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat    $CLONE_DIR$3/ $WORK_DIR$3 
     if [ $? -ne 0 ];then
         echo "ERROR: 仿真环境同步失败!"
         exit 2
@@ -118,8 +119,8 @@ function product(){
         exit  2
     fi
     #将$WORK_DIR下面的项目通过ansible批量推送到目标服务器
-    ansible  web:nginx1  -a  "mkdir -p /data/wwwroot/$1"
-    ansible web:nginx1  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
+    ansible  web:nginx1:im  -a  "mkdir -p /data/wwwroot/$1"
+    ansible web:nginx1:im  -m synchronize -a "src=/data/wwwroot/$1/ dest=/data/wwwroot/$1/ compress=yes"
     echo "OK: 正式发布成功"
 }
 

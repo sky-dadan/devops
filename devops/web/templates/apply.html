@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block css %}
 <link rel="stylesheet"type="text/css"href="/static/css/jquery.dataTables.min.css">
+<link rel="stylesheet"type="text/css"href="/static/css/bootstrapSwitch.css">
 <style>   
 .table th, .table td { 
 text-align: center; 
@@ -35,25 +36,33 @@ position:static;
       <form class="form-horizontal" id="applyform">
         <input type="hidden" id='project_id' name="project_id">  <!--update need id-->
         <input type="hidden" id='applicant' name="applicant">  <!--获取当前用户-->
-     	<div class="form-group">
+     	<div class="control-group">
             <label class="control-label">项目名</label>
      		 <div class="controls">
        		 	<input id="project_name"  type="text"  name="project_username">
       		</div> 
        	</div> <!--project_name end-->
-     	<div class="form-group">
+     	<div class="control-group">
             <label class="control-label">发布简介</label>
      		 <div class="controls">
        		 	<input id="info"   type="text"  name="info" />
       		</div>  
        	</div> <!-- project_info  end-->
-        <div class="form-group">
+        <div class="control-group">
             <label class="control-label">发布详情</label>
       		<div class="controls">
                 <textarea id="detail" type="text"  rows="5" name="detail" ></textarea>
        		</div> 
 		</div><!--project_detail  end -->
-    	<div class="form-group">
+        <div class="control-group">
+            <label class="control-label">发布类型</label>
+                <div class="controls">
+                      <div class="switch" data-off="primary" data-off-label="正常" data-on="danger" data-on-label="紧急">
+                <input id="apply_type" name="apply_type" type="checkbox" />
+                </div>
+                      </div>
+              </div><!--apply_type  end -->
+    	<div class="control-group">
      		<div class="modal-footer">
                 <button type="submit" class="btn btn-primary" >确定</button>
                 <button class="btn btn-warning" data-dismiss="modal">取消</button>
@@ -99,6 +108,7 @@ position:static;
 
 {% block js %}
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrapSwitch.js"></script>
 <script>
 name = "apply"
 /*datatable function*/

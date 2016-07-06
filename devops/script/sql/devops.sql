@@ -281,6 +281,7 @@ CREATE TABLE `project_apply` (
   `version` varchar(64) DEFAULT NULL COMMENT '发布版本',
   `commit` varchar(64) NOT NULL COMMENT '代码最新版本',
   `apply_date` datetime NOT NULL COMMENT '申请时间',
+  `apply_type` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发布类型，0为正常，1为紧急',
   `status` int(10) DEFAULT 0 COMMENT '发布状态',
   `detail` text COMMENT '发布详情',
   PRIMARY KEY (`id`),
@@ -303,6 +304,7 @@ CREATE TABLE `project_deploy` (
   `commit` varchar(64) NOT NULL COMMENT '代码最新版本',
   `applicant` varchar(64) NOT NULL COMMENT '操作人',
   `apply_date` datetime NOT NULL COMMENT '操作时间',
+  `apply_type` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发布类型，0为正常，1为紧急',
   `status` int(10) DEFAULT 0 COMMENT '发布状态',
   `detail` text COMMENT '发布详情',
   PRIMARY KEY (`id`)

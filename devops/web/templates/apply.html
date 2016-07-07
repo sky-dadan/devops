@@ -172,7 +172,7 @@ list()
 $("tbody").on('click','.applybtn',function(){
     var project_name = $(this).attr('data')
     var project_id = $(this).attr('data-id')
-    var applicant = '{{ info.username }}'
+    var applicant = '{% if info %}{{ info.username }}{% endif %}'
     $('#project_name').val(project_name)
     $('#project_id').val(project_id)
     $('#applicant').val(applicant)

@@ -28,12 +28,38 @@ def get_config(config_filename, section=''):
        conf_items.update(config.items(section))
     return conf_items
 
+class ConcurrentDayRotatingFileHandler(logging.handlers.BaseRotatingHandler):
+    def __init__(self, filename, encoding=None, delay=False):
+        logging.handlers.BaseRotatingHandler.__init__(self, filename, 'a', encoding, delay)
+        self.day = time.strftime('%Y-%m-%d', time.localtime())
+
+    def shouldRollover(self, record):
+        now_day = time.strftime('%Y-%m-%d', time.localtime())
+        if self.stream is None:
+            self.stream = self._open()
+        if now_day == self.day:
+            return False
+        return True
+
+    def doRollover(self):
+        if self.stream:
+            self.stream.close()
+            self.stream = None
+
+        rotate_log = "%s.%s" % (self.baseFilename, self.day)
+        if not os.path.exists(rotate_log):
+            os.rename(self.baseFilename, rotate_log)
+        self.day = time.strftime('%Y-%m-%d', time.localtime())
+
+        if not self.delay:
+            self.stream = self._open()
+
 def set_logging(log_path, log_level='error'):
     def add_handler(log_name, formatter, level, logger=None):
         if not logger:
             return
 
-        log_handler = logging.handlers.TimedRotatingFileHandler(log_name, when='midnight')
+        log_handler = ConcurrentDayRotatingFileHandler(log_name)
         log_formatter = logging.Formatter(formatter)
         log_handler.setFormatter(log_formatter)
         logger.addHandler(log_handler)

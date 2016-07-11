@@ -14,7 +14,7 @@ script_name='/usr/local/devops/devops/script/online/online.sh'
 
 def get_project_info(where):
     id2name_project = app.config['cursor'].projects
-    res = app.config['cursor'].get_one_result('project_apply', ['project_id', 'version', 'commit', 'status'], where)
+    res = app.config['cursor'].get_one_result('project_apply', ['project_id', 'version', 'commit', 'apply_type', 'status'], where)
     res['name'] = id2name_project[str(res['project_id'])]
     return res
 
@@ -38,7 +38,13 @@ def apply_create(auth_info, **kwargs):
     role = int(auth_info['role'])
     try:
         data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
-        ret, commit = util.run_script_with_timeout("sh %s apply %s " % (script_name,data['project_username']))    
+        # 如果key 'apply_type'存在字典里，说明是紧急发布，不存在，是正常发布
+        if 'apply_type' in data:
+            data['apply_type'] = 1 # 紧急发布
+        else:
+            data['apply_type'] = 0 # 正常发布
+
+        ret, commit = util.run_script_with_timeout("sh %s apply %s %d" % (script_name,data['project_username'], data['apply_type']))    
         if not ret:
             return json.dumps({'code': 1, 'errmsg': commit})
         data['version']=''
@@ -71,7 +77,7 @@ def apply_list(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = ['id','project_id','info','applicant','version','commit','apply_date','status','detail']
+        output = ['id','project_id','info','applicant','version','commit','apply_date','apply_type', 'status','detail']
         fields = kwargs.get('output', output)
         loginer = app.config['cursor'].get_results('project_apply',fields)
 
@@ -123,7 +129,7 @@ def apply_emulation(auth_info,**kwargs):
         data, where = {'version':version,'status':'2'},{'id':pid}
         result = get_project_info(where)
         #调用脚本  sh script_name emultion tag commit project_name
-        ret, msg = util.run_script_with_timeout("%s emulation %s %s %s" % (script_name,version,result['commit'],result['name']))
+        ret, msg = util.run_script_with_timeout("%s emulation %s %s %s %d" % (script_name,version,result['commit'],result['name'], result['apply_type']))
         if ret:
             apply_pub(username,data,where)
             return json.dumps({'code':0, 'result': '仿真发布成功'})
@@ -146,7 +152,7 @@ def apply_cancel(auth_info,**kwargs):
         where,data = {'id':pid},{'status':'4'}
         result = get_project_info(where)
 #调用脚本  sh script_name  cancel_flag project_name 
-        ret, msg = util.run_script_with_timeout("%s cancel %s %s %s" % (script_name,result['status'],result['version'],result['name']))
+        ret, msg = util.run_script_with_timeout("%s cancel %s %s %s %d" % (script_name,result['status'], result['name'], result['version'], result['apply_type']))
         if ret:
             apply_pub(username,data,where)
             return json.dumps({'code':0, 'result': '取消发布成功'})

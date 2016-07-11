@@ -10,7 +10,8 @@ from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
 
-script_name='/usr/local/devops/devops/script/online/online.sh'
+#script_name='/usr/local/devops/devops/script/online/online.sh'
+script_name='/home/zhangxunan/myproject/devops.aiyuanxin.com/devops/script/online/online.sh'
 
 def get_project_info(where):
     id2name_project = app.config['cursor'].projects
@@ -207,7 +208,7 @@ def deploy_list(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        fields = ['project_id','applicant','version','commit','apply_date','status']
+        fields = ['project_id','applicant','version','commit','apply_date','apply_type','status']
         sql = 'SELECT %s FROM (SELECT %s FROM project_deploy ORDER BY apply_date DESC) AS tbl GROUP BY commit, project_id' % (','.join(fields), ','.join(fields))
         app.config['cursor'].execute(sql)
         result_sets = app.config['cursor'].fetchall()
@@ -229,7 +230,7 @@ def deploy_get(auth_info, **kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        fields = ['id', 'project_id','info','applicant','version','commit','apply_date','status','detail']
+        fields = ['id', 'project_id','info','applicant','version','commit','apply_date','apply_type','status','detail']
         if 'ver' in kwargs.get('args', {}):
             where = {'project_id': kwargs.get('where', {}).get('id'), 'commit': kwargs.get('args', {}).get('ver')}
             deploy_result = app.config['cursor'].get_results('project_deploy', fields, where)

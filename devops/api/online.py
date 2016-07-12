@@ -10,8 +10,7 @@ from auth import auth_login
 from jsondate import MyEncoder
 from user_perm import getid_list
 
-#script_name='/usr/local/devops/devops/script/online/online.sh'
-script_name='/home/zhangxunan/myproject/devops.aiyuanxin.com/devops/script/online/online.sh'
+script_name='/usr/local/devops/devops/script/online/online.sh'
 
 def get_project_info(where):
     id2name_project = app.config['cursor'].projects

@@ -177,7 +177,7 @@ def apply_success(auth_info,**kwargs):
         where,data = {'id':pid},{'status':'3'}
         result = get_project_info(where)
 #调用脚本  sh script_name product_name
-        ret, msg = util.run_script_with_timeout("%s product %s" % (script_name,result['name']))
+        ret, msg = util.run_script_with_timeout("%s product %s %s" % (script_name,result['name'],result['apply_type']))
         if ret:
             apply_pub(username,data,where)
             return json.dumps({'code':0, 'result': '正式发布成功'})

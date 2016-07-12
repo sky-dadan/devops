@@ -185,7 +185,7 @@
             <li ><a href="/phpmyadmin">访问仿真数据库</a></li>
             {% endif %}
             {% if info and 'jumpserver' in info.perm %}
-            <li ><a href="http://jump.aiyuanxin.com/login?auth={{ info.author }}&fix_pwd=123456" target="_blank">JumpServer</a></li>
+            <li ><a href="http://jump.aiyuanxin.com/login?auth={{ info.author }}&fix_pwd={{ info.fix_pwd }}" target="_blank">JumpServer</a></li>
             {% endif %}
         </ul>
         </li> <!--end priviage-->

@@ -102,7 +102,7 @@ def apply_one(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = ['id','project_id','info','applicant','version','commit','apply_date','status','detail']
+        output = ['id','project_id','info','applicant','version','commit','apply_date','apply_type','status','detail']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('project_apply',fields,where)

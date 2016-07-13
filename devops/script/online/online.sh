@@ -60,6 +60,8 @@ function apply(){
 function emu_prepare(){     #tag  commit  project_name  path($CLONE_DIR|$URGENT)
     if [ $4 == '/data/urgent/' ];then
        tmp=${2}_urgent
+    else
+       tmp=$2
     fi
     cd $4$3
     git tag -a $1 $2 -m $1

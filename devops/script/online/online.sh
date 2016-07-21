@@ -74,7 +74,7 @@ function emu_prepare(){     #tag  commit  project_name  path($CLONE_DIR|$URGENT)
         echo  "ERROR: 标示远程版本失败!"
         exit 2
     fi
-    tar zcf $4$3/$tmp.tar.gz -C $WORK_DIR $3
+    tar zcf $BACK_UP$3/$tmp.tar.gz -C $WORK_DIR $3
     if [ $? -ne 0 ];then
         echo "ERROR: 备份代码失败!"
         exit 2

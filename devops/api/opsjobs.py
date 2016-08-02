@@ -19,6 +19,10 @@ def opsjob_create(auth_info, **kwargs):
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] , data['apply_persion'] = 0, username
         app.config['cursor'].execute_insert_sql('ops_jobs',data)
+        '''sendemail'''
+        smtp_to = ['sa@yuanxin-inc.com']              #给运维部门发送邮件
+        send_info = '%s提交工单申请，运维同事请及时处理!'  % username
+        util.sendmail(app.config, smtp_to,'圆心运维工单申请',send_info)
         util.write_log(username, "create opsjonb  create")
         print data
         return json.dumps({'code':0,'result':'创建工单成功!'})
@@ -92,18 +96,29 @@ def opsjob_deal(auth_info, **kwargs):
     try:
         username = auth_info['username']
         data = request.get_json()['params']   # data = {'where':{'id':3},'status':0,'deal_desc':'deal desc comment'}
+        status = data.get('status',None)
         data['deal_persion'] = username
         where = data['where']
+        result = app.config['cursor'].get_one_result('ops_jobs',['apply_persion','apply_type','apply_desc'],where)
         data.pop('where')
-        if data['status'] == 0:       #工单改为处理状态
+        if status is None:       #工单改为处理状态
             data['status'] = 1
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             util.write_log(username, ' opsjobs 正在处理中......')
+            smtp_to = [result['apply_persion']+'@yuanxin-inc.com']
+            smtp_info = '%s您提交的工单正在处理中.......'  % result['apply_persion']
+            util.sendmail(app.config,smtp_to, '圆心运维工单',smtp_info)
             print  data,where
             return json.dumps({'code':0,'result':'工单正在处理中......'})
         else:                          #工单处理结束
             data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
+            if result['apply_type'] == 1:        #DB类型的修改操作，需要通知测试组
+                smtp_to = ['test@yuanxin-inc.com',result['apply_persion']+'@yuanxin-inc.com']
+            else:
+                smtp_to = [result['apply_persion']+'@yuanxin-inc.com']
+            smtp_info = '%s提交的工单已经处理完成' % username  +  '\n'  + data['deal_desc']
+            util.sendmail(app.config,smtp_to,'圆心运维工单',smtp_info)
             util.write_log(username, 'finish the ope job')
             return json.dumps({'code':0,'result':'ope job处理完成!'})
     except:

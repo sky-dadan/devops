@@ -26,47 +26,6 @@ def opsjob_create(auth_info, **kwargs):
         logging.getLogger().error('opsjob create error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'工单申请失败!'})
 
-#工单处理中..........
-@jsonrpc.method('opsjob.deal')
-@auth_login
-def opsjob_deal(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
-    try:
-        jid = kwargs.get('where')
-        where, data = {'id':jid['id']}, {'deal_persion':username,'status':'1'}
-        app.config['cursor'].execute_update_sql('ops_jobs',data,where)
-        util.write_log(username, "opsjob 正在处理中.......")
-        print  data, where
-        return json.dumps({'code':0,'result':'状态改变成功!'})
-    except:
-        logging.getLogger().error('opsjob deal error  : %s'  %  traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'工单处理失败!'})
-
-#工单处理结束.......
-@jsonrpc.method('opsjob.finish')
-@auth_login
-def opsjob_finish(auth_info, **kwargs):
-    if auth_info['code'] == 1:
-        return jons.dumps(auth_info)
-    if auth_info['role'] != '0':
-        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
-    username = auth_info['username']
-    try:
-        data = request.get_json()['params']
-        where = data['where']
-        data['deal_time'] = time.strftime('%Y-%m-%d %H:%M')
-        data.pop('where')
-        app.config['cursor'].execute_update_sql('ops_jobs',data,where)
-        util.write_log(username, 'finish the ope job')
-        return json.dumps({'code':0,'result':'ope job处理完成!'})
-    except:
-        logging.getLogger().error('opsjob finish error : %s' % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'工单处理失败!'})
-
 #获取一个工单详细信息
 @jsonrpc.method('opsjob.get')
 @auth_login
@@ -120,4 +79,34 @@ def opsjob_list(auth_info,**kwargs):
     except:
         logging.getLogger().error("select ops_jobs list error: %s" % traceback.format_exc())
         return json.dumps({'code':1, 'errmsg':'获取工单列表失败!'})
+
+
+#工单处理
+@jsonrpc.method('opsjob.deal')
+@auth_login
+def opsjob_deal(auth_info, **kwargs):
+    if auth_info['code'] == 1:
+        return json.dumps(auth_info)
+    if auth_info['role'] != '0':
+        return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
+    try:
+        username = auth_info['username']
+        data = request.get_json()['params']   # data = {'where':{'id':3},'status':0,'deal_desc':'deal desc comment'}
+        data['deal_persion'] = username
+        where = data['where']
+        data.pop('where')
+        if data['status'] == 0:       #工单改为处理状态
+            data['status'] = 1
+            app.config['cursor'].execute_update_sql('ops_jobs',data,where)
+            util.write_log(username, ' opsjobs 正在处理中......')
+            print  data,where
+            return json.dumps({'code':0,'result':'工单正在处理中......'})
+        else:                          #工单处理结束
+            data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
+            app.config['cursor'].execute_update_sql('ops_jobs',data,where)
+            util.write_log(username, 'finish the ope job')
+            return json.dumps({'code':0,'result':'ope job处理完成!'})
+    except:
+        logging.getLogger().error('opsjob finish error : %s'  % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'工单处理失败!'})
 

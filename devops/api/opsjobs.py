@@ -110,7 +110,9 @@ def opsjob_deal(auth_info, **kwargs):
             util.sendmail(app.config,smtp_to, '圆心运维工单',smtp_info)
             return json.dumps({'code':0,'result':'工单正在处理中......'})
         else:                          #工单处理结束
+            data = data['data']
             data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
+            util.write_log(data,' finish最后阶段的data')
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             if result['apply_type'] == 1:        #DB类型的修改操作，需要通知测试组
                 util.write_log(username,' DB类型修改，同时给测试组发送邮件.....................')

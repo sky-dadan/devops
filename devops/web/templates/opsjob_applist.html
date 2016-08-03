@@ -206,7 +206,7 @@ $('#finishedForm').on('submit',function(){
     var str = $('#finishedForm').serialize()
     var data = {'method':'opsjob','formdata':str}
     console.log(data)
-    $.post('/opsjob/deal',data,function(data){
+    $.post('/updateapi',data,function(data){
         data=JSON.parse(data)
         data=JSON.parse(data['result'])
         if (data['code']==0){

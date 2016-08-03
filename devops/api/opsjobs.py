@@ -98,7 +98,6 @@ def opsjob_deal(auth_info, **kwargs):
         status = kwargs.get('status')
         data['deal_persion'] = username
         where = kwargs.get('where')
-        print status, where
         util.write_log(data, 'data de shu ju lei xing')
         result = app.config['cursor'].get_one_result('ops_jobs',['apply_persion','apply_type','apply_desc'],where)
         data.pop('where')
@@ -114,7 +113,7 @@ def opsjob_deal(auth_info, **kwargs):
             data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             if result['apply_type'] == 1:        #DB类型的修改操作，需要通知测试组
-                util.write_log('DB类型修改，同时给测试组发送邮件.....................')
+                util.write_log(username,' DB类型修改，同时给测试组发送邮件.....................')
                 smtp_to = ['test@yuanxin-inc.com',result['apply_persion']+'@yuanxin-inc.com']
             else:
                 smtp_to = [result['apply_persion']+'@yuanxin-inc.com']

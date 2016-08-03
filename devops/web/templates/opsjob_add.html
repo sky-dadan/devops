@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block css %} 
+
+<link rel="stylesheet" href="{{url_for('static',filename='css/validform.css')}}">
+{% endblock%}
+
+{% block title %}运维工单申请{% endblock %}
+{% block breadcrumb %}<a href="/opsjob/apply">运维工单申请</a>{% endblock %}
+
+{% block h1 %}运维表单申请{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+<div class="widget-box">
+   <div class="widget-title"> 
+      <span class="icon"> <i class="icon-info-sign"></i> </span>
+      <h5>表单申请</h5>
+   </div> <!--end widget-title-->
+
+   <div class="widget-content">
+     
+       <form class="form-horizontal" id="opsjob_apply" accept-charset="UTF-8" method="POST" autocomplete="off" novalidate="novalidate">
+    <div class="control-group">
+        <label class="control-label">工单申请类型：</label>
+        <div class="controls">
+            <select name='apply_type' id='apply_type' style='width:120px'> 
+                <option value=0>新人入职</option>
+                <option value=1>DB修改</option>
+                <option value=2>故障处理</option>
+                <option value=3>其他</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">申请描述：</label>
+        <div class="controls">
+            <textarea  name="apply_desc" id="apply_desc"  rows="12"  style="margin-left: 0px; margin-right: 0px; width: 751px;">
+            </textarea>
+        </div>
+    </div>
+    <div class="form-actions">
+          <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定申请" class="btn btn-success global_radius_4">
+    </div>
+    </form> 
+       
+       
+  </div> <!--widget-content  end -->
+</div><!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+<script>
+
+/*检查表单数据是否合法*/
+$("#opsjob_apply").Validform({
+    btnSubmit:"#submit_data_btn",
+    tiptype:3, 
+    datatype:{
+        "zh2-4" : /^[\u4E00-\u9FA5\uf900-\ufa2d]{2,4}$/,
+    }
+})
+
+$("#submit_data_btn").on('click',function(){
+        apply()
+ })
+
+/*通过jsonrpc接口统一处理*/
+function apply(){
+        var str = $('#opsjob_apply').serialize()
+        console.log(str)
+        var data={'method':'opsjob','formdata':str}
+        $.post('/addapi',data,function(data){ 
+            data=JSON.parse(data);   //将json串转换为对象，然后取值
+            data = JSON.parse(data['result']) //object
+            if (data['code']==0){
+                swal("Good!", "工单申请成功", "success"); 
+                 window.location='/opsjob/apply'
+            }else{
+                swal("error","工单申请失败," + data['errmsg'],"error")
+             }
+         })
+}
+
+
+
+
+</script>
+{% endblock %}

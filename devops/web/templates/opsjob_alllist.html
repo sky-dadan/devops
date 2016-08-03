@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="/static/css/jquery.dataTables.min.css">
+<style>   
+.table th, .table td { 
+text-align: center; 
+}
+.widget-content .dataTables_filter{
+position:static;
+}
+</style>
+{% endblock %}
+{% block title %}运维工单申请列表{% endblock %}
+{% block breadcrumb %}<a href="/opsjob/applist">申请列表</a>{% endblock %}
+
+<!--主体内容-->
+{% block row %}
+
+<div class="widget-box">
+  <div class="widget-title">
+	  <span class="icon"> <i class="icon-th"></i></span>
+      <h5>运维工单申请列表</h5>
+  </div> <!--end widget-title-->
+
+<div class="widget-content">
+   <table id ="datatable"  class="table table-bordered table-striped">
+	<thead>
+		<tr>
+            <th scope="col">申请人</th>
+            <th scope="col">工单类型</th>
+            <th scope="col">申请时间</th>
+            <th scope="col">工单状态</th>
+            <th scope="col">处理人</th>
+            <th scope="col">处理结束时间</th>
+            <th scope="col">操作</th>
+        </tr>
+    </thead> 
+    <tbody>
+    </tbody>
+   </table>
+</div> <!--widget-content-->
+
+</div> <!--widget-box end-->
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
+<script>
+
+function replace(id){
+       var parent=$("[data-id="+id+"]").parents('tr');
+       var statusDom=parent.find('.status');
+       var apply_type=parent.find('.apply_type');
+       if (statusDom.html()==0){
+           parent.find('.finished-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
+           statusDom.html('申请中....')
+       }else if (statusDom.html()==1){
+           parent.find('.dealing-btn').attr('disabled',true).css('cursor', 'not-allowed'); 
+           statusDom.html("处理中....").css('color','red')
+       }else if (statusDom.html()==2) {
+            statusDom.html('成功').css('color','green')
+        }else {
+            statusDom.html('失败').css('color','red')
+        }
+        if (apply_type.html()==0){
+            apply_type.html('新人入职').css('color','green')
+        } else if (apply_type.html()==2) {
+            apply_type.html('WEB故障').css('color','red')
+        } else if (apply_type.html()==1) {
+            apply_type.html('DB修改').css('color','green')
+        } else {
+            apply_type.html('其他...').css('color','green')
+        }
+}
+/* list all data */
+function list(){
+    var url = "/listapi?method=opsjob"
+    $.getJSON(url,function(data){
+       var str = ''
+       data=JSON.parse(data['result']); //object 
+       console.log(data)
+       if (data['code']==0){
+           $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+
+                str +='<tr class="odd gradeX">'+
+                    '<td class="apply_persion">'+v['apply_persion']+'</td>'+  
+                    '<td class="apply_type">'+v['apply_type']+'</td>'+ 
+                    '<td class="apply_date">'+v['apply_date']+'</td>'+  
+                    '<td class="status" style="color:#5EDF47;">'+v['status']+'</td>'+
+                    '<td class="deal_persion">'+v['deal_persion']+'</td>'+  
+                    '<td class="deal_time">'+v['deal_time']+'</td>'+  
+                    '<td>'+
+                    '<button class="btn btn-primary btn-sm detail-btn" data-id="'+v['id']+'">详情</button>'+
+                    '</td>'+
+                    '</tr>'          
+           })   //each end    
+           $("tbody").html(str)
+           $.each(data.result,function(k,v){ 
+                replace(v['id'])	
+           })  //each end
+           datatable()
+    }else{
+                swal("error", data['errmsg'],"error")
+    
+    }  //end if 
+  })  //getJSON end 
+}    //function end 
+list()
+/* DataTable */
+function datatable(){
+$('#datatable').DataTable({
+	"bDestroy":true,
+    "language": {
+        "lengthMenu": "每页 _MENU_ 条记录",
+        "zeroRecords": "没有找到记录",
+        "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
+        "infoEmpty": "无记录",
+        "infoFiltered": "(从 _MAX_ 条记录过滤)",
+        "sSearch": "搜索:",
+        "oPaginate": {
+            "sFirst": "首页",
+            "sPrevious": "上一页",
+            "sNext": "下一页",
+            "sLast": "末页"
+        }
+    }
+});
+}
+
+//详情按钮信息页面
+function detail(id){
+    var url = "/getapi?method=opsjob&id="+id
+    var str = ''
+    $.getJSON(url,function(data){
+        data = JSON.parse(data['result'])
+        console.log(data)
+        if (data['code']==0){  
+            str = '申请人: ' + data['result']['apply_persion']+'\n'+
+                '申请时间: '+data['result']['apply_date']+'\n'+
+                '申请详情: '+data['result']['apply_desc']+'\n'+
+                '处理摘要: '+data['result']['deal_desc']
+            swal(str)
+        }else{
+            swal("OMG", data['errmsg'],"error")
+        }
+    })
+    return false;
+}
+//弹出详情按钮页面
+$("tbody").on('click', '.detail-btn',function(){
+    var id = $(this).attr('data-id')
+     detail(id)
+})
+
+</script>
+{% endblock %}

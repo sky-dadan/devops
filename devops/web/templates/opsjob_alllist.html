@@ -48,6 +48,7 @@ position:static;
 <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
 <script>
 
+/* 替换状态的方法 */
 function replace(id){
        var parent=$("[data-id="+id+"]").parents('tr');
        var statusDom=parent.find('.status');
@@ -73,16 +74,16 @@ function replace(id){
             apply_type.html('其他...').css('color','green')
         }
 }
-/* list all data */
+
+/* 渲染所有数据 */
 function list(){
     var url = "/listapi?method=opsjob"
     $.getJSON(url,function(data){
        var str = ''
-       data=JSON.parse(data['result']); //object 
        console.log(data)
+       data=JSON.parse(data['result']); //object 
        if (data['code']==0){
            $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-
                 str +='<tr class="odd gradeX">'+
                     '<td class="apply_persion">'+v['apply_persion']+'</td>'+  
                     '<td class="apply_type">'+v['apply_type']+'</td>'+ 
@@ -107,28 +108,30 @@ function list(){
   })  //getJSON end 
 }    //function end 
 list()
+
 /* DataTable */
 function datatable(){
-$('#datatable').DataTable({
+  $('#datatable').DataTable({
 	"bDestroy":true,
+    "order": [[ 2, "desc" ]],
     "language": {
-        "lengthMenu": "每页 _MENU_ 条记录",
+         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",
         "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
         "infoEmpty": "无记录",
         "infoFiltered": "(从 _MAX_ 条记录过滤)",
         "sSearch": "搜索:",
         "oPaginate": {
-            "sFirst": "首页",
+            "sFir st": "首页",
             "sPrevious": "上一页",
             "sNext": "下一页",
             "sLast": "末页"
         }
     }
-});
+  });
 }
 
-//详情按钮信息页面
+/* 详情按钮信息页面 */
 function detail(id){
     var url = "/getapi?method=opsjob&id="+id
     var str = ''
@@ -139,18 +142,19 @@ function detail(id){
             str = '申请人: ' + data['result']['apply_persion']+'\n'+
                 '申请时间: '+data['result']['apply_date']+'\n'+
                 '申请详情: '+data['result']['apply_desc']+'\n'+
-                '处理摘要: '+data['result']['deal_desc']
-            swal(str)
+                 '处理摘要: '+data['result']['deal_desc']
+             swal(str)
         }else{
             swal("OMG", data['errmsg'],"error")
-        }
+         }
     })
-    return false;
+     return false;
 }
-//弹出详情按钮页面
+
+/* 弹出详情按钮页面 */
 $("tbody").on('click', '.detail-btn',function(){
     var id = $(this).attr('data-id')
-     detail(id)
+    detail(id)
 })
 
 </script>

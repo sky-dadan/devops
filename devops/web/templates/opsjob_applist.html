@@ -105,26 +105,25 @@ function replace(id){
             apply_type.html('其他...').css('color','green')
         }
 }
-/* list all data */
+/* 列出所有的待处理的数据 */
 function list(){
-    var url = "/listapi?method=opsjob_apply"
+    var url = "/listapi?method=opsjob&condition=apply"
     $.getJSON(url,function(data){
        var str = ''
-       data=JSON.parse(data['result']); //object 
+       data=JSON.parse(data['result']); 
        if (data['code']==0){
-           $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-
-                str +='<tr class="odd gradeX">'+
+            $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+                 str +='<tr class="odd gradeX">'+
                     '<td class="apply_persion">'+v['apply_persion']+'</td>'+  
                     '<td class="apply_type">'+v['apply_type']+'</td>'+ 
                     '<td class="apply_date">'+v['apply_date']+'</td>'+  
                     '<td class="status" style="color:#5EDF47;">'+v['status']+'</td>'+
                     '<td>'+
                     '<button class="btn btn-info btn-sm dealing-btn" data-id="'+v['id']+'">处理</button>'+
-                    '<button class="btn btn-success btn-sm finished-btn" data-id="'+v['id']+'" >完成</button>'+
+                    '<button class="btn btn-success btn-sm finished-btn" data-id="'+v['id']+'">完成</button>'+
                     '<button class="btn btn-primary btn-sm detail-btn" data-id="'+v['id']+'">详情</button>'+
                     '</td>'+
-                    '</tr>'          
+                     '</tr>'          
            })   //each end    
            $("tbody").html(str)
            $.each(data.result,function(k,v){ 
@@ -132,17 +131,18 @@ function list(){
            })  //each end
            datatable()
     }else{
-                swal("error", data['errmsg'],"error")
+        swal("error", data['errmsg'],"error")
     
     }  //end if 
   })  //getJSON end 
 }    //function end 
 list()
+
 /* DataTable */
 function datatable(){
 $('#datatable').DataTable({
-	"bDestroy":true,
-    "language": {
+	 "bDestroy":true,
+     "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",
         "sInfo": "第 _PAGE_ 页 ( 总共 _PAGES_ 页 ),显示第 _START_ 至 _END_ 项(总共 _TOTAL_ 项)",
@@ -154,22 +154,20 @@ $('#datatable').DataTable({
             "sPrevious": "上一页",
             "sNext": "下一页",
             "sLast": "末页"
-        }
+         }
     }
 });
 }
 
-//详情按钮信息页面
+/* 详情按钮信息页面 */
 function detail(id){
     var url = "/getapi?method=opsjob&id="+id
     var str = ''
     $.getJSON(url,function(data){
-        data = JSON.parse(data['result'])
+        data = JSON. parse(data['result'])
         console.log(data)
         if (data['code']==0){  
-            str = '申请人: ' + data['result']['apply_persion']+'\n'+
-                '申请时间: '+data['result']['apply_date']+'\n'+
-                '申请详情: '+data['result']['apply_desc']
+            str = '申请详情: '+ '\n'+data['result']['apply_desc']
             swal(str)
         }else{
             swal("OMG", data['errmsg'],"error")
@@ -177,28 +175,29 @@ function detail(id){
     })
     return false;
 }
-//弹出详情按钮页面
+/* 弹出详情按钮页面 */
 $("tbody").on('click', '.detail-btn',function(){
     var id = $(this).attr('data-id')
-     detail(id)
+    detail(id)
 })
 
-//处理按钮功能页面
+/* 处理按钮功能页面 */
 $('tbody').on('click', '.dealing-btn',function(){
     var id = $(this).attr('data-id')
-    var url = "/opsjob/deal?status=0&id="+id
-    $.post(url, function(data){
+    var str = "status=0&id="+id
+    var data = {'method':'opsjob','formdata':str}
+    $.post('/updateapi',data,function(data){
         data = JSON.parse(data)
         data = JSON.parse(data['result'])
         console.log(data)
         if (data['code']==0){
-        swal({
+           swal({
                 title: "提交成功",
                 text: data['result'],
                 type: "success",
                 confirmButtonText: "Cool"},
             function(){
-                location.reload()
+                 location.reload()
            });
         }else{
             swal(data['result'])
@@ -206,14 +205,14 @@ $('tbody').on('click', '.dealing-btn',function(){
     })
 })
 
-//完成按钮功能页面
+/* 完成按钮功能页面 */
 $('tbody').on('click','.finished-btn',function(){
     var id = $(this).attr('data-id')
     $('#opsid').val(id)
     $('#finishedModal').modal('show')
 })
 
-//submit
+/* 任务处理完成  */
 $('#finishedForm').on('submit',function(){
     var str = $('#finishedForm').serialize()
     var data = {'method':'opsjob','formdata':str}
@@ -222,21 +221,20 @@ $('#finishedForm').on('submit',function(){
         data=JSON.parse(data['result'])
         console.log(data)
         if (data['code']==0){
-/*           swal({
+           swal({
                 title: "提交成功",
                 text: data['result'],
                 type: "success",
                 confirmButtonText: "Cool"},
             function(){
                 $('#finishedModal').modal('hide')
-                list()
                 location.reload()
-           });*/
-            alert('ok')
+           });
         }else{
             $('#errMsg').html('Failed:'+data['errmsg']).show()
-        }
-    })
+          }
+      })
+       return false
 })
 </script>
 {% endblock %}

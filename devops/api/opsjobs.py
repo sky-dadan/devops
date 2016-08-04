@@ -50,7 +50,7 @@ def opsjob_get(auth_info,**kwargs):
         return json.dumps({'code':1,'errmsg':"获取工单详情失败!"})
 
 #获取申请，处理中的工单列表
-@jsonrpc.method('opsjobad.getlist')              # status = 0 and status = 1的工单列表 
+@jsonrpc.method('opsjob_apply.getlist')              # status = 0 and status = 1的工单列表 
 @auth_login
 def opsjob_getadmin(auth_info,**kwargs):
     if auth_info['code'] == 1:
@@ -63,8 +63,8 @@ def opsjob_getadmin(auth_info,**kwargs):
         util.write_log(username, 'get opsjob status in (0 ,1) success!') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
-        logging.getLogger().error("select opsjob status in (2,3) error : %s"  % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'select opsjob status in (2,3) error!'})
+        logging.getLogger().error("select opsjob status in (0,1) error : %s"  % traceback.format_exc())
+        return json.dumps({'code':1,'errmsg':'select opsjob status in (0,1) error!'})
 
 
 #获取所有工单列表

@@ -107,7 +107,7 @@ function replace(id){
 }
 /* list all data */
 function list(){
-    var url = "/listapi?method=opsjobad"
+    var url = "/listapi?method=opsjob_apply"
     $.getJSON(url,function(data){
        var str = ''
        data=JSON.parse(data['result']); //object 

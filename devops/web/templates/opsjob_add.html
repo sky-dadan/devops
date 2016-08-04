@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="form-actions">
-          <input type="button" href="javascript:void(0);" id="submit_data_btn" value="确定申请" class="btn btn-success global_radius_4">
+          <input type="button"  id="submit_data_btn" value="确定申请" class="btn btn-success global_radius_4">
     </div>
     </form> 
        
@@ -61,7 +61,32 @@ $("#opsjob_apply").Validform({
 })
 
 $("#submit_data_btn").on('click',function(){
-        apply()
+        var str = $('#opsjob_apply').serialize()
+        console.log(str)
+        var data={'method':'opsjob','formdata':str}
+        $.post('/addapi',data,function(data){ 
+            data=JSON.parse(data);   //将json串转换为对象，然后取值
+            data = JSON.parse(data['result']) //object
+            console.log(data)
+
+            if (data['code']==0){
+                swal("error","工单申请失败," + data['errmsg'],"error")
+                /* alert("sucess")
+          /*      swal({
+                title: "提交成功",
+                text: data['result'],
+                type: "success",
+                confirmButtonText: "Cool"
+              /*  },function(){
+                     location.href="/opsjob/history"
+                      swal("OMG!", "你必须选择一个组", "error")
+                });
+               */
+            }else{
+                swal("error","工单申请失败," + data['errmsg'],"error")
+             }
+         })
+           return false;
  })
 
 /*通过jsonrpc接口统一处理*/
@@ -72,13 +97,22 @@ function apply(){
         $.post('/addapi',data,function(data){ 
             data=JSON.parse(data);   //将json串转换为对象，然后取值
             data = JSON.parse(data['result']) //object
-            if (data['code']==0){
-                swal("Good!", "工单申请成功", "success"); 
-                 window.location='/opsjob/apply'
+            console.log(data)
+            if (data['code']==0)
+            {
+                swal({
+                title: "提交成功",
+                text: data['result'],
+                type: "success",
+                confirmButtonText: "Cool"
+                },function(){
+                    location.href="/opsjob/history"
+                });
             }else{
                 swal("error","工单申请失败," + data['errmsg'],"error")
              }
          })
+           return false;
 }
 
 

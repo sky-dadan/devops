@@ -19,6 +19,7 @@ def opsjob_create(auth_info, **kwargs):
         util.write_log(data, ' request.get_json() params')
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] , data['apply_persion'] = 0, username
+        util.write_log(username,'%s  opsjob.create data'  % data)
         app.config['cursor'].execute_insert_sql('ops_jobs',data)
         '''sendemail'''
         smtp_to = ['sa@yuanxin-inc.com']              #给运维部门发送邮件
@@ -122,7 +123,7 @@ def opsjob_deal(auth_info, **kwargs):
             smtp_info = '%s提交的工单已经处理完成' % username  +  '\n'  + data['deal_desc']
             util.sendmail(app.config,smtp_to,'圆心运维工单',smtp_info)
             util.write_log(username, 'finish the ope job')
-            return json.dumps({'code':0,'result':'ope job处理完成!'})
+            return json.dumps({'code':0,'result':'工单处理完成!'})
     except:
         logging.getLogger().error('opsjob finish error : %s'  % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'工单处理失败!'})

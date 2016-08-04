@@ -64,11 +64,11 @@ def opsjob_getadmin(auth_info,**kwargs):
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
         logging.getLogger().error("select opsjob status in (0,1) error : %s"  % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'select opsjob status in (2,3) error!'})
+        return json.dumps({'code':1,'errmsg':'select opsjob status in (0,1) error!'})
 
 
 #获取所有工单列表
-@jsonrpc.method('opsjob.getlist')             # 所有工单的列表
+@jsonrpc.method('opsjob.getlist')           
 @auth_login
 def opsjob_list(auth_info,**kwargs):
     if auth_info['code'] == 1:

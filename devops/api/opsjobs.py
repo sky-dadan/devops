@@ -16,13 +16,11 @@ def opsjob_create(auth_info, **kwargs):
     username = auth_info['username']
     try:
         data = request.get_json()['params']
-        util.write_log(data, ' request.get_json() params')
         data['apply_date'] = time.strftime('%Y-%m-%d %H:%M')
         data['status'] , data['apply_persion'] = 0, username
-        util.write_log(username,'%s  opsjob.create data'  % data)
         app.config['cursor'].execute_insert_sql('ops_jobs',data)
         '''sendemail'''
-        smtp_to = ['sa@yuanxin-inc.com']              #给运维部门发送邮件
+        smtp_to = ['sa@yuanxin-inc.com']              
         send_info = '%s提交工单申请，运维同事请及时处理!'  % username  + '\n' + '工单申请描述\n' + data['apply_desc']
         util.sendmail(app.config, smtp_to,'圆心运维工单申请',send_info)
         util.write_log(username, "create opsjonb  create")
@@ -43,17 +41,19 @@ def opsjob_get(auth_info,**kwargs):
         output = ['id','apply_date','apply_type','apply_desc','deal_persion','status','deal_desc','deal_time','apply_persion']
         fields = kwargs.get('output',output)
         result = app.config['cursor'].get_one_result('ops_jobs',fields,where)
+        if not result:
+            return json.dumps({'code':1,'errmsg':'查询的数据不存在'})
         util.write_log(username, 'get one opejobs detail success!')
         return json.dumps({'code':0,'result':result},cls=MyEncoder)
     except:
         logging.getLogger().error('get one ops_jobs detail error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"获取工单详情失败!"})
 
-#获取申请，处理中的工单列表
-@jsonrpc.method('opsjobad.getlist')              # status = 0 and status = 1的工单列表 
+# 获取申请，处理中的工单列表即status = 0 and status = 1的工单列表
+@jsonrpc.method('opsjob.applylist')              
 @auth_login
 def opsjob_getadmin(auth_info,**kwargs):
-    if auth_info['code'] == 1:
+    if auth_info['code'] == 1: 
         return json.dumps(auth_info)
     try:
         username = auth_info['username']
@@ -63,7 +63,7 @@ def opsjob_getadmin(auth_info,**kwargs):
         util.write_log(username, 'get opsjob status in (0 ,1) success!') 
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
-        logging.getLogger().error("select opsjob status in (2,3) error : %s"  % traceback.format_exc())
+        logging.getLogger().error("select opsjob status in (0,1) error : %s"  % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'select opsjob status in (2,3) error!'})
 
 
@@ -78,7 +78,7 @@ def opsjob_list(auth_info,**kwargs):
         output = ['id','apply_date','apply_type','apply_desc','deal_persion','status','deal_desc','deal_time','apply_persion']
         fields = kwargs.get('output',output)
         result = app.config['cursor'].get_results('ops_jobs',fields)
-        util.write_log(username,' get all opsjob list success')
+        util.write_log(username,'get all opsjob list success')
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
         logging.getLogger().error("select ops_jobs list error: %s" % traceback.format_exc())
@@ -95,14 +95,19 @@ def opsjob_deal(auth_info, **kwargs):
         return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try:
         username = auth_info['username']
-        data = request.get_json()['params']   # data = {'where':{'id':3},'status':0,'deal_desc':'deal desc comment'}
-        status = kwargs.get('status')
+        data = request.get_json()['params']   # data = {'where':{'id':3},'status':0,'deal_desc':'info'}
+        status = data.get('status',None)
+        deal_desc = data.get('deal_desc',None)
+        where = data.get('where',None)
         data['deal_persion'] = username
-        where = kwargs.get('where')
-        util.write_log(data, 'data de shu ju lei xing')
+        if not  where:
+            return json.dumps({'code':1,'errmsg':'必须有一个where条件'})
         result = app.config['cursor'].get_one_result('ops_jobs',['apply_persion','apply_type','apply_desc'],where)
+        if not result:
+            return json.dumps({'code':1,'errmsg':'需要操作的数据不存在'})
         data.pop('where')
-        if status is not None and status == '0':       #工单改为处理状态
+        # 开始处理工单，状态为处理中
+        if status and status == '0':    
             data['status'] = 1
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             util.write_log(result['apply_persion'], '提交的工单正在处理中......')
@@ -110,10 +115,10 @@ def opsjob_deal(auth_info, **kwargs):
             smtp_info = '%s您提交的工单正在处理中.......\n %s'  % (result['apply_persion'],result['apply_desc'])
             util.sendmail(app.config,smtp_to, '圆心运维工单',smtp_info)
             return json.dumps({'code':0,'result':'工单正在处理中......'})
-        else:                          #工单处理结束
-            data = data['data']
+
+        # 处理完成工单，状态改为成功或者失败
+        elif status and deal_desc:             
             data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
-            util.write_log(data,' finish最后阶段的data')
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             if result['apply_type'] == 1:        #DB类型的修改操作，需要通知测试组
                 util.write_log(username,' DB类型修改，同时给测试组发送邮件.....................')
@@ -124,6 +129,9 @@ def opsjob_deal(auth_info, **kwargs):
             util.sendmail(app.config,smtp_to,'圆心运维工单',smtp_info)
             util.write_log(username, 'finish the ope job')
             return json.dumps({'code':0,'result':'工单处理完成!'})
+        else:
+            return json.dumps({'code':1,'errmsg':'传入参数不正确'})
+
     except:
         logging.getLogger().error('opsjob finish error : %s'  % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':'工单处理失败!'})

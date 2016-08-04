@@ -203,10 +203,10 @@
             {% endif %}
         </a>
         <ul>
-            {% if info and info.role == 0 %}
-            <li class="sa"><a href="/opsjob/applist">工单申请列表</a></li>
-            {% endif %}
             <li><a href="/opsjob/apply">工单申请</a></li>
+            {% if info and info.role == 0 %}
+            <li><a href="/opsjob/applist">工单申请列表</a></li>
+            {% endif %}
             <li><a href="/opsjob/history">历史工单列表</a></li>
         </ul>
     </ul>

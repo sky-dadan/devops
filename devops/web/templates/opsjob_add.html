@@ -70,8 +70,8 @@ $("#submit_data_btn").on('click',function(){
             console.log(data)
 
             if (data['code']==0){
-                swal("error","工单申请失败," + data['errmsg'],"error")
-                /* alert("sucess")
+                 alert("工单申请成功")
+          //       location.href="/opsjob/history"
           /*      swal({
                 title: "提交成功",
                 text: data['result'],
@@ -83,7 +83,7 @@ $("#submit_data_btn").on('click',function(){
                 });
                */
             }else{
-                swal("error","工单申请失败," + data['errmsg'],"error")
+                alert("工单申请失败")
              }
          })
            return false;

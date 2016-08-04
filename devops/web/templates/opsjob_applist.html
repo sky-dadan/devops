@@ -111,7 +111,6 @@ function list(){
     $.getJSON(url,function(data){
        var str = ''
        data=JSON.parse(data['result']); //object 
-       console.log(data)
        if (data['code']==0){
            $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
 
@@ -189,8 +188,21 @@ $('tbody').on('click', '.dealing-btn',function(){
     var id = $(this).attr('data-id')
     var url = "/opsjob/deal?status=0&id="+id
     $.post(url, function(data){
-        alert(url)
+        data = JSON.parse(data)
+        data = JSON.parse(data['result'])
         console.log(data)
+        if (data['code']==0){
+        swal({
+                title: "提交成功",
+                text: data['result'],
+                type: "success",
+                confirmButtonText: "Cool"},
+            function(){
+                location.reload()
+           });
+        }else{
+            swal(data['result'])
+        }
     })
 })
 
@@ -205,12 +217,12 @@ $('tbody').on('click','.finished-btn',function(){
 $('#finishedForm').on('submit',function(){
     var str = $('#finishedForm').serialize()
     var data = {'method':'opsjob','formdata':str}
-    console.log(data)
     $.post('/updateapi',data,function(data){
         data=JSON.parse(data)
         data=JSON.parse(data['result'])
+        console.log(data)
         if (data['code']==0){
-            swal({
+/*           swal({
                 title: "提交成功",
                 text: data['result'],
                 type: "success",
@@ -219,7 +231,8 @@ $('#finishedForm').on('submit',function(){
                 $('#finishedModal').modal('hide')
                 list()
                 location.reload()
-           });
+           });*/
+            alert('ok')
         }else{
             $('#errMsg').html('Failed:'+data['errmsg']).show()
         }

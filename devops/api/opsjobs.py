@@ -75,9 +75,13 @@ def opsjob_list(auth_info,**kwargs):
         return json.dumps(auth_info)
     try:
         username = auth_info['username']
+        where = {}
         output = ['id','apply_date','apply_type','apply_desc','deal_persion','status','deal_desc','deal_time','apply_persion']
         fields = kwargs.get('output',output)
-        result = app.config['cursor'].get_results('ops_jobs',fields)
+        condition = kwargs.get('condition',None)
+        if auth_info['role'] == '0' and condition:
+            where = {'status':['0','1']}
+        result = app.config['cursor'].get_results('ops_jobs',fields,where)
         util.write_log(username,'get all opsjob list success')
         return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
     except:
@@ -95,25 +99,24 @@ def opsjob_deal(auth_info, **kwargs):
         return json.dumps({'code':1,'errmsg':'只有管理员才有此权限'})
     try:
         username = auth_info['username']
-        data = request.get_json()['params']   # data = {'where':{'id':3},'status':0,'deal_desc':'info'}
+        data = request.get_json()['params']   
+        # data = {'where': {'id': '65'},'data':{'status':'0','id':'65','deal_desc':'info'}}
+        where = data.get('where',None)
+        data = data.get('data',None)
+        if not  where or not data:
+            return json.dumps({'code':1,'errmsg':'必须有where条件和update数据'})
         status = data.get('status',None)
         deal_desc = data.get('deal_desc',None)
-        where = data.get('where',None)
         data['deal_persion'] = username
-        if not  where:
-            return json.dumps({'code':1,'errmsg':'必须有一个where条件'})
         result = app.config['cursor'].get_one_result('ops_jobs',['apply_persion','apply_type','apply_desc'],where)
         if not result:
             return json.dumps({'code':1,'errmsg':'需要操作的数据不存在'})
-        data.pop('where')
+        
         # 开始处理工单，状态为处理中
         if status and status == '0':    
             data['status'] = 1
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
             util.write_log(result['apply_persion'], '提交的工单正在处理中......')
-            smtp_to = [result['apply_persion']+'@yuanxin-inc.com']
-            smtp_info = '%s您提交的工单正在处理中.......\n %s'  % (result['apply_persion'],result['apply_desc'])
-            util.sendmail(app.config,smtp_to, '圆心运维工单',smtp_info)
             return json.dumps({'code':0,'result':'工单正在处理中......'})
 
         # 处理完成工单，状态改为成功或者失败

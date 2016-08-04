@@ -39,25 +39,16 @@ def rpc():
 
         }
         '''
-        # applylist请求,显示所有待处理的工单
-        data = {
-                'jsonrpc':'2.0',
-                'method': 'opsjob.applylist',      
-                'id':'1',
-                'params':{
-                }
-        }
-
         # getlist请求,显示所有工单
-        '''
+
         data = {
                 'jsonrpc':'2.0',
                 'method': 'opsjob.getlist',      
                 'id':'1',
                 'params':{
+                    "condition":"apply"    # getlist可以接受一个条件参数
                 }
         }
-        '''
         # get请求,显示莫一条工单详情
         '''
         data = {

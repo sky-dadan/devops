@@ -52,8 +52,11 @@ def render(template):
 def listapi():
     headers['authorization'] = session['author']
     method = request.args.get('method')
+    condition = request.args.get('condition',{})
+    if condition: 
+        condition = {'condition':condition}
     data['method'] = method+".getlist"
-    data['params'] = {}
+    data['params'] = condition
     r = requests.post(get_url(),headers=headers,json=data)
     return r.text 
 
@@ -106,7 +109,6 @@ def updateapi():
             "id":formdata['id']
         }
     }
-#    print data
     r = requests.post(get_url(), headers=headers, json=data)
     return r.content
 

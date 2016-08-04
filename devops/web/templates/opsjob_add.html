@@ -34,15 +34,13 @@
     <div class="control-group">
         <label class="control-label">申请描述：</label>
         <div class="controls">
-            <textarea  name="apply_desc" id="apply_desc"  rows="12"  style="margin-left: 0px; margin-right: 0px; width: 751px;">
-            </textarea>
+            <textarea  name="apply_desc" id="apply_desc"  rows="12"  style="width: 751px;"></textarea>
         </div>
     </div>
     <div class="form-actions">
-          <input type="button"  id="submit_data_btn" value="确定申请" class="btn btn-success global_radius_4">
+          <input type="button"  id="add_btn" value="确定申请" class="btn btn-success">
     </div>
     </form> 
-       
        
   </div> <!--widget-content  end -->
 </div><!--widget-box end-->
@@ -51,16 +49,7 @@
 {% block js %}
 <script>
 
-/*检查表单数据是否合法*/
-$("#opsjob_apply").Validform({
-    btnSubmit:"#submit_data_btn",
-    tiptype:3, 
-    datatype:{
-        "zh2-4" : /^[\u4E00-\u9FA5\uf900-\ufa2d]{2,4}$/,
-    }
-})
-
-$("#submit_data_btn").on('click',function(){
+$("#add_btn").on('click',function(){
         var str = $('#opsjob_apply').serialize()
         console.log(str)
         var data={'method':'opsjob','formdata':str}
@@ -68,55 +57,21 @@ $("#submit_data_btn").on('click',function(){
             data=JSON.parse(data);   //将json串转换为对象，然后取值
             data = JSON.parse(data['result']) //object
             console.log(data)
-
             if (data['code']==0){
-                 alert("工单申请成功")
-          //       location.href="/opsjob/history"
-          /*      swal({
-                title: "提交成功",
-                text: data['result'],
-                type: "success",
-                confirmButtonText: "Cool"
-              /*  },function(){
-                     location.href="/opsjob/history"
-                      swal("OMG!", "你必须选择一个组", "error")
-                });
-               */
+                swal({
+                  title: "提交成功",
+                  text: data['result'],
+                  type: "success",
+                  confirmButtonText: "Cool"},
+                function(){
+                       location.href="/opsjob/history"
+                   });
             }else{
-                alert("工单申请失败")
-             }
+                swal("OMG!", data['errmsg'], "error")
+            }
          })
            return false;
  })
-
-/*通过jsonrpc接口统一处理*/
-function apply(){
-        var str = $('#opsjob_apply').serialize()
-        console.log(str)
-        var data={'method':'opsjob','formdata':str}
-        $.post('/addapi',data,function(data){ 
-            data=JSON.parse(data);   //将json串转换为对象，然后取值
-            data = JSON.parse(data['result']) //object
-            console.log(data)
-            if (data['code']==0)
-            {
-                swal({
-                title: "提交成功",
-                text: data['result'],
-                type: "success",
-                confirmButtonText: "Cool"
-                },function(){
-                    location.href="/opsjob/history"
-                });
-            }else{
-                swal("error","工单申请失败," + data['errmsg'],"error")
-             }
-         })
-           return false;
-}
-
-
-
 
 </script>
 {% endblock %}

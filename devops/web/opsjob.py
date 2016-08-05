@@ -18,6 +18,7 @@ def opsjob_apply():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+    session['pre_click'] = 'opsjob'
     if int(validate_result['code']) == 0:
         return render_template('opsjob_add.html',info=session)
     else:
@@ -31,6 +32,7 @@ def opsjob_adeal():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+    session['pre_click'] = 'opsjob'
     if int(validate_result['code']) == 0:
         return render_template('opsjob_applist.html', info=session)
     else:
@@ -43,6 +45,7 @@ def opsjob_hisrtory():
         return redirect('/login')
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
+    session['pre_click'] = 'opsjob'
     if int(validate_result['code']) == 0:
         return render_template('opsjob_alllist.html', info=session)
     else:

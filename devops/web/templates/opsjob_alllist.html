@@ -11,7 +11,7 @@ position:static;
 </style>
 {% endblock %}
 {% block title %}运维工单申请列表{% endblock %}
-{% block breadcrumb %}<a href="/opsjob/applist">申请列表</a>{% endblock %}
+{% block breadcrumb %}<a href="/opsjob/history">运维工单历史列表</a>{% endblock %}
 
 <!--主体内容-->
 {% block row %}
@@ -19,7 +19,7 @@ position:static;
 <div class="widget-box">
   <div class="widget-title">
 	  <span class="icon"> <i class="icon-th"></i></span>
-      <h5>运维工单申请列表</h5>
+      <h5>运维工单历史列表</h5>
   </div> <!--end widget-title-->
 
 <div class="widget-content">
@@ -65,7 +65,7 @@ function replace(id){
             statusDom.html('失败').css('color','red')
         }
         if (apply_type.html()==0){
-            apply_type.html('新人入职').css('color','green')
+            apply_type.html('权限修改').css('color','green')
         } else if (apply_type.html()==2) {
             apply_type.html('WEB故障').css('color','red')
         } else if (apply_type.html()==1) {

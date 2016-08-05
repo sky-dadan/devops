@@ -36,20 +36,6 @@ def opsjob_adeal():
     else:
         return render_template('opsjob_applist.html',errmsg=validate_result['errmsg'])
 
-#处理
-@app.route('/opsjob/deal',methods=['POST'])
-def opsjob_deal():
-    if session.get('author','nologin') == 'nologin':
-        return redirect('/login')
-    headers['authorization'] = session['author']
-    j_id = request.args.get('id')
-    status = request.args.get('status')
-    deal_desc = request.args.get('deal_desc',None)
-    data['method'] = 'opsjob.update'
-    data['params'] = {'where':{'id':j_id},'status':status,'deal_desc':deal_desc}
-    print data
-    r = requests.post(get_url(), headers=headers,json=data)
-    return r.text
 
 @app.route('/opsjob/history')
 def opsjob_hisrtory():

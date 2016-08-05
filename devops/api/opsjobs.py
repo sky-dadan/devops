@@ -49,24 +49,6 @@ def opsjob_get(auth_info,**kwargs):
         logging.getLogger().error('get one ops_jobs detail error: %s' % traceback.format_exc())
         return json.dumps({'code':1,'errmsg':"获取工单详情失败!"})
 
-# 获取申请，处理中的工单列表即status = 0 and status = 1的工单列表
-@jsonrpc.method('opsjob.applylist')              
-@auth_login
-def opsjob_getadmin(auth_info,**kwargs):
-    if auth_info['code'] == 1: 
-        return json.dumps(auth_info)
-    try:
-        username = auth_info['username']
-        where = {'status':['0','1']}
-        fields = ['id','apply_date','apply_type','apply_desc','deal_persion','status','deal_desc','deal_time','apply_persion']
-        result = app.config['cursor'].get_results('ops_jobs',fields,where)
-        util.write_log(username, 'get opsjob status in (0 ,1) success!') 
-        return json.dumps({'code':0,'result':result,'count':len(result)},cls=MyEncoder)
-    except:
-        logging.getLogger().error("select opsjob status in (0,1) error : %s"  % traceback.format_exc())
-        return json.dumps({'code':1,'errmsg':'select opsjob status in (0,1) error!'})
-
-
 #获取所有工单列表
 @jsonrpc.method('opsjob.getlist')           
 @auth_login

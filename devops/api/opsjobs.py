@@ -105,7 +105,7 @@ def opsjob_deal(auth_info, **kwargs):
         elif status and deal_desc:             
             data['deal_time'] = time.strftime("%Y-%m-%d %H:%M")
             app.config['cursor'].execute_update_sql('ops_jobs',data,where)
-            if result['apply_type'] == 1:        #DB类型的修改操作，需要通知测试组
+            if result['apply_type'] == 1 and status == '2':        #DB类型的修改成功操作，需要通知测试组
                 util.write_log(username,' DB类型修改，同时给测试组发送邮件.....................')
                 smtp_to = ['test@yuanxin-inc.com',result['apply_persion']+'@yuanxin-inc.com']
             else:

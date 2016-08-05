@@ -18,22 +18,24 @@
 --
 -- Table structure for table `ops_jobs`
 --
+USE `devops`;
+SET NAMES utf8;
 
 DROP TABLE IF EXISTS `ops_jobs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ops_jobs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `apply_date` datetime NOT NULL COMMENT 'åˆ›å»ºæ—¶é—´',
-  `apply_type` tinyint(3) unsigned NOT NULL COMMENT 'å·¥å•ç”³è¯·ç±»åž‹',
-  `apply_desc` text NOT NULL COMMENT 'å·¥å•ç”³è¯·æè¿°',
-  `deal_persion` varchar(20) DEFAULT NULL COMMENT 'å·¥å•å¤„ç†äºº',
-  `status` tinyint(3) NOT NULL COMMENT 'å·¥å•å¤„ç†è¿‡ç¨‹çš„çŠ¶æ€',
-  `deal_desc` text COMMENT 'å¤„ç†æè¿°',
-  `deal_time` datetime DEFAULT NULL COMMENT 'å¤„ç†å®Œæˆæ—¶é—´',
-  `apply_persion` varchar(20) NOT NULL COMMENT 'å·¥å•ç”³è¯·äºº',
+  `apply_date` datetime NOT NULL COMMENT '创建时间',
+  `apply_type` tinyint(3) unsigned NOT NULL COMMENT '工单申请类型',
+  `apply_desc` text NOT NULL COMMENT '工单申请描述',
+  `deal_persion` varchar(20) DEFAULT NULL COMMENT '工单处理人',
+  `status` tinyint(3) NOT NULL COMMENT '工单处理过程的状态',
+  `deal_desc` text COMMENT '处理描述',
+  `deal_time` datetime DEFAULT NULL COMMENT '处理完成时间',
+  `apply_persion` varchar(20) NOT NULL COMMENT '工单申请人',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 

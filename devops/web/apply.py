@@ -22,11 +22,12 @@ def project_apply():
     headers['authorization'] = session['author']
     validate_result = json.loads(util.validate(session['author'], app.config['passport_key']))
     if int(validate_result['code']) == 0:
-        data['method'] = 'userproject.getlist'
+        data['method'] = 'git.getlist'
         data['params'] = {}
         r = requests.post(get_url(),headers=headers,json=data)
         result = json.loads(r.text)
         result = json.loads(result['result'])
+        print result
 
         if int(result['code']) == 0:
             return render_template('apply.html',info=session,result=result['result'])

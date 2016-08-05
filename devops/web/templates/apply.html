@@ -85,16 +85,16 @@ position:static;
         </tr>
 	</thead>
 	<tbody>
-          {% if result %}
-        {% for p_id,p_name in result.iteritems() %}
+        {% if result %}
+        {% for project in result %}
         <tr>
-            <td class="p_name" style="text-align: center;">{{ p_name }}</td>
+            <td class="p_name" style="text-align: center;">{{ project.name }}</td>
             <td class="commit" style="text-align: center;">新项目</td>
             <td class="applicant" style="text-align: center;">新项目</td>
             <td class="apply_date" style="text-align: center;">新项目</td>
             <td class="status" style="color:#5EDF47; text-align: center;">新项目</td>
             <td style="text-align: center;">
-            <button  class='btn btn-primary btn-sm applybtn' data-id='{{ p_id }}' data='{{ p_name }}'>申请发布</button>   
+            <button  class='btn btn-primary btn-sm applybtn' data-id='{{ project.id }}' data='{{ project.name }}'>申请发布</button>   
               </td>
         </tr>
         {% endfor %}

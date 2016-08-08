@@ -124,12 +124,37 @@
   							</tr>
 					</table> 
                 </div><!--detail end-->
+                
            </div> <!--row-fluid end-->
     </div> <!--widget-content  end -->
-
 </div><!--widget-box end-->
 
-
+<div class="widget-box">
+       <div class="widget-title"> 
+          <span class="icon"> <i class="icon-briefcase"></i> </span>
+          <h5>值班表</h5>
+          <h5 style="float:right;" id = "edit">
+         （<i class="icon-edit"></i>编辑值班表）</h5>
+	   </div> <!--end widget-title-->
+            
+	    <div class="widget-content">
+           <div class="row-fluid">
+               <div class="span8">
+					<table class="table table-bordered" id="rota">
+                        <thead>
+							<tr>
+                                <th scope="col"><h4>开始日期</h4></th>
+                                <th scope="col"><h4>结束日期</h4></th>
+                                <th scope="col"><h4>值班人</h4></th>
+							</tr>
+                        </thead>
+                        <tbody class="rota_list">
+						</tbody>
+					</table>
+               </div>
+           </div>
+        </div>
+</div>
 {% endblock %}
 {% block js %}
 <script>
@@ -187,6 +212,27 @@ $("#uppwbtn").on('click',function(){
    })
         return false
 })
+
+function list(){
+    var url = "/listapi?method=rota"
+    $.getJSON(url,function(data){
+      // data = data['result']  //string
+       data=JSON.parse(data['result']); //object 
+       console.log("data=",data)   
+       var str = ''
+       $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
+        //   console.log(v)   
+           str += '<tr class="odd gradeX">'+
+           '<td>'+v['start_date']+'</td>'+  
+           '<td>'+v['end_date']+'</td>'+  
+           '<td>'+v['man_on_duty']+'</td>'+ 
+           '</tr>'          
+       })       
+         $(".rota_list").html(str)
+    })
+}
+list()
+
 
 </script>
 {% endblock %}

@@ -215,6 +215,7 @@ $('tbody').on('click','.finished-btn',function(){
 /* 任务处理完成  */
 $('#finishedForm').on('submit',function(){
     var str = $('#finishedForm').serialize()
+    str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
     var data = {'method':'opsjob','formdata':str}
     $.post('/updateapi',data,function(data){
         data=JSON.parse(data)

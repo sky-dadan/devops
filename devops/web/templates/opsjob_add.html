@@ -51,6 +51,7 @@
 
 $("#add_btn").on('click',function(){
         var str = $('#opsjob_apply').serialize()
+        str = str.replace(/\+/g," ")   // g表示对整个字符串中符合条件的都进行替换
         console.log(str)
         var data={'method':'opsjob','formdata':str}
         $.post('/addapi',data,function(data){ 

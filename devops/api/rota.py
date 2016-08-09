@@ -50,9 +50,9 @@ def rota_create(auth_info, **kwargs):
         return json.dumps({'code':2,'errmsg':'添加值班记录失败'})
 
 
-@jsonrpc.method('rota.get')     
+@jsonrpc.method('rota.get2')     
 @auth_login
-def rota_get(auth_info,**kwargs):
+def rota_get2(auth_info,**kwargs):
     """
     获取一条值班记录
     """
@@ -80,9 +80,9 @@ def rota_get(auth_info,**kwargs):
 
 
 
-@jsonrpc.method('rota.getlist')     
+@jsonrpc.method('rota.get')     
 @auth_login
-def rota_getlist(auth_info,**kwargs):
+def rota_get(auth_info,**kwargs):
     """
     获取最近4周的值班表，从本周一开始往后四周。
     """
@@ -120,9 +120,9 @@ def rota_getlist(auth_info,**kwargs):
         logging.getLogger().error("查询单个值班记录错误: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询单个值班记录错误'})
 
-@jsonrpc.method('rota.getlist2')
+@jsonrpc.method('rota.getlist')
 @auth_login
-def rota_getlist2(auth_info,**kwargs):
+def rota_getlist(auth_info,**kwargs):
     """
     获取所有的值班列表
     """

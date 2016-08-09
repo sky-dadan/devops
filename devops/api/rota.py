@@ -77,7 +77,6 @@ def rota_get(auth_info,**kwargs):
             for i,k in enumerate(fields):
                 res[k] = item[i]
             result.append(res)
-        print result
         if result:
             for item in result:
                 item['start_date'] = str(item['start_date'])

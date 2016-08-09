@@ -50,14 +50,43 @@ url = "http://127.0.0.1:2000/api"
 #        }
 #
 #}
-
+#data = {
+#        'jsonrpc':'2.0',
+#        'method': 'rota.create',      
+#        'id':'1',
+#        'params':{
+#            'start_date': '2016-09-06',
+#            'end_date': '2016-09-12',
+#            'man_on_duty': 'duminchao'
+#        }
+#    }
+#
 data = {
         'jsonrpc':'2.0',
-        'method': 'groups_sel.get',      
+        'method': 'rota.get',      
         'id':'1',
         'params':{'where':{'id':1}}
     }
 
+#data = {
+#        'jsonrpc': '2.0',
+#        'method': 'rota.getlist',
+#        'id': '1',
+#        'params': {}
+#        }
+#data = {
+#        'jsonrpc':'2.0',
+#        'method': 'rota.update',      
+#        'id':'1',
+#        'params':{
+#            'data' : {'id':2,'start_date':'2016-08-15', 'end_date': '2016-08-21', 'man_on_duty': 'zhangxunan'},
+#            'where' : {'id':2}
+#                }
+#        }
+#data = {'params': {'where': {'id': 3}, 'data': {'remark': 'dnsdfas', 'store_date': '2015-12-17', 'expire': '2018-12-17', 'type': 'dns', 'id': '3', 'manufacturer': 'dnspod'}}, 'jsonrpc': '2.0', 'id': 1,'method':'softassets.update'}
+
+
+#
 #data = {
 #        'jsonrpc':'2.0',
 #        'method': 'host.delete',      

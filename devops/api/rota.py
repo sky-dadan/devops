@@ -50,36 +50,6 @@ def rota_create(auth_info, **kwargs):
         return json.dumps({'code':2,'errmsg':'添加值班记录失败'})
 
 
-@jsonrpc.method('rota.get2')     
-@auth_login
-def rota_get2(auth_info,**kwargs):
-    """
-    获取一条值班记录
-    """
-    if auth_info['code'] == 1:   
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
-    try:
-        output =['id', 'start_date', 'end_date', 'man_on_duty']
-        fields = kwargs.get('output', output)
-        where = kwargs.get('where',None)
-        result = app.config['cursor'].get_one_result('rota', fields, where)
-        if result:
-            result['start_date'] = str(result['start_date'])
-            result['end_date'] = str(result['end_date'])
-            util.write_log(username, '获取一条值班记录成功') 
-            return json.dumps({'code':0,'result':result})
-        else:
-            util.write_log(username, '获取一条值班记录失败')
-            return json.dumps({'code':1,'errmsg':'获取一条值班记录失败'})
-    except:
-        logging.getLogger().error("获取一条值班记录错误: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': '获取一条值班记录错误'})
-
-
-
 @jsonrpc.method('rota.get')     
 @auth_login
 def rota_get(auth_info,**kwargs):
@@ -119,6 +89,36 @@ def rota_get(auth_info,**kwargs):
     except:
         logging.getLogger().error("查询单个值班记录错误: %s" % traceback.format_exc())
         return json.dumps({'code': 1, 'errmsg': '查询单个值班记录错误'})
+    
+    
+@jsonrpc.method('rota.get2')     
+@auth_login
+def rota_get2(auth_info,**kwargs):
+    """
+    获取一条值班记录
+    """
+    if auth_info['code'] == 1:   
+        return json.dumps(auth_info)
+    username = auth_info['username']
+    if auth_info['role'] != '0':
+        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
+    try:
+        output =['id', 'start_date', 'end_date', 'man_on_duty']
+        fields = kwargs.get('output', output)
+        where = kwargs.get('where',None)
+        result = app.config['cursor'].get_one_result('rota', fields, where)
+        if result:
+            result['start_date'] = str(result['start_date'])
+            result['end_date'] = str(result['end_date'])
+            util.write_log(username, '获取一条值班记录成功') 
+            return json.dumps({'code':0,'result':result})
+        else:
+            util.write_log(username, '获取一条值班记录失败')
+            return json.dumps({'code':1,'errmsg':'获取一条值班记录失败'})
+    except:
+        logging.getLogger().error("获取一条值班记录错误: %s" % traceback.format_exc())
+        return json.dumps({'code': 1, 'errmsg': '获取一条值班记录错误'})
+   
 
 @jsonrpc.method('rota.getlist')
 @auth_login

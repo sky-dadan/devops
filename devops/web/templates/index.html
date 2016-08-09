@@ -175,8 +175,8 @@
        <div class="widget-title"> 
           <span class="icon"> <i class="icon-briefcase"></i> </span>
           <h5>值班表</h5>
-          <h5 style="float:right;" id="add_rota">
-              （<i class="icon-edit"></i>添加值班记录）</h5>
+          <h5 style="float:right;" id="iadd_rota"><a href='/rota'>管理值班列表</a><h5>
+              <!--     （<i class="icon-edit"></i>添加值班记录）</h5>-->
 	   </div> <!--end widget-title-->
             
 	    <div class="widget-content">
@@ -290,7 +290,7 @@ $('#add_rota_btn').on('click',function(){
 
 
 function list(){
-    var url = "/listapi?method=rota"
+    var url = "/getapi?method=rota"
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 

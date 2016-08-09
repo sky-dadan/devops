@@ -92,6 +92,47 @@
 </div> <!--modal end-->
 <!--模态窗结束-->
 
+<!--添加值班表模态窗-->
+<div id="addrotaModal"  class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>添加值班记录</h3>
+  </div> <!--modal-header end-->
+  <div class="modal-body">
+    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+    <form class="form-horizontal" id="addrota" method="POST">
+     	<div class="form-group">
+            <label class="control-label">开始日期</label>
+     		 <div class="controls">
+       		 	<input id="start_date" type="date" name="start_date" >
+      		</div> 
+       	</div> <!-- start_date end-->
+     	<div class="form-group">
+			<label class="control-label">结束日期</label>
+     		 <div class="controls">
+       		 	<input id="end_date"  type="date"  name="end_date" >
+      		</div> 
+       	</div> <!--end_date end-->
+
+        <div class="form-group">
+			<label class="control-label">值班人</label>
+     		 <div class="controls">
+       		 	<input id="man_on_duty"  type="text"  name="man_on_duty" >
+      		</div> 
+       	</div> <!--end_date end-->
+
+    	<div class="form-group">
+     		<div class="modal-footer">
+                <button class="btn btn-primary" id="add_rota_btn" >添加</button>
+			 	<button class="btn btn-warning exit-btn" data-dismiss="modal">退出</button>
+            </div> 
+        </div><!--button end-->
+    </form><!--form end-->
+  </div> <!--modal-body end -->
+</div> <!--modal end-->
+<!--模态窗结束-->
+
+
 	<div class="widget-content">
            <div class="row-fluid">
                <div class="span6">
@@ -129,12 +170,13 @@
     </div> <!--widget-content  end -->
 </div><!--widget-box end-->
 
+{% if user.role == 0 %}
 <div class="widget-box">
        <div class="widget-title"> 
           <span class="icon"> <i class="icon-briefcase"></i> </span>
           <h5>值班表</h5>
-          <h5 style="float:right;" id = "edit">
-         （<i class="icon-edit"></i>编辑值班表）</h5>
+          <h5 style="float:right;" id="add_rota">
+              （<i class="icon-edit"></i>添加值班记录）</h5>
 	   </div> <!--end widget-title-->
             
 	    <div class="widget-content">
@@ -155,6 +197,8 @@
            </div>
         </div>
 </div>
+{% endif %}
+
 {% endblock %}
 {% block js %}
 <script>
@@ -213,6 +257,38 @@ $("#uppwbtn").on('click',function(){
         return false
 })
 
+$("#add_rota").on('click',function(){
+    $('#addrotaModal').modal('show')  
+})
+
+//add_rota_btn
+$('#add_rota_btn').on('click',function(){
+	   var str = $('#addrota').serialize()
+           console.log(str)
+       var data = {"method":'rota',"formdata":str}
+	   $.post("/addapi",data,function(data){
+	     //console.log(data)    //string
+         data = JSON.parse(data)  //object
+         data = JSON.parse(data['result']) //object
+         if (data['code']==0){
+			  swal({
+						title:"添加成功",
+						type: "success",
+						confirmButtonText: "Cool"
+					},function(){                    
+						$('#addModal').modal('hide')
+						list()
+						location.reload()
+					})  //end swal
+         }else{
+		    $('#errorMsg').html('Failed: '+data['errmsg']).show()
+         }
+ }) //end post
+	   return false
+})  //submit form
+
+
+
 function list(){
     var url = "/listapi?method=rota"
     $.getJSON(url,function(data){
@@ -223,9 +299,9 @@ function list(){
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
         //   console.log(v)   
            str += '<tr class="odd gradeX">'+
-           '<td>'+v['start_date']+'</td>'+  
-           '<td>'+v['end_date']+'</td>'+  
-           '<td>'+v['man_on_duty']+'</td>'+ 
+           '<td style="text-align:center;">'+v['start_date']+'</td>'+  
+           '<td style="text-align:center;">'+v['end_date']+'</td>'+  
+           '<td style="text-align:center;">'+v['man_on_duty']+'</td>'+ 
            '</tr>'          
        })       
          $(".rota_list").html(str)

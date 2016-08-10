@@ -207,7 +207,7 @@ $('#addForm').on('submit',function(){
 /*get one data from id for update*/
 $('tbody').on('click','.update-btn',function(){
 	var id = $(this).attr('data-id')
-    var url = "/getone?method="+name+"&id="+id
+    var url = "/getapi?method="+name+"&id="+id
     console.log(url)
 	$.getJSON(url,function(data){
       data = JSON.parse(data['result'])

@@ -290,7 +290,7 @@ $('#add_rota_btn').on('click',function(){
 
 
 function list(){
-    var url = "/getapi?method=rota"
+    var url = "/listapi?method=rota&condition=True"
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 

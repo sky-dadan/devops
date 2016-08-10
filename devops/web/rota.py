@@ -23,14 +23,3 @@ def rota():
     else:
         return render_template('rota.html',errmsg=validate_result['errmsg'])
 
-
-@app.route('/getone')
-def getone():
-    headers['authorization'] = session['author']
-    method = request.args.get('method')
-    data['method'] = method+".get2"
-    id = request.args.get('id')
-    where = {'id': id}
-    data['params'] = {'where': where, 'args': request.args}
-    r = requests.post(get_url(),headers=headers,json=data)
-    return r.text

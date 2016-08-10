@@ -49,50 +49,10 @@ def rota_create(auth_info, **kwargs):
         logging.getLogger().error('添加值班记录错误: %s' % traceback.format_exc())
         return json.dumps({'code':2,'errmsg':'添加值班记录失败'})
 
-
+    
 @jsonrpc.method('rota.get')     
 @auth_login
 def rota_get(auth_info,**kwargs):
-    """
-    获取最近4周的值班表，从本周一开始往后四周。
-    """
-    if auth_info['code'] == 1:   
-        return json.dumps(auth_info)
-    username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
-    try:
-        fields = ['id', 'start_date', 'end_date', 'man_on_duty']
-        result = []
-        # 今天
-        today = datetime.date.today()
-        # 通过今天算出每周的周一
-        monday = today - datetime.timedelta(today.weekday())
-        # 每周的周一加上4周减一天 4*7-1 就是这周到第4周的最后一天
-        last_day = monday + datetime.timedelta(days=27)
-        sql = "SELECT %s FROM rota WHERE start_date >= '%s' and end_date <= '%s'" % (','.join(fields), str(monday), str(last_day))
-        app.config['cursor'].execute(sql)
-        for item in app.config['cursor'].fetchall():
-            res = {}
-            for i,k in enumerate(fields):
-                res[k] = item[i]
-            result.append(res)
-        if result:
-            for item in result:
-                item['start_date'] = str(item['start_date'])
-                item['end_date'] = str(item['end_date'])
-            util.write_log(username, '查询值班表单个记录成功') 
-            return json.dumps({'code':0,'result':result})
-        else:
-            return json.dumps({'code':1,'errmsg':'没查到值班表记录'})
-    except:
-        logging.getLogger().error("查询单个值班记录错误: %s" % traceback.format_exc())
-        return json.dumps({'code': 1, 'errmsg': '查询单个值班记录错误'})
-    
-    
-@jsonrpc.method('rota.get2')     
-@auth_login
-def rota_get2(auth_info,**kwargs):
     """
     获取一条值班记录
     """
@@ -123,7 +83,7 @@ def rota_get2(auth_info,**kwargs):
 @auth_login
 def rota_getlist(auth_info,**kwargs):
     """
-    获取所有的值班列表
+    获取最近四周(从本周一开始往后)或所有的值班列表
     """
     if auth_info['code'] == 1:   
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
@@ -131,13 +91,30 @@ def rota_getlist(auth_info,**kwargs):
     if auth_info['role'] != '0':
         return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
+
         fields = ['id', 'start_date', 'end_date', 'man_on_duty'] 
-        result = app.config['cursor'].get_results('rota', fields)
+        data = request.get_json()['params']
+        # 判断条件，如果存在condition则获取最近四周的值班记录，如果不存在则获取所有的
+        if 'condition' in data and data['condition']:
+            result = []
+            # 今天
+            today = datetime.date.today()
+            # 通过今天算出每周的周一
+            monday = today - datetime.timedelta(today.weekday())
+            sql = "SELECT %s FROM rota WHERE start_date >= '%s' LIMIT 4" % (','.join(fields), monday)
+            app.config['cursor'].execute(sql)
+            for item in app.config['cursor'].fetchall():
+                res = {}
+                for i,k in enumerate(fields):
+                    res[k] = item[i]
+                result.append(res)
+        else:
+            result = app.config['cursor'].get_results('rota', fields)
+
         if result:
             for item in result:
                 item['start_date'] = str(item['start_date'])
                 item['end_date'] = str(item['end_date'])
-            print result
             util.write_log(username, '查询值班列表成功') 
             return json.dumps({'code':0,'result':result,'count':len(result)})
         else:

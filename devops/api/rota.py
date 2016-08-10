@@ -109,7 +109,7 @@ def rota_getlist(auth_info,**kwargs):
                     res[k] = item[i]
                 result.append(res)
         else:
-            result = app.config['cursor'].get_results('rota', fields, order='start_date')
+            result = app.config['cursor'].get_results('rota', fields)
 
         if result:
             for item in result:

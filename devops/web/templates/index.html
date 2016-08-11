@@ -170,13 +170,14 @@
     </div> <!--widget-content  end -->
 </div><!--widget-box end-->
 
-{% if user.role == 0 %}
 <div class="widget-box">
        <div class="widget-title"> 
           <span class="icon"> <i class="icon-briefcase"></i> </span>
           <h5>值班表</h5>
+          {% if user.role ==0 %}
           <h5 style="float:right;" id="iadd_rota"><a href='/rota'>管理值班列表</a><h5>
               <!--     （<i class="icon-edit"></i>添加值班记录）</h5>-->
+        {% endif %}
 	   </div> <!--end widget-title-->
             
 	    <div class="widget-content">
@@ -193,11 +194,11 @@
                         <tbody class="rota_list">
 						</tbody>
 					</table>
+                   <p><strong>注：标颜色的为当前值班人员</strong></p>
                </div>
            </div>
         </div>
 </div>
-{% endif %}
 
 {% endblock %}
 {% block js %}
@@ -297,9 +298,13 @@ function list(){
        console.log("data=",data)   
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-        //   console.log(v)   
-           str += '<tr class="odd gradeX">'+
-           '<td style="text-align:center;">'+v['start_date']+'</td>'+  
+            if (k == 0){
+                str += '<tr  class="odd gradeX error">'
+            }else{
+                str += '<tr class="odd gradeX">'
+            }
+             
+           str += '<td style="text-align:center;">'+v['start_date']+'</td>'+  
            '<td style="text-align:center;">'+v['end_date']+'</td>'+  
            '<td style="text-align:center;">'+v['man_on_duty']+'</td>'+ 
            '</tr>'          

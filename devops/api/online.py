@@ -19,7 +19,7 @@ def get_project_info(where):
 def apply_pub(username,data,where):
     app.config['cursor'].execute_update_sql('project_apply',data,where)
     util.write_log(username,"success and update project_apply status %s" % data['status'])
-    fields = ['project_id','info','version','commit','status','detail']  #为project_deplpy 准备数据
+    fields = ['project_id','info','version','commit','status','detail','apply_type']  #为project_deplpy 准备数据
     result=app.config['cursor'].get_one_result('project_apply',fields,where)
     result['applicant'] = username
     result['apply_date'] = time.strftime("%Y-%m-%d %H:%M:%S")

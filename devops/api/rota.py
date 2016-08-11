@@ -88,8 +88,6 @@ def rota_getlist(auth_info,**kwargs):
     if auth_info['code'] == 1:   
         return json.dumps({'code': 1, 'errmsg': '%s' % auth_info['errmsg']})
     username = auth_info['username']
-    if auth_info['role'] != '0':
-        return json.dumps({'code': 1,'errmsg':'只有管理员才有此权限' })
     try:
 
         fields = ['id', 'start_date', 'end_date', 'man_on_duty'] 

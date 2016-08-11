@@ -22,6 +22,46 @@ position:static;
       <h5>运维工单历史列表</h5>
   </div> <!--end widget-title-->
 
+<!--detail modal-->
+<div id='detailModal' class="modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">工单详情</h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label class="control-label">申请人</label>
+             <div class="controls">
+                        <span id="detail_applypersion" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div> <!--detail applypersion   end-->
+        <div class="form-group">
+            <label class="control-label">申请时间</label>
+             <div class="controls">
+                        <span id="detail_applytime" class="input-xlarge uneditable-input"></span>
+            </div>
+        </div> <!--detail spply_time end-->
+        <div class="form-group">
+            <label class="control-label">申请描述</label>
+             <div class="controls">
+                        <span id="detail_applydesc" ></span>
+            </div>
+        </div> <!--detail desc end-->
+        <div class="form-group">
+            <label class="control-label">处理摘要</label>
+             <div class="controls">
+                        <span id="detail_dealdesc"></span>
+            </div>
+        </div> <!--detail deal desc end-->
+        <div class="form-group">
+            <div class="modal-footer">
+                <button class="btn btn-warning" data-dismiss="modal">退出</button>
+            </div>
+      </div><!--button end-->
+    </div>
+</div>
+
 <div class="widget-content">
    <table id ="datatable"  class="table table-bordered table-striped">
 	<thead>
@@ -134,6 +174,7 @@ function datatable(){
 /* 详情按钮信息页面 */
 function detail(id){
     var url = "/getapi?method=opsjob&id="+id
+    $('#detailModal').modal('show')
     var str = ''
     $.getJSON(url,function(data){
         data = JSON.parse(data['result'])
@@ -143,7 +184,11 @@ function detail(id){
                 '申请时间: '+data['result']['apply_date']+'\n'+
                 '申请详情: '+data['result']['apply_desc']+'\n'+
                  '处理摘要: '+data['result']['deal_desc']
-             swal(str)
+//             alert(str)
+            $('#detail_applypersion').html(data['result']['apply_persion'])
+            $('#detail_applytime').html(data['result']['apply_date'])
+            $('#detail_applydesc').html(data['result']['apply_desc'])
+            $('#detail_dealdesc').html(data['result']['deal_desc'])
         }else{
             swal("OMG", data['errmsg'],"error")
          }

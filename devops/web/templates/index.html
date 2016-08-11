@@ -1,4 +1,12 @@
 {% extends "base.html" %}
+{% block css %}
+<style>
+.notice {
+    color:red;
+    font-size: large;
+}
+</style>
+{% endblock %}
 {% block title %}个人信息{% endblock %}
 {% block breadcrumb %}<a href="/">个人中心</a>{% endblock %}
 
@@ -194,7 +202,7 @@
                         <tbody class="rota_list">
 						</tbody>
 					</table>
-                   <p><strong>注：标颜色的为当前值班人员</strong></p>
+                    <p><strong>注：标颜色的为当前值班人员,有什么需求请</strong><strong class="notice">先提工单</strong>，<strong>然后</strong><strong class="notice">找值班人员</strong>!</strong></p>
                </div>
            </div>
         </div>

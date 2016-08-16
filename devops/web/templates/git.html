@@ -50,68 +50,44 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>负责人</label>
 			<div class='controls'>
-				<select name='principal' id='add_principal' class='user_list'>
+				<select name='principal' id='p_principal' class ="form-control multiselect"  multiple="multiple">
 				</select>
-			</div>
+            </div>
+        </div><!--add principal -->
 		<div class='form-group'>
-			<label class='control-label'>组标签</label>
+            <label class='control-label'>项目成员</label>
 			<div class='controls'>
-				<select name='tag' id='add_tag' class='groups_list'>
-				</select>
-			</div>
-		</div>
-		</div><!--add principal -->
+				<select name='p_user' id='p_user' class ="form-control multiselect"  multiple="multiple">
+		 	 	</select>
+             </div> 
+		</div><!--add p_user -->
+		<div class='form-group'>
+            <label class='control-label'>项目组</label>
+			<div class='controls'>
+			 	<select name='p_group' id='p_group' class ="form-control multiselect"  multiple="multiple">
+                </select>
+			</div> 
+		</div><!--add p_group -->
 		<div class='form-group'>
 			<label class='control-label'>状态</label>
 			<div class='controls'>
 			<select name='is_lock'>
-				<option value=0>正常</option>
+			 	<option value=0>正常</option>
 				<option value=1>锁定</option>
 			</select>
-			</div>
+			</div> 
 		</div> <!--add status-->
-		<div class='form-group'>
-			<label class='control-label'>RW+_用户权限</label>
-			<div class='controls'>
-				<select name='user_all_perm' class='user_list'   multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--add user_all_perm-->
-		
-		<div class='form-group'>
-			<label class='control-label'>RW+_组权限</label>
-			<div class='controls'>
-				<select name='group_all_perm' class='groups_list'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--add group_all_perm-->
-
-		<div class='form-group'>
-			<label class='control-label'>RW_用户权限</label>
-			<div class='controls'>
-				<select name='user_rw_perm' class='user_list'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--add user_rw_perm-->
-
-		<div class='form-group'>
-			<label class='control-label'>RW_组权限</label>
-			<div class='controls'>
-				<select name='group_rw_perm' class='groups_list'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--add group_rw_perm-->
 
 		<div class='from-group'>
-			<label class='control-label'>描述</label>
+			<label  class='control-label'>描述</label>
 			<div class='controls'>
 				<textarea  rows='3' name='comment'></textarea>
 			</div>
-		</div>
+        </div> <!-- comment -->
     	<div class="form-group">
      		<div class="modal-footer">
                 <button class="btn btn-primary" >添加</button>
-				<button class="btn btn-warning" data-dismiss="modal">退出</button>
+			 	<button class="btn btn-warning" data-dismiss="modal">退出</button>
          	</div>
       </div><!--button end-->
     </form><!--form end-->
@@ -147,57 +123,33 @@ position:static;
 		<div class='form-group'>
 			<label class='control-label'>负责人</label>
 			<div class='controls'>
-				<select name='principal' id='up_principal_sel'>
+				<select name='principal' id='up_p_principal' class ="form-control multiselect"  multiple="multiple">
+ 				</select>
+ 			</div>
+		</div><!--update p_principal -->
+		<div class='form-group'>
+            <label  class='control-label'>项目成员</label>
+			<div class='controls'>
+				<select name='p_user' id='up_p_user'  class = "form-control multiselect"  multiple="multiple">
 				</select>
 			</div>
-		</div><!--update principal -->
+        </div> <!--update p_user -->
 		<div class='form-group'>
-			<label class='control-label'>组标签</label>
+            <label  class='control-label'>项目组</label>
 			<div class='controls'>
-				<select name='tag' id='up_id'  class='groups_list'>
+				<select name='p_group' id='up_p_group'  class = "form-control multiselect"  multiple="multiple">
 				</select>
 			</div>
-		</div>
+        </div> <!--update p_group -->
 		<div class='form-group'>
-			<label class='control-label'>状态</label>
+			<label  class='control-label'>状态</label>
 			<div class='controls'>
-			<select name='is_lock'>
+			<select id = 'up_is_lock'  name='is_lock'>
 				<option value=0>正常</option>
 				<option value=1>锁定</option>
 			</select>
 			</div>
 		</div> <!--update status-->
-		<div class='form-group'>
-			<label class='control-label'>RW+_用户权限</label>
-			<div class='controls'>
-				<select name='user_all_perm' id='up_u_all_sel'   multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--update user_all_perm-->
-		
-		<div class='form-group'>
-			<label class='control-label'>RW+_组权限</label>
-			<div class='controls'>
-				<select name='group_all_perm' id='up_g_all_sel'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--update group_all_perm-->
-
-		<div class='form-group'>
-			<label class='control-label'>RW_用户权限</label>
-			<div class='controls'>
-				<select name='user_rw_perm' id='up_u_rw_sel'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--update user_rw_perm-->
-
-		<div class='form-group'>
-			<label class='control-label'>RW_组权限</label>
-			<div class='controls'>
-				<select name='group_rw_perm' id='up_g_rw_sel'  multiple='multiple'>
-				</select>
-			</div>
-		</div> <!--update group_rw_perm-->
 
 		<div class='from-group'>
 			<label class='control-label'>comment</label>
@@ -210,9 +162,9 @@ position:static;
      		<div class="modal-footer">
 				<button class="btn btn-primary" >更新</button>
 				<button class="btn btn-warning" data-dismiss="modal">退出</button>
-         	</div>
+          	</div>
       </div><!--button end-->
-    </form><!--form end-->
+    </form><!--form  end-->
 
    </div> <!--modal body end-->
 </div><!-- /.modal -->
@@ -223,13 +175,11 @@ position:static;
 		<tr>
             <th scope="col">项目名称</th>
             <th scope="col">负责人</th>
-            <th scope="col">用户RW+</th>
-            <th scope="col">用户RW</th>
-            <th scope="col">组RW+</th>
-            <th scope="col">组RW</th>
-            {%if info and info.role ==0%}
+            <th scope="col">项目成员</th>
+            <th scope="col">项目组</th>
             <th scope="col">状态</th>
-            <th  scope="col">操作</th>
+            {%if info and info.role ==0%}
+            <th scope="col">操作</th>
             {%endif%}
         </tr>
     </thead> 
@@ -252,11 +202,8 @@ function list(){
     $.getJSON(url,function(data){
       // data = data['result']  //string
        data=JSON.parse(data['result']); //object 
-//       console.log(data)   //Object {count: 3, code: 0, result: Array[3]}
-       var count =  data['count']     
        var str = ''
        $.each(data.result,function(k,v){   //循环输出数组Array[3]的值
-//           console.log(v)   //Object {id: 1, name: "www.100xhs.com", path:"/www.100xhs.com",...} 
            if (v['is_lock'] == 0){
                v['is_lock'] ="正常"
                str +='<tr class="odd gradeX">'
@@ -266,21 +213,18 @@ function list(){
                str +='<tr style="color: red" class="odd gradeX">'
            }
            
-   //        str +='<tr class="odd gradeX">'+ 
-        str +='<td><div title="'+v['path']+'"><a href="'+v['path']+'">'+v['name']+'</a></div></td>'+  
+           str +='<td><div title="'+v['path']+'"><a href="'+v['path']+'">'+v['name']+'</a></div></td>'+  
            '<td>'+v['principal']+'</td>'+  
-           '<td>'+v['user_all_perm']+'</td>'+ 
-           '<td>'+v['user_rw_perm']+'</td>'+ 
-           '<td>'+v['group_all_perm']+'</td>'+ 
-           '<td>'+v['group_rw_perm']+'</td>'+'{%if info and info.role ==0%}'+ 
+           '<td>'+v['p_user']+'</td>'+ 
+           '<td>'+v['p_group']+'</td>'+ 
            '<td>'+v['is_lock']+'</td>'+ 
-           '<td>'+
+           '<td>'+ '{%if info and info.role ==0%}'+ 
            '<button class="btn btn-primary btn-sm update-btn" data-id="'+v['id']+'">更新</button>'+
            '</td>'+ '{%endif%}'
            '</tr>'          
        })       
          $("tbody").html(str)
-		datatable()
+ 		datatable()
     })
 }
 list()
@@ -306,7 +250,7 @@ $('#datatable').DataTable({
 });
 }
 /*  add data */
-/*click show modal*/
+/* click show modal */
 $('#addBtn').on('click',function(){
 		$('#addModal').modal('show')
 		userlist()
@@ -335,36 +279,84 @@ $('#addForm').on('submit',function(){
          });
    }else{
     $('#errorMsg').html('Failed:' +data['errmsg']).show()
-   }   //end if code
+   }   
 
-  })  //end post
+  })  
     return false
-})  //submit form
+})  
 
-/*get one data from id for update*/
+/* get one data from id for update */
 $('tbody').on('click','.update-btn',function(){
 	var id = $(this).attr('data-id')
     var url = "/getapi?method="+name+"&id="+id
-	selected('g_all_sel',id)
-	selected('g_rw_sel',id)
-	selected('u_all_sel',id)
-	selected('u_rw_sel',id)
-	selected('principal_sel',id)
-	grouplist()
 	$.getJSON(url,function(data){
-//	  console.log(data)  
       data = JSON.parse(data['result'])
       if (data['code']==0){
           $('#upid').val(data['result']['id'])
           $('#up_project_name').val(data['result']['name'])
 		  $('#up_project_path').val(data['result']['path'])
+          $('#up_is_lock').val(data['result']['is_lock'])
 		  $('#up_comment').val(data['result']['comment'])
-		$('#updateModal').modal('show')  //show modal
+	      $('#updateModal').modal('show')  //show modal
+          s_userlist(id)
+          s_grouplist(id)
+          s_principal(id)
       }else{
          swal("OMG!", data['errmsg'], "error"); 
       }
 	})
 })
+
+/*获取项目的负责人，拼接为下拉列表*/
+function s_principal(id){
+    var url = "/getapi?method=selected&id="+id+"&m_table=git&field=principal&s_table=user"
+    $.getJSON(url, function(data){
+        data=JSON.parse(data['result'])
+        var str=''
+        $.each(data.result, function(k,v){
+            str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
+             '</option>'
+        })
+        $("#up_p_principal").html(str)
+        $("#up_p_principal").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $("#up_p_principal").multiselect('refresh');
+    })
+}
+
+/*获取项目的成员，拼接为下拉列表*/
+function s_userlist(id){
+    var url = "/getapi?method=selected&id="+id+"&m_table=git&field=p_user&s_table=user"
+    $.getJSON(url, function(data){
+        data=JSON.parse(data['result'])
+        var str=''
+        $.each(data.result, function(k,v){
+            str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
+             '</option>'
+        })
+        $("#up_p_user").html(str)
+        $("#up_p_user").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $("#up_p_user").multiselect('refresh');
+    })
+}
+
+/*获取项目的组，拼接为下拉列表*/
+function s_grouplist(id){
+    var url = "/getapi?method=selected&id="+id+"&m_table=git&field=p_group&s_table=user_group"
+    $.getJSON(url, function(data){
+        data=JSON.parse(data['result'])
+        var str=''
+        $.each(data.result, function(k,v){
+            str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
+            '</option>'
+        })
+        $("#up_p_group").html(str)
+        $("#up_p_group").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $("#up_p_group").multiselect('refresh');
+    })
+}
+
+
+
 
 /*update data*/
 $('#updateForm').on('submit',function(){
@@ -402,9 +394,9 @@ function userlist(){
 		$.each(data.users, function(k,v){
 			str += '<option value="' + v['id'] +'">' + v['username'] + '</option>'
 		})
-		$(".user_list").html(str)
-		$(".user_list").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
-		$(".user_list").multiselect('refresh')
+		$("#p_user,#p_principal").html(str)
+		$("#p_user,#p_principal").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+		$("#p_user,#p_principal").multiselect('refresh')
 	})
 }
 
@@ -417,27 +409,11 @@ function grouplist(){
         $.each(data.result, function(k,v){
             str += '<option value="' + v['id'] +'">' + v['name'] + '</option>'
         })
-        $(".groups_list").html(str)
-		$(".groups_list").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
-        $(".groups_list").multiselect('refresh')
-    })
+        $("#p_group").html(str)
+		$("#p_group").multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
+        $("#p_group").multiselect('refresh')
+     })
 }
 
-//获取列表  已选上的标记
-function selected(api,id){
-	var url = "/getapi?method=selected"+"&selected="+api+"&id="+id
-	var up_id = "#up_"+api
-	$.getJSON(url,function(data){
-		var str=''
-		data = JSON.parse(data.result)
-        $.each(data.result,function(k,v){
-            str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
-            '</option>'
-        })
-        $(up_id).html(str)
-        $(up_id).multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
-        $(up_id).multiselect('refresh');
-    })	
-}
 </script>
 {% endblock %}

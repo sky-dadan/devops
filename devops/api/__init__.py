@@ -19,10 +19,11 @@ import services
 import manufact
 import user_perm
 import power
-import git
+import gits
 import pub
 import project_test
 import online
 import ext
 import opsjobs
 import rota
+import select

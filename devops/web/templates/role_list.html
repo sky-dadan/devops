@@ -212,20 +212,18 @@ function have_perm(){
 }
 
 function uphave_perm(id){
-	var url = "/getapi?method=selected&id="+id+"&selected=power_sel"
+    var url = "/getapi?method=selected&id="+id+"&m_table=user_group&field=p_id&s_table=permission"
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		var str=''
 		$.each(data.result, function(k,v){
-			console.log(k,v)
 			str +='<option value='+v['id']+" "+v['selected']+'>'+v['name']+
 			'</option>'
 		})
-		console.log(str)
 		$("#upp_id").html(str)
 		$('#upp_id').multiselect({maxHeight:200, enableCaseInsensitiveFiltering: true})
 		$('#upp_id').multiselect('refresh');
-		$('#updateModal').modal('show')  //show modal
+	 	$('#updateModal').modal('show')  //show modal
 	})
 
 }
@@ -236,7 +234,6 @@ $('#addBtn').on('click',function(){
 /* add data for ajax */ 
 $('#addForm').on('submit',function(){
 	   var str = $('#addForm').serialize()
-        console.log("str:",str)
        var data = {"method":name,"formdata":str}
 	   $.post("/addapi",data,function(data){
 	     console.log(data)    //string

@@ -316,7 +316,7 @@ $("tbody").on('click','.delete-btn',function(){
 
 //get usr groups for update
 function user_groups(id){
-	var url = "/getapi?method=selected&selected=groups_sel&id="+id
+	var url = "/getapi?method=selected&id="+id+"&m_table=user&field=r_id&s_table=user_group"
 	$.getJSON(url, function(data){
 		data=JSON.parse(data['result'])
 		var str=''

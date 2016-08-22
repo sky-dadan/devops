@@ -209,43 +209,39 @@ def group_members(users=None, groups=None, user_groups=None, db=None):
     return g
     #print group    #{'ios': ['admin', 'wd'], 'php': ['songpeng'], 'sa': ['admin', 'songpeng']} 
 
-def project_perm_id2name(project_perms=None, projects=None, users=None, groups=None, db=None):
+# 获取所有项目中用户成员(用户和组中的成员要去重),结果格式:{'devops':['wd','pc'],'test':['wd','rock']}
+def project_members(db=None):
     if db:
-        users = db.users
-        groups = db.groups
-        projects = db.projects
-        project_perms = db.project_perms
+        users = db.users     # {'1':'wd','2':'pc'}
+        groups = db.groups   #  # {'1':'sa','2':'dba','3':'dev'}
+        user_groups = db.user_groups   #  # {'1':'sa','2':'dba','3':'dev'}
+	group_users = group_members(users, groups, user_groups)  # {'sa': ['wd'], 'dba': ['wd','pc']}
+        result = db.get_results('git',['id','name','principal','p_user','p_group']) 
+        # result=[{'id':'1','name':'devops','principal':'1','p_user':'1,2','p_group':'1,3'},......]
+        pro_pri = {}     # 项目负责人对应项目的字典
+        projects = {}    # 项目成员对应项目的字典
+        for p in result:
+            projects.setdefault(p['name'],[])
+            pro_pri.setdefault(p['name'],[])
+            for pri in p['principal'].split(','):
+                if pri in users:
+                    projects[p['name']].append(users[pri]) 
+                    pro_pri[p['name'] ].append(users[pri]) 
+            for u in p['p_user'].split(','):
+                if u in users:
+                      projects[p['name']].append(users[u]) 
+            for g in p['p_group'].split(','):
+                if g in groups:
+                     # 由于r_users不保存空组的信息，但项目表可能选择了空组,故将空组默认位置为空列表
+                     projects[p['name']] += group_users.get(groups[g],[]) 
+            projects[p['name']] = list(set(projects[p['name']])) # 将p_user和p_group中的用户去重复
+            
+        return projects,pro_pri
 
-    prj = {}
-    for prj_id, perms in project_perms.items():
-        prj[projects[prj_id]] = {}
-        for k, v in [('user_all_perm', users), ('user_rw_perm', users), ('group_all_perm', groups), ('group_rw_perm', groups)]:
-            prj[projects[prj_id]][k] = [v[x] for x in perms[k] if x in v]
-    return prj
-
-def project_members(project_perms=None, group_users=None, db=None):
-    if db:
-        users = db.users
-        groups = db.groups
-        user_groups = db.user_groups
-        projects = db.projects
-        project_perms = db.project_perms
-        project_perms = project_perm_id2name(project_perms, projects, users, groups)
-        group_users = group_members(users, groups, user_groups)
-
-    prj = {}
-    for name, perms in project_perms.items():
-        prj[name] = set([])
-        for k in ('user_all_perm', 'user_rw_perm'):
-            prj[name] |= set(perms.get(k, []))
-        for k in ('group_all_perm', 'group_rw_perm'):
-            for x in perms[k]:
-                prj[name] |= set(group_users.get(x, []))
-    return prj
 
 #普通用户返回他所拥有权限的项目
 def user_projects(name, db):
-    members = project_members(db=db)
+    members = project_members(db=db)[0]
     projects = reverse_dict(db.projects)
     return dict([(projects[x], x) for x in members if name in members[x]])
 
@@ -258,8 +254,8 @@ class ProjectConfig:
 
         self._load_config()
 
-    #配置文件中以[[]]内标示主机，其余行为项目名，其中行以'#'开头的为注释行
-    #有效的第一行必须为主机项
+    # 配置文件中以[[]]内标示主机，其余行为项目名，其中行以'#'开头的为注释行
+    # 有效的第一行必须为主机项
     def _load_config(self):
         in_all = False
         for l in file(self.name):

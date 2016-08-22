@@ -150,6 +150,7 @@ class Cursor():
             id_num=len(field_id)
             result = self.get_results(table_name, ['id'], {'id': field_id})
             if id_num !=len(result): 
+                field_id = ','.join(list(set(field_id) - set([x['id'] for x in result])))
                 result=False
         else:
             result = self.get_one_result(table_name, ['id'], {'id': field_id})
@@ -196,7 +197,7 @@ class Cursor():
 
     @property
     def projects(self):
-        return self.getinfo('project', ['id', 'name'])
+        return self.getinfo('git', ['id', 'name'])
 
     @property
     def project_perms(self):

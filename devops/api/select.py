@@ -2,7 +2,7 @@
 #coding:utf-8
 from flask import request
 from . import app,jsonrpc
-import  utils
+import  util
 from auth import auth_login
 import json,time,traceback
 import logging
@@ -22,10 +22,9 @@ def selected(auth_info,**kwargs):
         res=res[field].split(',')  #eg: ['1','2']
         result = app.config['cursor'].get_results(s_table,['id','name'])
         for x in result: #eg: [{'id':1,'name':'sa'},{'id':2,'name':'php'}]
-           for r_id in res:
-               if r_id in str(x['id']): 
-                     x['selected'] = 'selected="selected"'
-        utils.write_log(username,"selected  %s  successfully" % s_table)
+           if str(x['id']) in res:
+               x['selected'] = 'selected="selected"'
+        util.write_log(username,"selected  %s  successfully" % s_table)
         return json.dumps({'code':0,'result':result})
     except:
         logging.getLogger().error('selected  error: %s' % traceback.format_exc())

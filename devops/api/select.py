@@ -24,6 +24,8 @@ def selected(auth_info,**kwargs):
         for x in result: #eg: [{'id':1,'name':'sa'},{'id':2,'name':'php'}]
            if str(x['id']) in res:
                x['selected'] = 'selected="selected"'
+           else:
+               x['selected'] = ' '
         util.write_log(username,"selected  %s  successfully" % s_table)
         return json.dumps({'code':0,'result':result})
     except:

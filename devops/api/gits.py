@@ -184,14 +184,11 @@ def gitolite():
                     str2 += " -  master = %s \n" %(' '.join(v)) # 项目成员无权操作master分支
                     str2 += " RW = %s \n" %(' '.join(v))        # 项目成员可以操作其他分支
             f.write(str2)
-        return {'code':0,'result':"git操作成功"}
-        '''
         res, msg=util.run_script_with_timeout("%s/git.sh" % app.config['script_path'])
         if res:
             return {'code':0,'result':"git操作成功"}
         else:
              return {'code':1, 'errmsg': "git更新配置文件失败"}
-         '''
     except:
         logging.getLogger().error("get config error: %s" % traceback.format_exc())
         return {'code':1,'errmsg':"写配置文件报错"}

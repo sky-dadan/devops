@@ -213,39 +213,22 @@ CREATE TABLE `permission` (
 -- Table structure for table `project`
 --
 
-DROP TABLE IF EXISTS `project`;
+DROP TABLE IF EXISTS `git`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `project` (
+CREATE TABLE `git` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(128) NOT NULL COMMENT '项目名',
-  `path` varchar(80) NOT NULL COMMENT '项目代码仓库路径',
-  `principal` int(10) unsigned NOT NULL COMMENT '负责人',
-  `tag` varchar(30) DEFAULT '关联标签',
+  `name` varchar(64) NOT NULL COMMENT '项目名',
+  `path` varchar(128) NOT NULL COMMENT '项目路径',
+  `principal` varchar(128) NOT NULL COMMENT '项目负责人',
+  `p_user` varchar(256) DEFAULT NULL COMMENT '项目成员',
+  `p_group` varchar(256) DEFAULT NULL COMMENT '项目组',
   `create_date` date NOT NULL COMMENT '创建时间',
-  `is_lock` tinyint(1) unsigned DEFAULT '0' COMMENT '是否锁定 0-未锁定 1-锁定',
-  `comment` varchar(256) DEFAULT NULL COMMENT '备注',
+  `is_lock` tinyint(1) unsigned DEFAULT '0' COMMENT '是否锁定',
+  `comment` varchar(256) DEFAULT NULL COMMENT '项目描述',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `project_perm`
---
-
-DROP TABLE IF EXISTS `project_perm`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `project_perm` (
-  `id` int(10) unsigned NOT NULL COMMENT '项目id',
-  `user_all_perm` varchar(80) DEFAULT '' COMMENT '全部权限的用户列表',
-  `group_all_perm` varchar(80) DEFAULT '' COMMENT '全部权限的用户组列表',
-  `user_rw_perm` varchar(80) DEFAULT '' COMMENT '读写权限的用户列表',
-  `group_rw_perm` varchar(80) DEFAULT '' COMMENT '读写权限的用户组列表',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `project_test`

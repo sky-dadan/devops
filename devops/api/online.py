@@ -52,7 +52,9 @@ def apply_create(auth_info, **kwargs):
         data['status'] = 1
         where = {"project_id":int(data['project_id'])}
         data.pop('project_username')  
-        res = app.config['cursor'].get_one_result('project_apply',['status'],where)
+        res = app.config['cursor'].get_one_result('project_apply',['status','apply_type'],where)
+        if res and res['apply_type'] == 1:   # 查询某个项目在上次申请的类型，如果为紧急则更新字段
+            data['last_apply_type'] = 1
         if res and res['status'] in (1, 2):
             return json.dumps({'code': 1, 'errmsg': '目前项目状态不可申请'})
         if res: 
@@ -100,7 +102,7 @@ def apply_one(auth_info,**kwargs):
         return json.dumps(auth_info)
     username = auth_info['username']
     try:
-        output = ['id','project_id','info','applicant','version','commit','apply_date','apply_type','status','detail']
+        output = ['id','project_id','info','applicant','version','commit','apply_date','apply_type','last_apply_type','status','detail']
         fields = kwargs.get('output', output)
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('project_apply',fields,where)

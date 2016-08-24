@@ -32,10 +32,10 @@ position:static;
       </div><!--modal-header end-->
    
     <div class="modal-body">
-    <p hidden id="errorMsg" class="text-danger" style="color:red"></p> <!-- foe error msg-->
+    <p id="errorMsg" class="text-danger" style="color:red"></p> <!-- for error msg-->
+    <p id="remind" class="text-danger" style="color:red"></p> <!-- for remind-->
     <form class="form-horizontal" id="addForm_emulation">
-        <input id='id' type="hidden" name='id'>
-        
+        <input id='id' type="hidden" name='id'> 
         <div class="form-grop">
             <label class="control-label">版本号</label>
             <div class="controls">
@@ -167,6 +167,10 @@ $('tbody').on('click','.emulation-btn', function(){
         data = JSON.parse(data['result'])
         if (data['code']==0){
             $('#id').val(data['result']['id'])
+            var last_apply_type = data['result']['last_apply_type']
+            if (last_apply_type == 1){
+                $('#remind').html("上次为紧急发布，请测试时注意")
+            }    
         }else{
             swal("OMG",data['errmsg'],"error");
         }

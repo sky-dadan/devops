@@ -88,7 +88,8 @@ def getapi():
     where = {'username':username} if id is None else {'id': id}
     #data['params'] = {'selected': selected, 'where': where, 'args': request.args}
     data['params'] = { 
-        "m_table":request.args.get('m_table',None),
+        'args': request.args,
+        'm_table':request.args.get('m_table',None),
         'field':request.args.get('field',None),
         's_table':request.args.get('s_table',None),
 	'where':where

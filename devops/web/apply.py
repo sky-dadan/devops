@@ -27,12 +27,11 @@ def project_apply():
         r = requests.post(get_url(),headers=headers,json=data)
         result = json.loads(r.text)
         result = json.loads(result['result'])
-        print result
 
         if int(result['code']) == 0:
             return render_template('apply.html',info=session,result=result['result'])
         else:
-            return render_template('apply.html',info=session,result=result['errmsg'])
+            return render_template('apply.html',errmsg=result['errmsg'])
     else:
         return render_template('apply.html',errmsg=validate_result['errmsg'])
 

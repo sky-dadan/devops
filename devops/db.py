@@ -161,7 +161,7 @@ class Cursor():
             return False 
 
 
-    def getinfo(self, table_name, fields):
+    def getinfo(self, table_name, fields, where=None):
         '''
         查询单个数据表内容，fields首字段为key
         fields为两个字段，返回{v1: v2, ...}，格式为 ['field1','field2'], 例如['id','name'],['name','r_id']
@@ -177,7 +177,7 @@ class Cursor():
 
         if len(fields) < 2:
             return None
-        result = self.get_results(table_name,fields)
+        result = self.get_results(table_name, fields, where)
         if len(fields) == 2:
             return dict([(str(x[fields[0]]), val(fields[1], x[fields[1]])) for x in result])
         else:
@@ -195,11 +195,6 @@ class Cursor():
     def user_groups(self):
         return self.getinfo('user', ['id', 'r_id'])
 
-    @property
-    def projects(self):
-        return self.getinfo('git', ['id', 'name'])
-
-    @property
-    def project_perms(self):
-        return self.getinfo('project_perm', ['id', 'group_all_perm', 'group_rw_perm', 'user_all_perm', 'user_rw_perm'])
+    def projects(self, where=None):
+        return self.getinfo('git', ['id', 'name'], where)
 

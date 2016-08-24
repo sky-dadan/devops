@@ -11,7 +11,7 @@ from user_perm import getid_list
 script_name='/usr/local/devops/devops/script/online/online.sh'
 
 def get_project_info(where):
-    id2name_project = app.config['cursor'].projects
+    id2name_project = app.config['cursor'].projects()
     res = app.config['cursor'].get_one_result('project_apply', ['project_id', 'version', 'commit', 'apply_type', 'status'], where)
     res['name'] = id2name_project[str(res['project_id'])]
     return res
@@ -82,7 +82,7 @@ def apply_list(auth_info,**kwargs):
         where = {'status':['1','2']}
         result = app.config['cursor'].get_results('project_apply',fields,where)
         #id转换成名字
-        id2name_project = app.config['cursor'].projects
+        id2name_project = app.config['cursor'].projects()
         for res in result:
             res['project_name'] = id2name_project[str(res['project_id'])] 
 
@@ -105,7 +105,7 @@ def apply_one(auth_info,**kwargs):
         where = kwargs.get('where',None)
         result = app.config['cursor'].get_one_result('project_apply',fields,where)
         #id转换成名字
-        id2name_project = app.config['cursor'].projects
+        id2name_project = app.config['cursor'].projects()
         result['project_name'] = id2name_project[str(result['project_id'])]
 
         util.write_log(username, 'get one apply detail success')
@@ -188,7 +188,7 @@ def project_attr(result):
     ret = []
     status2name = {1: '申请上线', 2: '上线审核', 3: '上线完成', 4: '上线取消'}
     #id转换成名字
-    id2name_project = app.config['cursor'].projects
+    id2name_project = app.config['cursor'].projects()
     for res in result:
         if str(res['project_id']) not in id2name_project:
             continue

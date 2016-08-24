@@ -242,8 +242,8 @@ def project_members(db=None):
 #普通用户返回他所拥有权限的项目
 def user_projects(name, db):
     members = project_members(db=db)[0]
-    projects = reverse_dict(db.projects)
-    return dict([(projects[x], x) for x in members if name in members[x]])
+    projects = reverse_dict(db.projects({'is_lock': 0}))
+    return dict([(projects[x], x) for x in members if name in members[x] and x in projects])
 
 class ProjectConfig:
     def __init__(self, config_filename):

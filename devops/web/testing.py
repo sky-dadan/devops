@@ -28,7 +28,7 @@ def testing():
         if int(result['code']) == 0:
             return render_template('testing.html',info=session,result=result['result'])
         else:
-            return render_template('testing.html',errmsg=validate_result['errmsg'])
+            return render_template('testing.html',errmsg=result['errmsg'])
     else:
         return render_template('testing.html',errmsg=validate_result['errmsg'])
 

@@ -129,7 +129,7 @@ def git_getlist(auth_info, **kwargs):
 
         # 管理员查询项目表，把项目表中p_uesr,p_group,principal的ID 转为name
         # 结果:[{'id':1,'name':'devops','principal':'pc','p_user':'pc,wd'....},......]
-        projects = app.config['cursor'].get_results('git', fields, where={'is_lock': 0})
+        projects = app.config['cursor'].get_results('git', fields)
         for p  in projects:  # 循环项目列表，判断项目表中的p_user的id是否存在，如果存在则id2name
             p['principal'] = id2name(users, p['principal'].split(','))
             p['p_user'] =  id2name(users, p['p_user'].split(','))

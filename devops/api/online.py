@@ -61,6 +61,7 @@ def apply_create(auth_info, **kwargs):
             app.config['cursor'].execute_update_sql('project_apply', data, where)
         else:
             app.config['cursor'].execute_insert_sql('project_apply', data)
+        data.pop('last_apply_type')
         app.config['cursor'].execute_insert_sql('project_deploy',data)  
         util.write_log(username,{'code':0,'result':'项目申请成功'})
         return json.dumps({'code':0,'result':'项目申请成功'})    

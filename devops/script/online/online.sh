@@ -79,7 +79,7 @@ function emu_prepare(){     #tag  commit  project_name  path($CLONE_DIR|$URGENT)
         echo "ERROR: 备份代码失败!"
         exit 2
     fi
-    /usr/bin/rsync -avz    --exclude=.git  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat  --exclude=assets/*/  $4$3/ $WORK_DIR$3
+    /usr/bin/rsync -avz    --exclude=.git  --include=assets/js --include=assets/css --include=assets/images --include=assets/wechat --include=assets/My97DatePicker --exclude=assets/*/  $4$3/ $WORK_DIR$3
     if [ $? -ne 0 ];then
         echo "ERROR: 仿真环境同步失败!"
         exit 2
@@ -104,11 +104,6 @@ function emulation(){
 
 #取消发布
 function cancel(){
-    if [ $# -lt 4 ];then
-        echo "Usage sh $0 cancel_flag project_name tag apply_type" 
-        exit
-    fi
-    echo $1  $2  $3  $4
     if [ $1 -eq 1 ];then
         #如果是没有经过灰度，点击取消，则什么都不需要操作
         echo "OK: 取消仿真发布成功"
@@ -122,6 +117,11 @@ function cancel(){
         echo "ERROR: 未知发布状态，取消发布失败"
         exit 2
     fi
+    if [ $# -lt 4 ];then
+        echo "Usage sh $0 cancel_flag project_name tag apply_type" 
+        exit
+    fi
+    echo $1  $2  $3  $4
     git tag -d $3
     if [ $? -ne 0 ];then
         echo "ERROR: 取消本地版本失败!"

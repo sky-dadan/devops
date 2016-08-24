@@ -129,7 +129,7 @@ def git_getlist(auth_info, **kwargs):
 
         # 管理员查询项目表，把项目表中p_uesr,p_group,principal的ID 转为name
         # 结果:[{'id':1,'name':'devops','principal':'pc','p_user':'pc,wd'....},......]
-        projects = app.config['cursor'].get_results('git', fields)
+        projects = app.config['cursor'].get_results('git', fields, where={'is_lock': 0})
         for p  in projects:  # 循环项目列表，判断项目表中的p_user的id是否存在，如果存在则id2name
             p['principal'] = id2name(users, p['principal'].split(','))
             p['p_user'] =  id2name(users, p['p_user'].split(','))
@@ -179,7 +179,7 @@ def gitolite():
                 # 由于projests中存放了项目所有的成员，包括负责人。需要把负责人剔除
                 v = list(set(v)-set(principal[k]))
                 str2 += "repo %s \n" % k
-                str2 += " RW+ = %s \n" % ' '.join(principal[k])   # 负责人的权限最大
+                str2 += " RW+ = admin %s \n" % ' '.join(principal[k])   # 负责人的权限最大
 		if v:
                     str2 += " -  master = %s \n" %(' '.join(v)) # 项目成员无权操作master分支
                     str2 += " RW = %s \n" %(' '.join(v))        # 项目成员可以操作其他分支

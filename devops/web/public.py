@@ -23,6 +23,10 @@ def Handleformdata(formdata):
         if x.find('=') <= 0:
             continue
         k, v = x.split('=', 1)
+        try:
+            v = urllib.unquote(v).encode('iso-8859-1')
+        except:
+           pass
         if k in res and isinstance(res[k], list):
             res[k].append(v)
         elif k in res:
@@ -67,11 +71,6 @@ def addapi():
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
 #    print repr(formdata)          #flask默认解码为unicode格式如： u'id=13&name=aa&remark=%E4%BD%A0%E5%A5%BD' 中文部分python无法解析 
-    try:
-        formdata = urllib.unquote(formdata).encode('iso-8859-1') #
-        #print repr(formdata)          #解码后中文为utf8格式： u'id=13&name=aa&remark==\xe4\xbd\xa0\xe5\xa5\xbd' 
-    except:
-       pass
     formdata = Handleformdata(formdata)
     data['method'] = method+".create"
     data['params']=formdata
@@ -104,10 +103,6 @@ def updateapi():
     headers['authorization'] = session['author']
     method = request.form.get('method')
     formdata = request.form.get('formdata')  #str
-    try:
-        formdata = urllib.unquote(formdata).encode('iso-8859-1')
-    except:
-       pass
     formdata = Handleformdata(formdata)
     data['method'] = method+".update"
     data['params'] = {

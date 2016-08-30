@@ -265,6 +265,7 @@ CREATE TABLE `project_apply` (
   `commit` varchar(64) NOT NULL COMMENT '代码最新版本',
   `apply_date` datetime NOT NULL COMMENT '申请时间',
   `apply_type` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发布类型，0为正常，1为紧急',
+  `last_apply_type` int(10) DEFAULT '0' COMMENT '上次发布类型',
   `status` int(10) DEFAULT 0 COMMENT '发布状态',
   `detail` text COMMENT '发布详情',
   PRIMARY KEY (`id`),

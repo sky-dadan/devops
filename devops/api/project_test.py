@@ -25,7 +25,7 @@ def project_test_create(auth_info, **kwargs):
 
         data = request.get_json()['params']
         #执行上线脚本
-        result = app.config['cursor'].get_one_result('project', ['name'], {'id': data['project_id']})
+        result = app.config['cursor'].get_one_result('git', ['name'], {'id': data['project_id']})
         if not result:
             return json.dumps({'code': 1, 'errmsg': '发布的项目不存在'})
         work_dir = os.path.dirname(os.path.realpath(sys.argv[0]))

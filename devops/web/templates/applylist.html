@@ -140,7 +140,8 @@ list()
 /* DataTable */
 function datatable(){
 $('#datatable').DataTable({
-	"bDestroy":true,
+    "bDestroy":true,
+    "order":  [3, 'desc'],
     "language": {
         "lengthMenu": "每页 _MENU_ 条记录",
         "zeroRecords": "没有找到记录",

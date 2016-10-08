@@ -97,9 +97,7 @@ def rota_getlist(auth_info,**kwargs):
             result = []
             # 今天
             today = datetime.date.today()
-            # 通过今天算出每周的周一
-            monday = today - datetime.timedelta(today.weekday())
-            sql = "SELECT %s FROM rota WHERE start_date >= '%s' ORDER BY start_date LIMIT 4" % (','.join(fields), monday)
+            sql = "SELECT %s FROM rota WHERE end_date >= '%s' ORDER BY end_date LIMIT 4" % (','.join(fields), today)
             app.config['cursor'].execute(sql)
             for item in app.config['cursor'].fetchall():
                 res = {}

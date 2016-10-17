@@ -187,8 +187,8 @@ function detail(id){
 //             alert(str)
             $('#detail_applypersion').html(data['result']['apply_persion'])
             $('#detail_applytime').html(data['result']['apply_date'])
-            $('#detail_applydesc').html(data['result']['apply_desc'])
-            $('#detail_dealdesc').html(data['result']['deal_desc'])
+            $('#detail_applydesc').html('<pre>'+data['result']['apply_desc']+'</pre>')
+            $('#detail_dealdesc').html('<pre>'+data['result']['deal_desc']+'</pre>')
         }else{
             swal("OMG", data['errmsg'],"error")
          }

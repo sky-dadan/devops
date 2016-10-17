@@ -193,7 +193,7 @@ function detail(id){
         if (data['code']==0){  
             str = '申请详情: '+ '\n'+data['result']['apply_desc']
 /*            alert(str)  */
-            $('#detail_applydesc').html(data['result']['apply_desc'])
+            $('#detail_applydesc').html('<pre>'+data['result']['apply_desc']+'</pre>')
         }else{
             swal("OMG", data['errmsg'],"error")
         }

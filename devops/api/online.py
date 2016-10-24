@@ -36,6 +36,8 @@ def apply_create(auth_info, **kwargs):
     role = int(auth_info['role'])
     try:
         data = request.get_json()['params']  #project_id,project_name,applicant,info,detail
+        if not data['info']  or not  data['detail']:
+            return json.dumps({'code': 1, 'errmsg': "发布简介和发布详情不能为空"})
         # 如果key 'apply_type'存在字典里，说明是紧急发布，不存在，是正常发布
         if 'apply_type' in data:
             data['apply_type'] = 1 # 紧急发布
